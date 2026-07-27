@@ -1254,6 +1254,22 @@ public class KeyPwdListFragment extends BaseFragment {
 		return params;
 	}
 
+	/**
+	 * 创建成功事件是否由本 Fragment 处理分享
+	 * <p>
+	 * KeyPwdManageActivity 下挂着「生效中」「待生效」两个 KeyPwdListFragment，
+	 * 且 EventBus 注册在 BaseFragment，两个实例都会收到同一条创建成功事件。
+	 * 不加区分的话分享面板会被拉起两次，故只由事件指定的目标 tab 处理。
+	 *
+	 * @param tabCategory 事件携带的目标 tab 位置（见 CreatePwdKeyActionInfo）
+	 */
+	private boolean isTargetTab(int tabCategory) {
+		int targetCategory = CreatePwdKeyActionInfo.TAB_CATEGORY_0 == tabCategory
+				? KeyPwdConstant.IKeyPwdCategory.KEY_PWD_CATEGORY_AVAILABLE
+				: KeyPwdConstant.IKeyPwdCategory.KEY_PWD_CATEGORY_NOT_ACTIVATED;
+		return mCurrentCategory == targetCategory;
+	}
+
 	public void showShare(final KeyPwd item) {
 		try {
 			Intent vIt = new Intent(Intent.ACTION_SEND);
@@ -1331,23 +1347,20 @@ public class KeyPwdListFragment extends BaseFragment {
 
 			refreshData();
 			CreatePwdKeyActionInfo createPwdKeyActionInfo = (CreatePwdKeyActionInfo) event.obj;
-			if (null != createPwdKeyActionInfo && createPwdKeyActionInfo.isShare()) {
+			if (null != createPwdKeyActionInfo) {
 				if (mActivity instanceof KeyPwdManageActivity) {
 					KeyPwdManageActivity keyPwdManageActivity = (KeyPwdManageActivity) mActivity;
 					keyPwdManageActivity.setCurrentTab(createPwdKeyActionInfo.getTabCategory());
 				}
-				showShareBTKey(createPwdKeyActionInfo.getShareUrl());
-			} else {
-				if (mActivity instanceof KeyPwdManageActivity) {
-					KeyPwdManageActivity keyPwdManageActivity = (KeyPwdManageActivity) mActivity;
-					keyPwdManageActivity.setCurrentTab(createPwdKeyActionInfo.getTabCategory());
+				if (createPwdKeyActionInfo.isShare() && isTargetTab(createPwdKeyActionInfo.getTabCategory())) {
+					showShareBTKey(createPwdKeyActionInfo.getShareUrl());
 				}
 			}
 		} else if (Event.EventType.CREATE_PWD_SUCCESS == event.type) {
 			refreshData();
 			if (null != event.obj) {
 				CreatePwdKeyActionInfo createPwdKeyActionInfo = (CreatePwdKeyActionInfo) event.obj;
-				if (createPwdKeyActionInfo.isShare()) {
+				if (createPwdKeyActionInfo.isShare() && isTargetTab(createPwdKeyActionInfo.getTabCategory())) {
 					showShare(createPwdKeyActionInfo.getKeyPwd());
 				}
 				if (mActivity instanceof KeyPwdManageActivity) {

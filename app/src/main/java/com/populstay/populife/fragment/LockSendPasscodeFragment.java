@@ -665,7 +665,7 @@ public class LockSendPasscodeFragment extends BaseFragment implements View.OnCli
 							//toast(R.string.note_password_exist);
 							showShareKeyDialog(keyboardPwd);
 						} else {
-							toast(R.string.note_passcode_customize_fail);
+							toastServerFail(R.string.note_passcode_customize_fail, code, result.getString("msg"));
 						}
 					}
 				}).failure(new IFailure() {
@@ -678,6 +678,22 @@ public class LockSendPasscodeFragment extends BaseFragment implements View.OnCli
 				.build()
 				.post();
 
+	}
+
+	/**
+	 * 服务端返回失败时的提示：在原文案后附带 code / msg
+	 * 线上无远程日志，只能靠用户截图定位，故必须把服务端返回原样吐出来
+	 *
+	 * @param tipRes 原有的失败文案
+	 * @param code   服务端返回码
+	 * @param msg    服务端返回的错误描述，可能为空
+	 */
+	private void toastServerFail(int tipRes, int code, String msg) {
+		String tip = getString(tipRes) + " (" + code;
+		if (!StringUtil.isBlank(msg)) {
+			tip += ": " + msg;
+		}
+		toast(tip + ")");
 	}
 
 	public boolean isPasscodeGenerated() {
@@ -793,7 +809,7 @@ public class LockSendPasscodeFragment extends BaseFragment implements View.OnCli
 							showShareKeyDialog(passcodeInfo.getString("keyboardPwd"));
 
 						} else {
-							toast(R.string.create_password_fail);
+							toastServerFail(R.string.create_password_fail, code, result.getString("msg"));
 						}
 					}
 				})
