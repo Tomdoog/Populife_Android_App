@@ -1105,4 +1105,32 @@
     <string name="notification_push_title">Avvisi Messaggi</string>
     <string name="use_gateway_unlock_by_default">Usa sblocco gateway per impostazione predefinita</string>
     <string name="crash_exit">Errore del programma, uscita</string>
+
+    <!-- 未同步设备弹窗 -->
+    <string name="unsync_dialog_title">Completa la sincronizzazione del dispositivo</string>
+    <string name="unsync_dialog_body">Questo dispositivo è associato, ma non è ancora sincronizzato con il tuo account. Tocca Sincronizza ora. Se la sincronizzazione continua a non riuscire, controlla la connessione e riavvia l’app.</string>
+    <string name="unsync_dialog_checkbox">Non ricordarmi più di sincronizzare questo dispositivo</string>
+    <string name="unsync_dialog_later">Più tardi</string>
+    <string name="unsync_dialog_sync_now">Sincronizza ora</string>
+    <string name="unsync_sync_success">Sincronizzazione riuscita</string>
+    <string name="unsync_fail_network">Connessione di rete non disponibile</string>
+    <string name="unsync_fail_business">Sincronizzazione non riuscita. Riavvia l’app.</string>
+
+    <!-- 导出日志 -->
+    <string name="log_export">Esporta log</string>
+    <string name="log_export_none">Nessun log da esportare</string>
+    <string name="log_export_preparing">Preparazione dei log…</string>
+    <string name="log_export_fail">Esportazione non riuscita</string>
+    <string name="log_export_share_title">Invia log</string>
+
+    <!-- 删除设备异常态 -->
+    <string name="delete_result_unknown_tip">Esito della rimozione incerto. Conferma lo stato del dispositivo nei dettagli.</string>
+    <string name="delete_pending_account_tip">Dispositivo ripristinato ma non rimosso dall\'account. Completa la rimozione nei dettagli.</string>
+    <string name="delete_dlg_a_title">Completa la rimozione del dispositivo</string>
+    <string name="delete_dlg_a_body">Questo dispositivo è stato ripristinato ma non rimosso dal tuo account. Rimuovilo ora per completare.</string>
+    <string name="delete_dlg_b_title">Conferma lo stato del dispositivo</string>
+    <string name="delete_dlg_b_body">Una precedente rimozione del dispositivo è stata interrotta. Se il dispositivo può essere sbloccato con la password iniziale, rimuovilo dall\'account prima di aggiungerlo di nuovo.</string>
+    <string name="delete_dlg_remove">Rimuovi</string>
+    <string name="delete_dlg_later">Più tardi</string>
+    <string name="delete_removed_success">Dispositivo rimosso correttamente</string>
 </resources>

@@ -41,6 +41,7 @@ import com.populstay.populife.constant.Constant;
 import com.populstay.populife.db.PopulifeDBUtil;
 import com.populstay.populife.entity.OfflineLock;
 import com.populstay.populife.eventbus.Event;
+import com.populstay.populife.helper.OfflineLockUploader;
 import com.populstay.populife.home.HomeListActivity;
 import com.populstay.populife.me.PersonalCenterActivity;
 import com.populstay.populife.me.ServiceSupportActivity;
@@ -255,6 +256,8 @@ public class MainMeFragment extends BaseVisibilityFragment implements View.OnCli
 	@Override
 	public void onResume() {
 		super.onResume();
+		// Me 页刷新时,尝试补传未同步设备
+		OfflineLockUploader.getInstance().tryUploadAll("me");
 		List<OfflineLock> lockList = PopulifeDBUtil.getInstance(BaseApplication.getApplication()).queryByUserId(PeachPreference.readUserId());
 		if (null != lockList && !lockList.isEmpty()) {
 			mLlUnsyncedDevicesContainer.setVisibility(View.VISIBLE);

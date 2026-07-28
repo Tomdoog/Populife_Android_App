@@ -1102,4 +1102,32 @@
     <string name="use_gateway_unlock_by_default">Use gateway unlock by default</string>
     <string name="device_init_loading">Connecting…</string>
     <string name="crash_exit">Program error, exiting</string>
+
+    <!-- 未同步设备弹窗 -->
+    <string name="unsync_dialog_title">Finish Device Sync</string>
+    <string name="unsync_dialog_body">This device is paired but hasn’t synced to your account. Tap Sync now. If sync keeps failing, check your connection and restart the app.</string>
+    <string name="unsync_dialog_checkbox">Don’t remind me to sync this device again</string>
+    <string name="unsync_dialog_later">Later</string>
+    <string name="unsync_dialog_sync_now">Sync now</string>
+    <string name="unsync_sync_success">Sync successful</string>
+    <string name="unsync_fail_network">Network connection unavailable</string>
+    <string name="unsync_fail_business">Sync failed. Please restart the app.</string>
+
+    <!-- 导出日志 -->
+    <string name="log_export">Export Logs</string>
+    <string name="log_export_none">No logs to export</string>
+    <string name="log_export_preparing">Preparing logs...</string>
+    <string name="log_export_fail">Export failed</string>
+    <string name="log_export_share_title">Send logs</string>
+
+    <!-- 删除设备异常态 -->
+    <string name="delete_result_unknown_tip">Removal result unclear. Please confirm the device status in device details.</string>
+    <string name="delete_pending_account_tip">Device was reset but not removed from your account. Finish removal in device details.</string>
+    <string name="delete_dlg_a_title">Complete Device Removal</string>
+    <string name="delete_dlg_a_body">This device was reset but wasn\'t removed from your account. Remove it now to finish.</string>
+    <string name="delete_dlg_b_title">Confirm Device Status</string>
+    <string name="delete_dlg_b_body">A previous device removal was interrupted. If the device can be unlocked with its initial password, remove it from your account before adding it again.</string>
+    <string name="delete_dlg_remove">Remove</string>
+    <string name="delete_dlg_later">Later</string>
+    <string name="delete_removed_success">Lock removed successfully</string>
 </resources>

@@ -23,6 +23,8 @@ import com.populstay.populife.entity.Gateway;
 import com.populstay.populife.entity.Key;
 import com.populstay.populife.entity.OfflineLock;
 import com.populstay.populife.eventbus.Event;
+import com.populstay.populife.helper.OfflineLockUploader;
+import com.populstay.populife.helper.UnsyncedDeviceDialog;
 import com.populstay.populife.home.entity.HomeDevice;
 import com.populstay.populife.home.entity.HomeDeviceInfo;
 import com.populstay.populife.net.RestClient;
@@ -36,6 +38,7 @@ import com.populstay.populife.util.string.StringUtil;
 import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.WeakHashMap;
 
@@ -85,11 +88,28 @@ public class OfflineLockListActivity extends BaseActivity {
 		mAdapter.setOnSyncButtonClickListener(new OfflineLockListAdapter.OnSyncButtonClickListener() {
 			@Override
 			public void onSyncClick(int position, OfflineLock lock) {
-				if (lock.getLockType() < 0){
-					initializeMHTLock(lock.getLockDataJson());
-				}else {
-					initializeKJXLock(lock.getLockDataJson());
-				}
+				// 统一走同步入口:与后台自动同步共享并发锁与去重逻辑,避免重复初始化
+				showLoading();
+				OfflineLockUploader.getInstance().syncOne(lock, new OfflineLockUploader.SyncCallback() {
+					@Override
+					public void onSuccess(OfflineLock l, JSONObject data) {
+						stopLoading();
+						toast(R.string.sync_successfully);
+						refreshLocalList();
+						if (data != null) {
+							// 同步成功:进入设备结果/设置页(设名称、选空间、看管理员密码)
+							UnsyncedDeviceDialog.openSuccessPage(OfflineLockListActivity.this, l, data);
+						}
+					}
+
+					@Override
+					public void onFail(OfflineLock l, int failType) {
+						stopLoading();
+						toast(failType == OfflineLockUploader.FAIL_NETWORK
+								? R.string.unsync_fail_network
+								: R.string.unsync_fail_business);
+					}
+				});
 			}
 		});
 
@@ -133,6 +153,11 @@ public class OfflineLockListActivity extends BaseActivity {
 								mKey.setLockVersion(lockInfo.toJSONString());
 							}
 
+							// 免钥匙密码(成功页展示的"管理员密码")必须从云端响应里取:
+							// 本地 lockDataJson 中没有该字段,漏取会导致成功页密码为空(与首次绑定流程保持一致)
+							if (data.containsKey("noKeyPwd")) {
+								mKey.setNoKeyPwd(data.getString("noKeyPwd"));
+							}
 							mKey.setLockId(mLockId);
 							mBattery = (int) requestParams.get("electricQuantity");
 							mHomeDevice.setDeviceId(String.valueOf(mLockId));
@@ -308,6 +333,8 @@ public class OfflineLockListActivity extends BaseActivity {
 			mKey.setUserKeyId(lockInfo.getInteger("userKeyId"));
 		}
 
+		// Retrofit 的 FieldMap 不接受 null 值(否则抛 "Field map contained null value" 走 onFailure),剔除 null 项再提交
+		params.values().removeAll(Collections.singleton(null));
 		return params;
 	}
 
@@ -367,9 +394,24 @@ public class OfflineLockListActivity extends BaseActivity {
 			mKey.setUserKeyId(lockInfo.getInteger("userKeyId"));
 		}
 		mKey.setUserKeyId(2222);
+		// Retrofit 的 FieldMap 不接受 null 值(否则抛 "Field map contained null value" 走 onFailure),剔除 null 项再提交
+		params.values().removeAll(Collections.singleton(null));
 		return params;
 	}
 
+
+	/** 同步完成后刷新未同步设备列表(已成功上传的记录会被移除) */
+	private void refreshLocalList() {
+		mLockList.clear();
+		List<OfflineLock> list = PopulifeDBUtil.getInstance(getApplicationContext())
+				.queryByUserId(PeachPreference.readUserId());
+		if (null != list) {
+			mLockList.addAll(list);
+		}
+		if (null != mAdapter) {
+			mAdapter.notifyDataSetChanged();
+		}
+	}
 
 	private void getIntentData() {
 		Intent data = getIntent();

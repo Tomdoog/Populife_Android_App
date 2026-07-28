@@ -20,6 +20,9 @@ import com.populstay.populife.activity.PDFActivity;
 import com.populstay.populife.base.BaseVisibilityFragment;
 import com.populstay.populife.common.Urls;
 import com.populstay.populife.eventbus.Event;
+import com.populstay.populife.entity.OfflineLock;
+import com.populstay.populife.helper.OfflineLockUploader;
+import com.populstay.populife.helper.UnsyncedDeviceDialog;
 import com.populstay.populife.home.HomeListActivity;
 import com.populstay.populife.home.entity.Home;
 import com.populstay.populife.net.RestClient;
@@ -205,6 +208,13 @@ public class MainLockFragment extends BaseVisibilityFragment {
 	protected void onVisibilityChanged(boolean visible) {
 		super.onVisibilityChanged(visible);
 		if (visible) {
+			// 首页重新可见时先尝试补传;补传结束后若仍有同步失败的设备,再弹窗兜底提醒
+			OfflineLockUploader.getInstance().tryUploadAll("lockHome", new Runnable() {
+				@Override
+				public void run() {
+					checkUnsyncedDeviceDialog();
+				}
+			});
 
 			final String sharePreId = PeachPreference.getShareKeyPreId();
 			if (!TextUtils.isEmpty(sharePreId)){
@@ -226,6 +236,29 @@ public class MainLockFragment extends BaseVisibilityFragment {
 
 			// 刷新子 fragment 页面
 			refreshChildFragment();
+		}
+	}
+
+	/**
+	 * 兜底提醒:自动补传结束后仍存在同步失败的设备时,在首页弹窗提示用户手动同步。
+	 * 自动同步失败时不当场打扰用户(只记录状态),留到回到首页时再提醒。
+	 */
+	private void checkUnsyncedDeviceDialog() {
+		if (getActivity() == null || getActivity().isFinishing()) {
+			return;
+		}
+		if (UnsyncedDeviceDialog.isShowing()) {
+			return;
+		}
+		List<OfflineLock> list = OfflineLockUploader.getInstance().queryLocalList(PeachPreference.readUserId());
+		if (list == null || list.isEmpty()) {
+			return;
+		}
+		for (OfflineLock lock : list) {
+			if (UnsyncedDeviceDialog.shouldShow(lock)) {
+				UnsyncedDeviceDialog.show(getActivity(), lock);
+				return;
+			}
 		}
 	}
 

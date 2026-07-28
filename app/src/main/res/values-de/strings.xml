@@ -1105,4 +1105,32 @@
     <string name="notification_push_title">Nachrichtenwarnungen</string>
     <string name="use_gateway_unlock_by_default">Gateway-Entsperrung als Standard verwenden</string>
     <string name="crash_exit">Programmfehler, wird beendet</string>
+
+    <!-- 未同步设备弹窗 -->
+    <string name="unsync_dialog_title">Gerätesynchronisierung abschließen</string>
+    <string name="unsync_dialog_body">Dieses Gerät ist gekoppelt, aber noch nicht mit deinem Konto synchronisiert. Tippe auf Jetzt synchronisieren. Wenn die Synchronisierung weiterhin fehlschlägt, prüfe deine Verbindung und starte die App neu.</string>
+    <string name="unsync_dialog_checkbox">Nicht mehr an die Synchronisierung dieses Geräts erinnern</string>
+    <string name="unsync_dialog_later">Später</string>
+    <string name="unsync_dialog_sync_now">Jetzt synchronisieren</string>
+    <string name="unsync_sync_success">Synchronisierung erfolgreich</string>
+    <string name="unsync_fail_network">Netzwerkverbindung nicht verfügbar</string>
+    <string name="unsync_fail_business">Synchronisierung fehlgeschlagen. Bitte starte die App neu.</string>
+
+    <!-- 导出日志 -->
+    <string name="log_export">Protokolle exportieren</string>
+    <string name="log_export_none">Keine Protokolle zum Exportieren</string>
+    <string name="log_export_preparing">Protokolle werden vorbereitet…</string>
+    <string name="log_export_fail">Export fehlgeschlagen</string>
+    <string name="log_export_share_title">Protokolle senden</string>
+
+    <!-- 删除设备异常态 -->
+    <string name="delete_result_unknown_tip">Entfernungsergebnis unklar. Bitte bestätige den Gerätestatus in den Gerätedetails.</string>
+    <string name="delete_pending_account_tip">Gerät zurückgesetzt, aber nicht aus dem Konto entfernt. Schließe die Entfernung in den Gerätedetails ab.</string>
+    <string name="delete_dlg_a_title">Geräteentfernung abschließen</string>
+    <string name="delete_dlg_a_body">Dieses Gerät wurde zurückgesetzt, aber nicht aus deinem Konto entfernt. Entferne es jetzt, um abzuschließen.</string>
+    <string name="delete_dlg_b_title">Gerätestatus bestätigen</string>
+    <string name="delete_dlg_b_body">Eine frühere Geräteentfernung wurde unterbrochen. Wenn das Gerät mit dem Initialpasswort entsperrt werden kann, entferne es aus deinem Konto, bevor du es erneut hinzufügst.</string>
+    <string name="delete_dlg_remove">Entfernen</string>
+    <string name="delete_dlg_later">Später</string>
+    <string name="delete_removed_success">Gerät erfolgreich entfernt</string>
 </resources>

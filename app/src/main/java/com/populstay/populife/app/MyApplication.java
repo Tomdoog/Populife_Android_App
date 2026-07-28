@@ -2,7 +2,13 @@ package com.populstay.populife.app;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.Application;
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
+import android.net.NetworkRequest;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.Log;
@@ -23,6 +29,7 @@ import com.populstay.populife.entity.OfflineLock;
 import com.populstay.populife.entity.PPLBleSession;
 import com.populstay.populife.enumtype.Operation;
 import com.populstay.populife.eventbus.Event;
+import com.populstay.populife.helper.OfflineLockUploader;
 import com.populstay.populife.ui.loader.PeachLoader;
 import com.populstay.populife.util.date.DateUtil;
 import com.populstay.populife.util.log.PeachLogger;
@@ -567,6 +574,76 @@ public class MyApplication extends BaseApplication {
 		MultiDex.install(this);
 		init();
 		initBleLock();
+		registerNetworkCallback();
+		registerForegroundWatcher();
+	}
+
+	/**
+	 * 监听 App 回到前台:此时尝试补传未同步设备。
+	 * (冷启动首个 Activity 也会触发一次,与 MainActivity 的触发由上传器内的并发锁去重)
+	 */
+	private void registerForegroundWatcher() {
+		registerActivityLifecycleCallbacks(new Application.ActivityLifecycleCallbacks() {
+			private int mStartedCount = 0;
+
+			@Override
+			public void onActivityStarted(Activity activity) {
+				if (mStartedCount++ == 0) {
+					OfflineLockUploader.getInstance().tryUploadAll("foreground");
+				}
+			}
+
+			@Override
+			public void onActivityStopped(Activity activity) {
+				if (--mStartedCount < 0) {
+					mStartedCount = 0;
+				}
+			}
+
+			@Override
+			public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
+			}
+
+			@Override
+			public void onActivityResumed(Activity activity) {
+			}
+
+			@Override
+			public void onActivityPaused(Activity activity) {
+			}
+
+			@Override
+			public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
+			}
+
+			@Override
+			public void onActivityDestroyed(Activity activity) {
+			}
+		});
+	}
+
+	/**
+	 * 注册全局网络监听:网络恢复可用时,自动补传未上传到云端的设备。
+	 */
+	private void registerNetworkCallback() {
+		try {
+			ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+			if (cm == null) {
+				return;
+			}
+			NetworkRequest request = new NetworkRequest.Builder()
+					.addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+					.build();
+			cm.registerNetworkCallback(request, new ConnectivityManager.NetworkCallback() {
+				@Override
+				public void onAvailable(Network network) {
+					super.onAvailable(network);
+					OfflineLockUploader.getInstance().tryUploadAll("network");
+				}
+			});
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	private void init() {

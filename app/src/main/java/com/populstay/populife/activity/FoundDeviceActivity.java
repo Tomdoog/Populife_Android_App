@@ -60,6 +60,7 @@ import com.ttlock.bl.sdk.entity.LockVersion;
 import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.WeakHashMap;
 
@@ -573,7 +574,7 @@ public class FoundDeviceActivity extends BaseActivity implements AdapterView.OnI
 					@Override
 					public void onFailure() {
 						PeachLogger.d(TAG + " initializeLock 提交失败 onFailure");
-						resetLock();
+						keepForRetry();
 						stopLoading();
 						//customProgress.cancel();
 						toast(R.string.note_lock_init_fail);
@@ -583,7 +584,7 @@ public class FoundDeviceActivity extends BaseActivity implements AdapterView.OnI
 					@Override
 					public void onError(int code, String msg) {
 						PeachLogger.d(TAG + " initializeLock 提交失败 onError");
-						resetLock();
+						keepForRetry();
 						stopLoading();
 						//customProgress.cancel();
 						toast(R.string.note_lock_init_fail);
@@ -653,7 +654,7 @@ public class FoundDeviceActivity extends BaseActivity implements AdapterView.OnI
 					@Override
 					public void onFailure() {
 						PeachLogger.d(TAG + " initializeLock 提交失败 onFailure");
-						resetLock();
+						keepForRetry();
 						stopLoading();
 						//customProgress.cancel();
 						toast(R.string.note_lock_init_fail);
@@ -663,7 +664,7 @@ public class FoundDeviceActivity extends BaseActivity implements AdapterView.OnI
 					@Override
 					public void onError(int code, String msg) {
 						PeachLogger.d(TAG + " initializeLock 提交失败 onError");
-						resetLock();
+						keepForRetry();
 						stopLoading();
 						//customProgress.cancel();
 						toast(R.string.note_lock_init_fail);
@@ -674,7 +675,19 @@ public class FoundDeviceActivity extends BaseActivity implements AdapterView.OnI
 	}
 
 	/**
-	 * 上传失败，重置锁，数据回滚
+	 * 网络类上传失败(断网/超时/服务端未明确拒绝):不重置物理锁、保留本地待上传记录,
+	 * 等联网后由 OfflineLockUploader 自动补传。
+	 *
+	 * 注意:此处绝不能调 resetLock() —— 一旦重置物理锁,本地那份 lockData 立即作废,
+	 * 后续补传只会在云端造出一把"列表里有、实际打不开"的幽灵锁。
+	 */
+	private void keepForRetry() {
+		PeachLogger.d(TAG + " 上传失败(网络类),保留锁绑定与本地记录,等待自动补传");
+		AddDeviceFailActivity.actionStart(this, mLockType);
+	}
+
+	/**
+	 * 上传失败，重置锁，数据回滚(仅用于服务端明确拒绝的业务失败)
 	 */
 	private void resetLock() {
 		PeachLogger.d(TAG + " reset 上传失败，重置锁，数据回滚");
@@ -691,8 +704,11 @@ public class FoundDeviceActivity extends BaseActivity implements AdapterView.OnI
             mTTLockAPI.resetLock(mKey.getLockData(), mKey.getLockMac(),new ResetLockCallback() {
                 @Override
                 public void onResetLockSuccess() {
-//                    makeToast("-lock is reset and now upload to  server -");
-//                    uploadResetLock2Server();
+                    // 物理锁已被重置,本地那份 lockData 随之作废;必须同步删掉本地待上传记录,
+                    // 否则后续手动 Sync / 自动上传会把失效数据传上云端,造出一把"列表里有、实际打不开"的幽灵锁
+                    PopulifeDBUtil.getInstance(BaseApplication.getApplication())
+                            .deleteByUserAndMac(mKey.getUserId(), mKey.getLockMac());
+                    PeachLogger.d(TAG + " reset 成功,已删除本地待上传记录 " + mKey.getLockMac());
                 }
 
                 @Override
@@ -747,6 +763,8 @@ public class FoundDeviceActivity extends BaseActivity implements AdapterView.OnI
 			mKey.setUserKeyId(lockInfo.getInteger("userKeyId"));
 		}
 
+		// Retrofit 的 FieldMap 不接受 null 值(否则抛 "Field map contained null value" 走 onFailure),剔除 null 项再提交
+		params.values().removeAll(Collections.singleton(null));
 		return params;
 	}
 
@@ -807,6 +825,8 @@ public class FoundDeviceActivity extends BaseActivity implements AdapterView.OnI
 			mKey.setUserKeyId(lockInfo.getInteger("userKeyId"));
 		}
 		mKey.setUserKeyId(2222);
+		// Retrofit 的 FieldMap 不接受 null 值(否则抛 "Field map contained null value" 走 onFailure),剔除 null 项再提交
+		params.values().removeAll(Collections.singleton(null));
 		return params;
 	}
 

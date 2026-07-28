@@ -1103,4 +1103,32 @@
     <string name="notification_push_title">メッセージアラート</string>
     <string name="use_gateway_unlock_by_default">デフォルトでゲートウェイ解錠を使用する</string>
     <string name="crash_exit">プログラムエラー、終了します</string>
+
+    <!-- 未同步设备弹窗 -->
+    <string name="unsync_dialog_title">デバイスの同期を完了</string>
+    <string name="unsync_dialog_body">このデバイスはペアリング済みですが、まだアカウントに同期されていません。今すぐ同期をタップしてください。同期できない場合は、ネットワーク接続を確認し、アプリを再起動してください。</string>
+    <string name="unsync_dialog_checkbox">このデバイスの同期について再度通知しない</string>
+    <string name="unsync_dialog_later">後で</string>
+    <string name="unsync_dialog_sync_now">今すぐ同期</string>
+    <string name="unsync_sync_success">同期しました</string>
+    <string name="unsync_fail_network">ネットワーク接続を利用できません</string>
+    <string name="unsync_fail_business">同期に失敗しました。アプリを再起動してください。</string>
+
+    <!-- 导出日志 -->
+    <string name="log_export">ログをエクスポート</string>
+    <string name="log_export_none">エクスポートできるログがありません</string>
+    <string name="log_export_preparing">ログを準備しています…</string>
+    <string name="log_export_fail">エクスポートに失敗しました</string>
+    <string name="log_export_share_title">ログを送信</string>
+
+    <!-- 删除设备异常态 -->
+    <string name="delete_result_unknown_tip">削除結果が未確認です。デバイス詳細で状態を確認してください。</string>
+    <string name="delete_pending_account_tip">デバイスはリセットされましたが、アカウントから削除されていません。デバイス詳細で完了してください。</string>
+    <string name="delete_dlg_a_title">デバイスの削除を完了</string>
+    <string name="delete_dlg_a_body">このデバイスはリセットされましたが、アカウントから削除されていません。今すぐ削除して完了してください。</string>
+    <string name="delete_dlg_b_title">デバイスの状態を確認</string>
+    <string name="delete_dlg_b_body">前回のデバイス削除が中断されました。デバイスが初期パスワードで解錠できる場合は、アカウントから削除してから再度追加してください。</string>
+    <string name="delete_dlg_remove">削除</string>
+    <string name="delete_dlg_later">後で</string>
+    <string name="delete_removed_success">デバイスを削除しました</string>
 </resources>

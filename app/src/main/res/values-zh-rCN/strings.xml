@@ -1102,4 +1102,32 @@
     <string name="use_gateway_unlock_by_default">默认使用网关解锁</string>
     <string name="device_init_loading">正在连接设备…</string>
     <string name="crash_exit">程序出错，即将退出</string>
+
+    <!-- 未同步设备弹窗 -->
+    <string name="unsync_dialog_title">处理未同步设备</string>
+    <string name="unsync_dialog_body">设备已绑定，但还没有同步到您的账号。点击立即同步。若一直无法同步，请确认网络连接稳定，并重启 App。</string>
+    <string name="unsync_dialog_checkbox">不再提醒我同步此设备</string>
+    <string name="unsync_dialog_later">稍后</string>
+    <string name="unsync_dialog_sync_now">立即同步</string>
+    <string name="unsync_sync_success">同步成功</string>
+    <string name="unsync_fail_network">网络连接不可用</string>
+    <string name="unsync_fail_business">同步失败，请重启 App</string>
+
+    <!-- 导出日志 -->
+    <string name="log_export">导出日志</string>
+    <string name="log_export_none">暂无可导出的日志</string>
+    <string name="log_export_preparing">正在打包日志…</string>
+    <string name="log_export_fail">导出失败</string>
+    <string name="log_export_share_title">发送日志</string>
+
+    <!-- 删除设备异常态 -->
+    <string name="delete_result_unknown_tip">删除结果未确认,请在设备详情中确认设备状态</string>
+    <string name="delete_pending_account_tip">设备已重置,但尚未从账号移除,请在设备详情中完成移除</string>
+    <string name="delete_dlg_a_title">完成设备移除</string>
+    <string name="delete_dlg_a_body">设备已恢复出厂设置,但尚未从您的账号中移除。立即移除后,设备将不再显示在 App 中。</string>
+    <string name="delete_dlg_b_title">确认设备状态</string>
+    <string name="delete_dlg_b_body">上次删除被中断。如果设备可以用初始化密码开锁,请先从账号移除,再重新添加。</string>
+    <string name="delete_dlg_remove">从账号移除</string>
+    <string name="delete_dlg_later">稍后</string>
+    <string name="delete_removed_success">设备已移除</string>
 </resources>

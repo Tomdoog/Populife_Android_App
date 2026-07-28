@@ -64,9 +64,11 @@ public class Urls {
 	public static final String LOCK_INIT = "lock/init/v3"; //（post）初始化锁,(谁初始化锁，谁就是该锁的管理员。初始化后，之前所有的钥匙密码失效)
 	public static final String MH_LOCK_INIT = "lock/mhd_init"; //（post）曼哈顿初始化锁,(谁初始化锁，谁就是该锁的管理员。初始化后，之前所有的钥匙密码失效)
 	public static final String LOCK_ADMIN_DELETE = "lock/del"; //（post）删除锁(只有管理员可以操作)
+	public static final String LOCK_ADMIN_DELETE_V2 = "lock/del/v2"; //（post）删除锁V2(只需 userId+lockId,不需要密码;删除准备已验过密码后用它做账号移除)
 	public static final String LOCK_NAME_MODIFY = "lock/rename"; //（post）修改锁名称
 	public static final String LOCK_BIND_HOME = "lock/bind-home"; //（post）绑定一个家庭
 	public static final String LOCK_LIST = "lock/list"; //（post）锁列表,实指该用户所拥有的钥匙列表
+	public static final String LOCK_GET = "lock/get"; //（post）获取当前用户的锁(返回含 mac),用于自动上传前按 mac 去重
 	public static final String LOCK_FIRMWARE_INFO = "setting/lock/version"; //（get）根据参数锁id检查锁固件版本和是否有新固件版本可升级
 	public static final String LOCK_OPERATE_RECORDS_GET = "operation/log/get"; //（get）查询锁所有的操作记录，按操作日期（天）分组，默认取最近20条，从操作时间由近至远排列
 	public static final String LOCK_OPERATE_RECORDS_DELETE = "operation/log/remove"; //（post）根据操作记录id删除一条操作记录

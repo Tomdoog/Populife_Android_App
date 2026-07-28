@@ -1105,4 +1105,32 @@
     <string name="notification_push_title">Alertes de Messages</string>
     <string name="use_gateway_unlock_by_default">Utiliser le déverrouillage par passerelle par défaut</string>
     <string name="crash_exit">Erreur du programme, fermeture</string>
+
+    <!-- 未同步设备弹窗 -->
+    <string name="unsync_dialog_title">Terminer la synchronisation de l’appareil</string>
+    <string name="unsync_dialog_body">Cet appareil est associé, mais il n’est pas encore synchronisé avec votre compte. Touchez Synchroniser. Si la synchronisation échoue toujours, vérifiez votre connexion et redémarrez l’app.</string>
+    <string name="unsync_dialog_checkbox">Ne plus me rappeler de synchroniser cet appareil</string>
+    <string name="unsync_dialog_later">Plus tard</string>
+    <string name="unsync_dialog_sync_now">Synchroniser</string>
+    <string name="unsync_sync_success">Synchronisation réussie</string>
+    <string name="unsync_fail_network">Connexion réseau indisponible</string>
+    <string name="unsync_fail_business">Échec de la synchronisation. Veuillez redémarrer l’app.</string>
+
+    <!-- 导出日志 -->
+    <string name="log_export">Exporter les journaux</string>
+    <string name="log_export_none">Aucun journal à exporter</string>
+    <string name="log_export_preparing">Préparation des journaux…</string>
+    <string name="log_export_fail">Échec de l\'exportation</string>
+    <string name="log_export_share_title">Envoyer les journaux</string>
+
+    <!-- 删除设备异常态 -->
+    <string name="delete_result_unknown_tip">Résultat de la suppression incertain. Confirmez l\'état de l\'appareil dans les détails.</string>
+    <string name="delete_pending_account_tip">Appareil réinitialisé mais non supprimé du compte. Terminez la suppression dans les détails.</string>
+    <string name="delete_dlg_a_title">Terminer la suppression de l\'appareil</string>
+    <string name="delete_dlg_a_body">Cet appareil a été réinitialisé mais n\'a pas été supprimé de votre compte. Supprimez-le maintenant pour terminer.</string>
+    <string name="delete_dlg_b_title">Confirmer l\'état de l\'appareil</string>
+    <string name="delete_dlg_b_body">Une suppression précédente de l\'appareil a été interrompue. Si l\'appareil peut être déverrouillé avec son mot de passe initial, supprimez-le de votre compte avant de l\'ajouter à nouveau.</string>
+    <string name="delete_dlg_remove">Supprimer</string>
+    <string name="delete_dlg_later">Plus tard</string>
+    <string name="delete_removed_success">Appareil supprimé</string>
 </resources>
