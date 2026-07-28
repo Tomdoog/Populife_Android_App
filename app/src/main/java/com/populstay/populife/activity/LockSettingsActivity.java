@@ -34,6 +34,7 @@ import com.populstay.populife.R;
 import com.populstay.populife.app.MyApplication;
 import com.populstay.populife.base.BaseActivity;
 import com.populstay.populife.common.Urls;
+import com.populstay.populife.helper.DeviceDeleteState;
 import com.populstay.populife.databinding.ActivityLockSettingsBinding;
 import com.populstay.populife.entity.Key;
 import com.populstay.populife.eventbus.Event;
@@ -112,6 +113,20 @@ public class LockSettingsActivity extends BaseActivity implements View.OnClickLi
 
 	private int mPwdType;//0删除锁时输入密码，1显示 Mac/Id 时输入密码
 	private boolean mIsDeleteCallbackCalled; // 删除锁时，onSuccess/onFail 是否被回调过
+
+	/** 删除超时保护:曼哈顿锁"从未连上"时可能无任何回调(连不上 → 连 onFinish 都不触发),用超时兜底为"结果未知" */
+	private static final long DELETE_TIMEOUT_MS = 30000;
+	private final android.os.Handler mDeleteTimeoutHandler = new android.os.Handler(android.os.Looper.getMainLooper());
+	private final Runnable mDeleteTimeoutRunnable = new Runnable() {
+		@Override
+		public void run() {
+			if (!mIsDeleteCallbackCalled) {
+				mIsDeleteCallbackCalled = true;
+				stopLoading();
+				onPhysicalDeleteUnknown();
+			}
+		}
+	};
 	private int mPwdWrongCount; // 输入账号密码错误次数
 
 	private HelpPopupWindow mHelpPopupWindow;
@@ -1047,6 +1062,19 @@ public class LockSettingsActivity extends BaseActivity implements View.OnClickLi
 						}
 					}
 				})
+				.failure(new IFailure() {
+					@Override
+					public void onFailure() {
+						// 删除准备(user/check)断网/失败:明确提示,不静默 —— 停在准备前,物理与账号均不变
+						toast(R.string.unsync_fail_network);
+					}
+				})
+				.error(new IError() {
+					@Override
+					public void onError(int code, String msg) {
+						toast(R.string.unsync_fail_network);
+					}
+				})
 				.build()
 				.post();
 	}
@@ -1098,9 +1126,26 @@ public class LockSettingsActivity extends BaseActivity implements View.OnClickLi
 		}
 	}
 
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		mDeleteTimeoutHandler.removeCallbacks(mDeleteTimeoutRunnable);
+	}
+
+	/**
+	 * 物理删除设备。此前 verifyAccountPwd(lock/user/check)已完成"删除准备"(联网+身份+密码校验),
+	 * 断网/密码错/非管理员根本进不到这里。本方法只负责发蓝牙删除指令并按三态处理结果。
+	 */
 	private void adminResetLock() {
+		PeachLogger.d("[ACTION] 删除设备 lockId=" + mKey.getLockId() + " mac=" + mKey.getLockMac());
 		if (isBleNetEnableWithToast()) {
 			showLoading();
+			mIsDeleteCallbackCalled = false;
+			// 启动超时保护:超时仍无任何回调(如锁始终不在范围连不上)则按"结果未知"处理,不让 loading 挂死
+			mDeleteTimeoutHandler.removeCallbacks(mDeleteTimeoutRunnable);
+			mDeleteTimeoutHandler.postDelayed(mDeleteTimeoutRunnable, DELETE_TIMEOUT_MS);
+			// 发出蓝牙删除指令前先留痕:万一 App 在回调前被杀,下次进设备详情能按"结果未知"对账,不留幽灵设备
+			DeviceDeleteState.set(PeachPreference.readUserId(), mKey.getLockId(), DeviceDeleteState.STATE_DELETING);
 			setDeleteLockCallback();
 			if (mKey.getLockId() < 0) {
 				if (sPPLOCK.isConnected(mKey.getLockMac())) {
@@ -1117,26 +1162,37 @@ public class LockSettingsActivity extends BaseActivity implements View.OnClickLi
                             @Override
                             public void run() {
                                 mIsDeleteCallbackCalled = true;
-                                stopLoading();
-                                requestDeleteLock();
+                                onPhysicalDeleteSuccess();
                             }
                         });
                     }
 
                     @Override
-                    public void onFail(LockError lockError) {
+                    public void onFail(final LockError lockError) {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
                                 mIsDeleteCallbackCalled = true;
                                 stopLoading();
-                                toastFail();
+                                // 连接超时/断连 → 结果未知(锁可能已删),不能当作明确失败
+                                if (isBleConnectError(lockError)) {
+                                    onPhysicalDeleteUnknown();
+                                } else {
+                                    onPhysicalDeleteFail();
+                                }
                             }
                         });
                     }
                 });
 			}
 		}
+	}
+
+	/** TTLock 的连接/超时类错误 = 物理删除结果未知(而非明确失败) */
+	private boolean isBleConnectError(LockError lockError) {
+		return lockError == LockError.LOCK_CONNECT_FAIL
+				|| lockError == LockError.WIRELESS_KEYBOARD_NO_RESPONSE
+				|| lockError == LockError.DEVICE_CONNECT_FAILED;
 	}
 
 	private void setDeleteLockCallback() {
@@ -1149,8 +1205,7 @@ public class LockSettingsActivity extends BaseActivity implements View.OnClickLi
 						@Override
 						public void run() {
 							mIsDeleteCallbackCalled = true;
-							stopLoading();
-							requestDeleteLock();
+							onPhysicalDeleteSuccess();
 						}
 					});
 				}
@@ -1162,7 +1217,7 @@ public class LockSettingsActivity extends BaseActivity implements View.OnClickLi
 						public void run() {
 							mIsDeleteCallbackCalled = true;
 							stopLoading();
-							toastFail();
+							onPhysicalDeleteFail();
 						}
 					});
 				}
@@ -1175,7 +1230,8 @@ public class LockSettingsActivity extends BaseActivity implements View.OnClickLi
 							if (!mIsDeleteCallbackCalled) {
 								mIsDeleteCallbackCalled = true;
 								stopLoading();
-								toast(R.string.note_make_sure_lock_nearby);
+								// 连接断开、没等到删除结果 → 结果未知
+								onPhysicalDeleteUnknown();
 							}
 						}
 					});
@@ -1184,54 +1240,91 @@ public class LockSettingsActivity extends BaseActivity implements View.OnClickLi
 		}
 	}
 
+	/** 物理删除明确成功:锁已重置,记为"待账号移除"并立即执行账号移除 */
+	private void onPhysicalDeleteSuccess() {
+		mDeleteTimeoutHandler.removeCallbacks(mDeleteTimeoutRunnable);
+		stopLoading();
+		DeviceDeleteState.set(PeachPreference.readUserId(), mKey.getLockId(), DeviceDeleteState.STATE_PENDING_ACCOUNT);
+		requestAccountRemove();
+	}
+
+	/** 物理删除明确失败:锁未动,清除记录,设备保留可继续管理 */
+	private void onPhysicalDeleteFail() {
+		mDeleteTimeoutHandler.removeCallbacks(mDeleteTimeoutRunnable);
+		DeviceDeleteState.clear(PeachPreference.readUserId(), mKey.getLockId());
+		toastFail();
+	}
+
+	/** 物理删除结果未知(超时/断连):保留"结果待确认"记录,回详情页由用户靠近设备确认 */
+	private void onPhysicalDeleteUnknown() {
+		mDeleteTimeoutHandler.removeCallbacks(mDeleteTimeoutRunnable);
+		DeviceDeleteState.set(PeachPreference.readUserId(), mKey.getLockId(), DeviceDeleteState.STATE_UNKNOWN);
+		toast(R.string.delete_result_unknown_tip);
+		finish();
+	}
+
 	/**
-	 * 请求服务器，删除锁
+	 * 账号移除:物理删除成功后调 lock/del/v2(不需密码,复用删除准备阶段已验过的授权)。
+	 * 成功 → 清记录、刷新首页;失败/超时 → 保留"待账号移除"记录,由详情页引导用户完成同一笔移除。
 	 */
-	private void requestDeleteLock() {
-		String userId = PeachPreference.readUserId();
-		String lockId = "";
-		if (mKey.getLockId() < 0) {
-			lockId = String.valueOf(mKey.getLockId());
-		}
+	private void requestAccountRemove() {
 		RestClient.builder()
-				.url(Urls.LOCK_ADMIN_DELETE)
+				.url(Urls.LOCK_ADMIN_DELETE_V2)
 				.loader(LockSettingsActivity.this)
-				.params("userId", userId)
+				.params("userId", PeachPreference.readUserId())
 				.params("lockId", mKey.getLockId())
-				.params("password", mInputPwd)
 				.success(new ISuccess() {
 					@Override
 					public void onSuccess(String response) {
-						PeachLogger.d("LOCK_ADMIN_DELETE", response);
-						JSONObject result = JSON.parseObject(response);
-						int code = result.getInteger("code");
-						boolean isSuccess = result.getBoolean("success");
-						if (code == 200 && isSuccess) {
-							PeachPreference.setBoolean(PeachPreference.HAVE_NEW_MESSAGE, true);
-							int lockNum = PeachPreference.getAccountLockNum(PeachPreference.readUserId());
-							PeachPreference.setAccountLockNum(PeachPreference.readUserId(), lockNum - 1);
-							PeachPreference.setLastUnlockTimeAndType(mKey.getLockId(), 0, 0);
-							EventBus.getDefault().post(new Event(Event.EventType.DELETE_LOCK_SUCCESS));
-							finish();
+						PeachLogger.d("LOCK_ADMIN_DELETE_V2 " + response);
+						boolean ok = false;
+						try {
+							JSONObject result = JSON.parseObject(response);
+							Integer code = result.getInteger("code");
+							Boolean success = result.getBoolean("success");
+							ok = code != null && code == 200 && Boolean.TRUE.equals(success);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+						if (ok) {
+							onAccountRemoveDone();
 						} else {
-							toastFail();
+							onAccountRemovePending();
 						}
 					}
 				})
 				.failure(new IFailure() {
 					@Override
 					public void onFailure() {
-						toastFail();
+						onAccountRemovePending();
 					}
 				})
 				.error(new IError() {
 					@Override
 					public void onError(int code, String msg) {
-						toastFail();
+						onAccountRemovePending();
 					}
 				})
 				.build()
 				.post();
+	}
+
+	/** 账号移除成功:两端都已删除,清记录、刷新首页、退出 */
+	private void onAccountRemoveDone() {
+		DeviceDeleteState.clear(PeachPreference.readUserId(), mKey.getLockId());
+		PeachPreference.setBoolean(PeachPreference.HAVE_NEW_MESSAGE, true);
+		int lockNum = PeachPreference.getAccountLockNum(PeachPreference.readUserId());
+		PeachPreference.setAccountLockNum(PeachPreference.readUserId(), lockNum - 1);
+		PeachPreference.setLastUnlockTimeAndType(mKey.getLockId(), 0, 0);
+		EventBus.getDefault().post(new Event(Event.EventType.DELETE_LOCK_SUCCESS));
+		finish();
+	}
+
+	/** 账号移除未完成:物理锁已重置,记录保留为"待账号移除",提示到设备详情继续 */
+	private void onAccountRemovePending() {
+		DeviceDeleteState.set(PeachPreference.readUserId(), mKey.getLockId(), DeviceDeleteState.STATE_PENDING_ACCOUNT);
+		toast(R.string.delete_pending_account_tip);
+		finish();
 	}
 
 	/**

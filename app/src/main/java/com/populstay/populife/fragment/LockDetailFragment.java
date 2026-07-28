@@ -44,6 +44,8 @@ import com.populstay.populife.app.MyApplication;
 import com.populstay.populife.base.BaseApplication;
 import com.populstay.populife.base.BaseFragment;
 import com.populstay.populife.common.Urls;
+import com.populstay.populife.helper.DeviceDeleteRecoveryDialog;
+import com.populstay.populife.helper.DeviceDeleteState;
 import com.populstay.populife.databinding.FragmentLockDetailBinding;
 import com.populstay.populife.entity.Gateway;
 import com.populstay.populife.entity.Key;
@@ -693,6 +695,7 @@ public class LockDetailFragment extends BaseFragment implements View.OnClickList
 	 * 开锁
 	 */
     private void unlock(final int operateType) {
+        PeachLogger.d("[ACTION] 开锁 lockId=" + (null != mCurKEY ? mCurKEY.getLockId() : 0) + " type=" + operateType);
         if (isBleEnableWithoutToast()) {
             mIsUnlockCalled = false;
             showUnLocking();
@@ -768,6 +771,7 @@ public class LockDetailFragment extends BaseFragment implements View.OnClickList
                                 long curTimeMillis = DateUtil.getCurTimeMillis();
                                 showLastUnLockTime(DateUtil.getDateToString(curTimeMillis, DateUtil.DATE_TIME_PATTERN_1), 1);
                                 PeachPreference.setLastUnlockTimeAndType(mCurKEY.getLockId(), curTimeMillis, 1);
+                                clearDeleteUnknownIfNeeded();
                                 getLockBattery();
                             }
                         });
@@ -822,6 +826,18 @@ public class LockDetailFragment extends BaseFragment implements View.OnClickList
 	 *                    2 小图标开锁（锁同时支持 APP 开锁、闭锁）
 	 *                    3 小图标闭锁（锁同时支持 APP 开锁、闭锁）
 	 */
+	/**
+	 * 状态B(删除结果未知)下开锁成功 = 原钥匙仍能开 = 锁未被删除,清除待确认记录、恢复正常管理。
+	 */
+	private void clearDeleteUnknownIfNeeded() {
+		String userId = PeachPreference.readUserId();
+		int lockId = mCurKEY.getLockId();
+		if (DeviceDeleteState.isResultUnknown(userId, lockId)) {
+			DeviceDeleteState.clear(userId, lockId);
+			PeachLogger.d("[ACTION] 删除待确认设备原钥匙开锁成功,恢复正常 lockId=" + lockId);
+		}
+	}
+
 	private void setUnlockCallback(final int operateType) {
 		if (mCurKEY.getLockId() < 0) {
 			Logger.t("PPLock").e("操作unlock sPPLOCK setUnlockCallback 开锁成功");
@@ -855,6 +871,7 @@ public class LockDetailFragment extends BaseFragment implements View.OnClickList
 								long curTimeMillis = DateUtil.getCurTimeMillis();
 								showLastUnLockTime(DateUtil.getDateToString(curTimeMillis, DateUtil.DATE_TIME_PATTERN_1), 1);
 								PeachPreference.setLastUnlockTimeAndType(mCurKEY.getLockId(), curTimeMillis, 1);
+								clearDeleteUnknownIfNeeded();
 								requestUploadLockBattery(battery);
 							}
 						});
@@ -963,6 +980,7 @@ public class LockDetailFragment extends BaseFragment implements View.OnClickList
 	 * 闭锁
 	 */
 	private void lock() {
+		PeachLogger.d("[ACTION] 关锁 lockId=" + (null != mCurKEY ? mCurKEY.getLockId() : 0));
 		if (isBleEnableWithoutToast()) {
 			mIsLockCalled = false;
 			showLocking();
@@ -1250,8 +1268,11 @@ public class LockDetailFragment extends BaseFragment implements View.OnClickList
 		else {
 			if (!TextUtils.isEmpty(mHomeId)) {
 				requestDeviceListForGroup(mHomeId);
+			} else {
+				// 还没拿到当前空间(如首页数据尚未加载完)时无从刷新。
+				// 此处必须关掉调用方已经打开的全局 loading,否则遮罩没人关闭,首页会一直转圈。
+				PeachLoader.stopLoading();
 			}
-
 		}
 	}
 
@@ -1816,7 +1837,29 @@ public class LockDetailFragment extends BaseFragment implements View.OnClickList
             binding.scRemoteOpen.setEnabled(false);
             requestUnlockType();
         });
+		// 删除异常态:进入设备详情时弹恢复弹窗(产品《设备删除一致性与异常恢复》第七节)
+		final String delUserId = PeachPreference.readUserId();
+		final int delLockId = mCurKEY.getLockId();
+		final boolean deleteBlockingA = DeviceDeleteState.isPendingAccount(delUserId, delLockId);
+		if (deleteBlockingA) {
+			// 状态A:物理删除已确认、等待账号移除 —— 引导用户完成移除
+			DeviceDeleteRecoveryDialog.show(getActivity(), true, delUserId, delLockId, null);
+		} else if (DeviceDeleteState.isResultUnknown(delUserId, delLockId)) {
+			// 状态B:删除结果未知 —— 提示用户靠近设备确认;不拦截操作,允许试开锁,
+			// 原钥匙能开(见 setUnlockCallback 里 clearDeleteUnknownIfNeeded)即视为未删、自动恢复正常
+			DeviceDeleteRecoveryDialog.show(getActivity(), false, delUserId, delLockId, null);
+		}
+
 		mActions.clear();
+		if (deleteBlockingA) {
+			// 状态A 不展示任何正常操作(开锁、改密码、网关等)
+			mAdapter.notifyDataSetChanged();
+			mLlLockDetailUnlocking.setVisibility(View.GONE);
+			mLlLockDetailUnlock.setVisibility(View.GONE);
+			mLlLockDetailLock.setVisibility(View.GONE);
+			binding.llRemoteOpen.setVisibility(View.GONE);
+			return;
+		}
 		if (mCurKEY.isAdmin()) { // 判断是否为管理员
 			// 管理员，显示全部按钮
 			if (mCurKEY.getLockId() < 0) {
