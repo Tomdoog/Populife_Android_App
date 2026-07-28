@@ -148,4 +148,27 @@
 
     <include layout="@layout/layout_view_line"/>
 
+    <LinearLayout
+        style="@style/list_item_overall"
+        android:minHeight="54dp"
+        android:id="@+id/ll_settings_export_log">
+
+        <TextView
+            style="@style/list_item_title"
+            android:text="@string/log_export"/>
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/ic_arrow_more_detail"/>
+
+    </LinearLayout>
+
+    <include layout="@layout/layout_view_line"/>
+
 </LinearLayout>

@@ -8,13 +8,14 @@ import android.widget.TextView;
 
 import com.populstay.populife.R;
 import com.populstay.populife.base.BaseActivity;
+import com.populstay.populife.helper.LogExportHelper;
 import com.populstay.populife.util.BiometricUtils;
 import com.populstay.populife.util.device.FingerprintUtil;
 import com.populstay.populife.util.storage.PeachPreference;
 
 public class SettingsActivity extends BaseActivity implements View.OnClickListener {
 
-	private LinearLayout mLlLockUser, mLlSwitchLanguage, mLlAbout, mLlTouchIdLogin;
+	private LinearLayout mLlLockUser, mLlSwitchLanguage, mLlAbout, mLlTouchIdLogin, mLlExportLog;
 	private Switch mSwitchTouchIdLogin, mSwitchReminder;
 
 	@Override
@@ -33,6 +34,7 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
 		mLlLockUser = findViewById(R.id.ll_settings_lock_user);
 		mLlSwitchLanguage = findViewById(R.id.ll_settings_switch_language);
 		mLlAbout = findViewById(R.id.ll_settings_about);
+		mLlExportLog = findViewById(R.id.ll_settings_export_log);
 
 		mLlTouchIdLogin = findViewById(R.id.ll_touch_id_login);
 
@@ -51,6 +53,7 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
 		mLlLockUser.setOnClickListener(this);
 		mLlSwitchLanguage.setOnClickListener(this);
 		mLlAbout.setOnClickListener(this);
+		mLlExportLog.setOnClickListener(this);
 		mSwitchTouchIdLogin.setOnClickListener(this);
 		mSwitchReminder.setOnClickListener(this);
 	}
@@ -66,6 +69,8 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
             goToNewActivity(ChangeLanguageActivity.class);
         } else if (id == R.id.ll_settings_about) {
             goToNewActivity(AboutActivity.class);
+        } else if (id == R.id.ll_settings_export_log) {
+            LogExportHelper.exportAndShare(this);
         }
     }
 }

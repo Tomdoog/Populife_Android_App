@@ -324,6 +324,7 @@ public class KeyPwdMoreActivity extends BaseActivity implements View.OnClickList
 				startLockActionScan();
 			}
 		}else {
+            PeachLogger.d("[ACTION] 清空所有IC卡 lockId=" + mKey.getLockId());
             mTTLockAPI.clearAllICCard(mKey.getLockData(), mKey.getLockMac(), new ClearAllICCardCallback() {
                 @Override
                 public void onClearAllICCardSuccess() {
@@ -396,6 +397,7 @@ public class KeyPwdMoreActivity extends BaseActivity implements View.OnClickList
 				startLockActionScan();
 			}
 		}else {
+            PeachLogger.d("[ACTION] 清空所有指纹 lockId=" + mKey.getLockId());
             mTTLockAPI.clearAllFingerprints(mKey.getLockData(), mKey.getLockMac(), new ClearAllFingerprintCallback() {
                 @Override
                 public void onClearAllFingerprintSuccess() {

@@ -120,6 +120,8 @@ public class ModifyAdminPasscodeActivity extends BaseActivity {
 					toast(R.string.note_passcode_invalid);
 				} else {
 					if (isBleNetEnableWithToast()) {
+						PeachLogger.d("[ACTION] 修改管理员密码 lockId=" + mKey.getLockId()
+								+ " mac=" + mKey.getLockMac() + " hasLockData=" + !StringUtil.isBlank(mKey.getLockData()));
 						showLoading();
 						setCallback(input);
 						if (isMHLock || (mKey.getLockId() < 0)) {

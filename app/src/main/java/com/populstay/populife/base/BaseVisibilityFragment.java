@@ -153,6 +153,10 @@ public class BaseVisibilityFragment extends BaseFragment implements OnAttachStat
 	 */
 	protected void onVisibilityChanged(boolean visible) {
 		info("==> onFragmentVisibilityChanged = " + visible);
+		// 页面轨迹:首页几个 tab 是 Fragment,切换时 Activity 不变,只有这里能反映用户切到了哪一屏
+		if (visible) {
+			PeachLogger.d("[PAGE] show " + this.getClass().getSimpleName());
+		}
 		if (mListener != null) {
 			mListener.onFragmentVisibilityChanged(visible);
 		}

@@ -167,6 +167,7 @@ public class LockTransferConfirmActivity extends BaseActivity {
         if (recUser == null) {
             toast(getString(R.string.note_receiver_format));
         }
+        PeachLogger.d("[ACTION] 转移锁 receiver=" + recUser);
         RestClient.builder()
                 .url(Urls.LOCK_TRANSFER)
                 .loader(this)

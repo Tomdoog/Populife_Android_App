@@ -470,6 +470,8 @@ public class BaseActivity extends AppCompatActivity{
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
+		// 页面退出:与下一条 [PAGE] show 组合即可看出用户是"返回"还是"前进"
+		PeachLogger.d("[PAGE] close " + this.getClass().getSimpleName());
         TTLockClient.getDefault().stopBTService();
 		stopLoading();
 
@@ -545,6 +547,9 @@ public class BaseActivity extends AppCompatActivity{
 	@Override
 	protected void onResume() {
 		super.onResume();
+		// 页面轨迹:onCreate 只在首次创建时记录,用户「返回」到已存在的页面不会触发,
+		// 这里补上,配合 [PAGE] 前缀即可从日志里还原出用户到过哪些页面、停在哪里
+		PeachLogger.d("[PAGE] show " + this.getClass().getSimpleName());
 		queryLatestDeviceId();
 	}
 

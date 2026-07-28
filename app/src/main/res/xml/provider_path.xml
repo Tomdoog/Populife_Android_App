@@ -3,4 +3,8 @@
     <external-path
         name="external_files"
         path="." />
+    <!-- 日志导出的 zip 存在 getExternalCacheDir(),显式映射保证 FileProvider 可分享 -->
+    <external-cache-path
+        name="external_cache"
+        path="." />
 </paths>
