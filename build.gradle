@@ -8,8 +8,6 @@ buildscript {
         google()
         //jcenter()
         mavenCentral()
-        maven {
-            url "https://lib.gcssloop.com:8081/repository/gcssloop-central/" }
         // 添加Mob Maven地址
 //        maven {
 //            url "http://mvn.mob.com/android" }
@@ -40,12 +38,6 @@ allprojects {
         mavenCentral()
        // jcenter()
         maven { url "https://jitpack.io" }
-        // 私有仓库地址
-        maven {
-            url "http://lib.gcssloop.com:8081/repository/gcssloop-central/"
-            allowInsecureProtocol = true
-        }
-
         //maven { url 'https://jcenter.bintray.com' }
 
     }
