@@ -1127,6 +1127,12 @@
     <string name="delete_dlg_a_body">This device was reset but wasn\'t removed from your account. Remove it now to finish.</string>
     <string name="delete_dlg_b_title">Confirm Device Status</string>
     <string name="delete_dlg_b_body">A previous device removal was interrupted. If the device can be unlocked with its initial password, remove it from your account before adding it again.</string>
+    <!-- 状态B Remove 前置判定(需求七.B):必须先确认锁已回到出厂态才允许账号移除 -->
+    <string name="delete_dlg_b_check_title">Confirm Device Status</string>
+    <string name="delete_dlg_b_check_body">Go to the device and try its initial passcode. Does it unlock?</string>
+    <string name="delete_dlg_b_check_yes">Yes, it unlocks</string>
+    <string name="delete_dlg_b_check_no">No / can\'t connect</string>
+    <string name="delete_dlg_b_check_blocked">Device status still unconfirmed, so it stays in your account. Please try again near the device, or contact support.</string>
     <string name="delete_dlg_remove">Remove</string>
     <string name="delete_dlg_later">Later</string>
     <string name="delete_removed_success">Lock removed successfully</string>

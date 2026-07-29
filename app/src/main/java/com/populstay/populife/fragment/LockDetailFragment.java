@@ -1838,10 +1838,11 @@ public class LockDetailFragment extends BaseFragment implements View.OnClickList
             requestUnlockType();
         });
 		// 删除异常态:进入设备详情时弹恢复弹窗(产品《设备删除一致性与异常恢复》第七节)
+		// 弹窗只做引导,不改变页面本身 —— 用户点 Later 后仍要能查旧密码、看开锁记录,
+		// 所以入口一律照常展示,不做任何屏蔽。
 		final String delUserId = PeachPreference.readUserId();
 		final int delLockId = mCurKEY.getLockId();
-		final boolean deleteBlockingA = DeviceDeleteState.isPendingAccount(delUserId, delLockId);
-		if (deleteBlockingA) {
+		if (DeviceDeleteState.isPendingAccount(delUserId, delLockId)) {
 			// 状态A:物理删除已确认、等待账号移除 —— 引导用户完成移除
 			DeviceDeleteRecoveryDialog.show(getActivity(), true, delUserId, delLockId, null);
 		} else if (DeviceDeleteState.isResultUnknown(delUserId, delLockId)) {
@@ -1851,15 +1852,6 @@ public class LockDetailFragment extends BaseFragment implements View.OnClickList
 		}
 
 		mActions.clear();
-		if (deleteBlockingA) {
-			// 状态A 不展示任何正常操作(开锁、改密码、网关等)
-			mAdapter.notifyDataSetChanged();
-			mLlLockDetailUnlocking.setVisibility(View.GONE);
-			mLlLockDetailUnlock.setVisibility(View.GONE);
-			mLlLockDetailLock.setVisibility(View.GONE);
-			binding.llRemoteOpen.setVisibility(View.GONE);
-			return;
-		}
 		if (mCurKEY.isAdmin()) { // 判断是否为管理员
 			// 管理员，显示全部按钮
 			if (mCurKEY.getLockId() < 0) {

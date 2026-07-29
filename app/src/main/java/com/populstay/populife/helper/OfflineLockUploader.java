@@ -288,6 +288,9 @@ public class OfflineLockUploader {
 	private void completeSync(OfflineLock lock, JSONObject data, InternalCallback callback) {
 		deleteLocal(lock);
 		clearSyncFailed(lock.getUserId(), lock.getLockMac());
+		// 这把锁已重新绑到账号上,之前那笔没删干净的记录作废,否则新设备一进详情页就被判成"待账号移除"
+		DeviceDeleteRecoveryDialog.onSameLockReAdded(lock.getUserId(),
+				data == null ? 0 : intOf(data.getInteger("lockId")), lock.getLockMac());
 		callback.onDone(true, data, 0);
 	}
 

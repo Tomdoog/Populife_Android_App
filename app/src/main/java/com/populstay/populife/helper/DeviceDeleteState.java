@@ -31,13 +31,76 @@ public class DeviceDeleteState {
 	public static final String STATE_PENDING_ACCOUNT = "pending_account";
 
 	private static final String KEY_PREFIX = "device_delete_state_";
+	/** MAC → lockId 索引,用于"同一把锁被重新添加后作废旧记录",见 {@link #clearOnLockAdded} */
+	private static final String KEY_MAC_PREFIX = "device_delete_state_mac_";
 
 	private static String key(String userId, int lockId) {
 		return KEY_PREFIX + (userId == null ? "" : userId) + "_" + lockId;
 	}
 
+	private static String macKey(String userId, String lockMac) {
+		return KEY_MAC_PREFIX + (userId == null ? "" : userId) + "_"
+				+ (lockMac == null ? "" : lockMac.toUpperCase());
+	}
+
 	public static void set(String userId, int lockId, String state) {
+		set(userId, lockId, state, null);
+	}
+
+	/**
+	 * @param lockMac 锁的 MAC。异常记录必须同时绑到物理锁上:lockId 是云端记录的 id,重新添加同一把锁时
+	 *                服务端可能换发新 id,只按 lockId 记录会导致旧记录永远挂着、或错扣到新设备头上。
+	 */
+	public static void set(String userId, int lockId, String state, String lockMac) {
 		PeachPreference.putStr(key(userId, lockId), state);
+		if (!StringUtil.isBlank(lockMac)) {
+			PeachPreference.putStr(macKey(userId, lockMac), String.valueOf(lockId));
+		}
+	}
+
+	/**
+	 * 同一把锁被重新添加(初始化成功)时调用:作废这把锁上已经失效的删除记录,并返回云端那条需要清理的幽灵 lockId。
+	 *
+	 * 分两种情况,取决于服务端是否复用 lockId:
+	 *  - 复用(新旧 id 相同):记录指向的就是刚添加的这台设备,必须清掉,否则用户一进详情页就被判成
+	 *    "待账号移除",点 Remove 等于把刚添加成功的设备删掉。此时没有幽灵,返回 0。
+	 *  - 换发新 id:旧 id 对应的是云端那条没删干净的幽灵记录,返回它交给调用方静默移除。
+	 *    移除成功前不清本地记录 —— 万一移除失败(如断网),详情页的恢复弹窗仍能兜底引导用户。
+	 *
+	 * @param newLockId 服务端本次返回的 lockId
+	 * @param lockMac   锁的 MAC,用于找回旧 lockId 的记录
+	 * @return 需要静默从账号移除的幽灵 lockId;没有则返回 0
+	 */
+	public static int onSameLockReAdded(String userId, int newLockId, String lockMac) {
+		clear(userId, newLockId);
+		if (StringUtil.isBlank(lockMac)) {
+			return 0;
+		}
+		String oldLockId = PeachPreference.getStr(macKey(userId, lockMac));
+		if (StringUtil.isBlank(oldLockId)) {
+			return 0;
+		}
+		int ghostLockId;
+		try {
+			ghostLockId = Integer.parseInt(oldLockId);
+		} catch (NumberFormatException e) {
+			PeachPreference.putStr(macKey(userId, lockMac), "");
+			return 0;
+		}
+		if (ghostLockId == newLockId) {
+			// 服务端复用了 lockId,旧记录已随上面的 clear 一并作废
+			PeachPreference.putStr(macKey(userId, lockMac), "");
+			return 0;
+		}
+		return ghostLockId;
+	}
+
+	/** 幽灵记录已从账号移除:清掉它的状态与 MAC 索引 */
+	public static void clearGhost(String userId, int ghostLockId, String lockMac) {
+		clear(userId, ghostLockId);
+		if (!StringUtil.isBlank(lockMac)) {
+			PeachPreference.putStr(macKey(userId, lockMac), "");
+		}
 	}
 
 	/** 返回当前状态;无记录返回空串 */

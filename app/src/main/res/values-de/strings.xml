@@ -1130,6 +1130,11 @@
     <string name="delete_dlg_a_body">Dieses Gerät wurde zurückgesetzt, aber nicht aus deinem Konto entfernt. Entferne es jetzt, um abzuschließen.</string>
     <string name="delete_dlg_b_title">Gerätestatus bestätigen</string>
     <string name="delete_dlg_b_body">Eine frühere Geräteentfernung wurde unterbrochen. Wenn das Gerät mit dem Initialpasswort entsperrt werden kann, entferne es aus deinem Konto, bevor du es erneut hinzufügst.</string>
+    <string name="delete_dlg_b_check_title">Gerätestatus bestätigen</string>
+    <string name="delete_dlg_b_check_body">Gehe zum Gerät und probiere das Initialpasswort. Lässt es sich entsperren?</string>
+    <string name="delete_dlg_b_check_yes">Ja, es entsperrt</string>
+    <string name="delete_dlg_b_check_no">Nein / keine Verbindung</string>
+    <string name="delete_dlg_b_check_blocked">Der Gerätestatus ist weiterhin unbestätigt, das Gerät bleibt in deinem Konto. Bitte versuche es in der Nähe des Geräts erneut oder wende dich an den Support.</string>
     <string name="delete_dlg_remove">Entfernen</string>
     <string name="delete_dlg_later">Später</string>
     <string name="delete_removed_success">Gerät erfolgreich entfernt</string>

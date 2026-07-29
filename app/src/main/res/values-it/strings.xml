@@ -1130,6 +1130,11 @@
     <string name="delete_dlg_a_body">Questo dispositivo è stato ripristinato ma non rimosso dal tuo account. Rimuovilo ora per completare.</string>
     <string name="delete_dlg_b_title">Conferma lo stato del dispositivo</string>
     <string name="delete_dlg_b_body">Una precedente rimozione del dispositivo è stata interrotta. Se il dispositivo può essere sbloccato con la password iniziale, rimuovilo dall\'account prima di aggiungerlo di nuovo.</string>
+    <string name="delete_dlg_b_check_title">Conferma stato del dispositivo</string>
+    <string name="delete_dlg_b_check_body">Avvicinati al dispositivo e prova la password iniziale. Si sblocca?</string>
+    <string name="delete_dlg_b_check_yes">Sì, si sblocca</string>
+    <string name="delete_dlg_b_check_no">No / impossibile connettersi</string>
+    <string name="delete_dlg_b_check_blocked">Lo stato del dispositivo non è ancora confermato, quindi resta nel tuo account. Riprova vicino al dispositivo o contatta l\'assistenza.</string>
     <string name="delete_dlg_remove">Rimuovi</string>
     <string name="delete_dlg_later">Più tardi</string>
     <string name="delete_removed_success">Dispositivo rimosso correttamente</string>

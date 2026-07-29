@@ -1130,6 +1130,11 @@
     <string name="delete_dlg_a_body">Este dispositivo se restableció pero no se eliminó de tu cuenta. Elimínalo ahora para finalizar.</string>
     <string name="delete_dlg_b_title">Confirmar el estado del dispositivo</string>
     <string name="delete_dlg_b_body">Una eliminación anterior del dispositivo se interrumpió. Si el dispositivo se puede desbloquear con su contraseña inicial, elimínalo de tu cuenta antes de agregarlo de nuevo.</string>
+    <string name="delete_dlg_b_check_title">Confirmar estado del dispositivo</string>
+    <string name="delete_dlg_b_check_body">Acércate al dispositivo y prueba su contraseña inicial. ¿Se desbloquea?</string>
+    <string name="delete_dlg_b_check_yes">Sí, se desbloquea</string>
+    <string name="delete_dlg_b_check_no">No / no se conecta</string>
+    <string name="delete_dlg_b_check_blocked">El estado del dispositivo sigue sin confirmarse, por lo que permanece en tu cuenta. Inténtalo de nuevo cerca del dispositivo o contacta con soporte.</string>
     <string name="delete_dlg_remove">Eliminar</string>
     <string name="delete_dlg_later">Más tarde</string>
     <string name="delete_removed_success">Dispositivo eliminado correctamente</string>

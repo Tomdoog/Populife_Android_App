@@ -1127,6 +1127,12 @@
     <string name="delete_dlg_a_body">设备已恢复出厂设置,但尚未从您的账号中移除。立即移除后,设备将不再显示在 App 中。</string>
     <string name="delete_dlg_b_title">确认设备状态</string>
     <string name="delete_dlg_b_body">上次删除被中断。如果设备可以用初始化密码开锁,请先从账号移除,再重新添加。</string>
+    <!-- 状态B Remove 前置判定(需求七.B):必须先确认锁已回到出厂态才允许账号移除 -->
+    <string name="delete_dlg_b_check_title">确认设备状态</string>
+    <string name="delete_dlg_b_check_body">请到设备旁尝试初始化密码,能开锁吗?</string>
+    <string name="delete_dlg_b_check_yes">能开锁</string>
+    <string name="delete_dlg_b_check_no">开不了 / 连不上</string>
+    <string name="delete_dlg_b_check_blocked">设备状态仍未确认,设备保留在您的账号中。请靠近设备后重试,或联系客服。</string>
     <string name="delete_dlg_remove">从账号移除</string>
     <string name="delete_dlg_later">稍后</string>
     <string name="delete_removed_success">设备已移除</string>

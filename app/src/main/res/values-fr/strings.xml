@@ -1130,6 +1130,11 @@
     <string name="delete_dlg_a_body">Cet appareil a été réinitialisé mais n\'a pas été supprimé de votre compte. Supprimez-le maintenant pour terminer.</string>
     <string name="delete_dlg_b_title">Confirmer l\'état de l\'appareil</string>
     <string name="delete_dlg_b_body">Une suppression précédente de l\'appareil a été interrompue. Si l\'appareil peut être déverrouillé avec son mot de passe initial, supprimez-le de votre compte avant de l\'ajouter à nouveau.</string>
+    <string name="delete_dlg_b_check_title">Confirmer l\'état de l\'appareil</string>
+    <string name="delete_dlg_b_check_body">Approchez-vous de l\'appareil et essayez son mot de passe initial. Se déverrouille-t-il ?</string>
+    <string name="delete_dlg_b_check_yes">Oui, il se déverrouille</string>
+    <string name="delete_dlg_b_check_no">Non / connexion impossible</string>
+    <string name="delete_dlg_b_check_blocked">L\'état de l\'appareil reste non confirmé, il est conservé dans votre compte. Réessayez à proximité de l\'appareil ou contactez le support.</string>
     <string name="delete_dlg_remove">Supprimer</string>
     <string name="delete_dlg_later">Plus tard</string>
     <string name="delete_removed_success">Appareil supprimé</string>

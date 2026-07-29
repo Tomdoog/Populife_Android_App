@@ -23,6 +23,7 @@ import com.populstay.populife.entity.Gateway;
 import com.populstay.populife.entity.Key;
 import com.populstay.populife.entity.OfflineLock;
 import com.populstay.populife.eventbus.Event;
+import com.populstay.populife.helper.DeviceDeleteRecoveryDialog;
 import com.populstay.populife.helper.OfflineLockUploader;
 import com.populstay.populife.helper.UnsyncedDeviceDialog;
 import com.populstay.populife.home.entity.HomeDevice;
@@ -159,6 +160,8 @@ public class OfflineLockListActivity extends BaseActivity {
 								mKey.setNoKeyPwd(data.getString("noKeyPwd"));
 							}
 							mKey.setLockId(mLockId);
+							// 这把锁已重新绑到账号上,之前那笔没删干净的记录作废,否则新设备一进详情页就被判成"待账号移除"
+							DeviceDeleteRecoveryDialog.onSameLockReAdded(mKey.getUserId(), mLockId, mKey.getLockMac());
 							mBattery = (int) requestParams.get("electricQuantity");
 							mHomeDevice.setDeviceId(String.valueOf(mLockId));
 							mHomeDevice.setName(mLockName);
@@ -231,6 +234,8 @@ public class OfflineLockListActivity extends BaseActivity {
 
 							mKey.setLockVersion("11111");
 							mKey.setLockId(mLockId);
+							// 这把锁已重新绑到账号上,之前那笔没删干净的记录作废,否则新设备一进详情页就被判成"待账号移除"
+							DeviceDeleteRecoveryDialog.onSameLockReAdded(mKey.getUserId(), mLockId, mKey.getLockMac());
 							mKey.setKeyId(mKeyId);
 							mKey.setNoKeyPwd(noKeyPwd);
 							mKey.setK1(k1);

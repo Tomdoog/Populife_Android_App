@@ -40,6 +40,9 @@
     <color name="color_f8f8f8">#F8F8F8</color>
     <color name="color_ffcccdcd">#ffcccdcd</color>
 
+    <!-- 破坏性操作(删除/移除)按钮文字色 -->
+    <color name="text_red_destructive">#EE2737</color>
+
     <color name="battery_red">#EE2737</color>
     <color name="battery_green">#7ED321</color>
     <color name="battery_orange">#F5A623</color>

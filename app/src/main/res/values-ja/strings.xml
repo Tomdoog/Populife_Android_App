@@ -1128,6 +1128,11 @@
     <string name="delete_dlg_a_body">このデバイスはリセットされましたが、アカウントから削除されていません。今すぐ削除して完了してください。</string>
     <string name="delete_dlg_b_title">デバイスの状態を確認</string>
     <string name="delete_dlg_b_body">前回のデバイス削除が中断されました。デバイスが初期パスワードで解錠できる場合は、アカウントから削除してから再度追加してください。</string>
+    <string name="delete_dlg_b_check_title">デバイスの状態を確認</string>
+    <string name="delete_dlg_b_check_body">デバイスのそばで初期パスワードを試してください。解錠できますか?</string>
+    <string name="delete_dlg_b_check_yes">解錠できる</string>
+    <string name="delete_dlg_b_check_no">解錠できない / 接続できない</string>
+    <string name="delete_dlg_b_check_blocked">デバイスの状態が未確認のため、アカウントに残されます。デバイスの近くで再試行するか、サポートにお問い合わせください。</string>
     <string name="delete_dlg_remove">削除</string>
     <string name="delete_dlg_later">後で</string>
     <string name="delete_removed_success">デバイスを削除しました</string>

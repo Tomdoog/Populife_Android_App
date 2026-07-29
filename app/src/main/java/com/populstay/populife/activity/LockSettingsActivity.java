@@ -1120,6 +1120,7 @@ public class LockSettingsActivity extends BaseActivity implements View.OnClickLi
 			mEtDialogInput.setHint(R.string.enter_pwd);
 			mEtDialogInput.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
 			mEtDialogInput.setFilters(new InputFilter[]{new InputFilter.LengthFilter(20)});
+			DialogUtil.autoPopSoftInput(window, mEtDialogInput);
 
 			cancel.setOnClickListener(this);
 			ok.setOnClickListener(this);
@@ -1145,7 +1146,7 @@ public class LockSettingsActivity extends BaseActivity implements View.OnClickLi
 			mDeleteTimeoutHandler.removeCallbacks(mDeleteTimeoutRunnable);
 			mDeleteTimeoutHandler.postDelayed(mDeleteTimeoutRunnable, DELETE_TIMEOUT_MS);
 			// 发出蓝牙删除指令前先留痕:万一 App 在回调前被杀,下次进设备详情能按"结果未知"对账,不留幽灵设备
-			DeviceDeleteState.set(PeachPreference.readUserId(), mKey.getLockId(), DeviceDeleteState.STATE_DELETING);
+			DeviceDeleteState.set(PeachPreference.readUserId(), mKey.getLockId(), DeviceDeleteState.STATE_DELETING, mKey.getLockMac());
 			setDeleteLockCallback();
 			if (mKey.getLockId() < 0) {
 				if (sPPLOCK.isConnected(mKey.getLockMac())) {
@@ -1244,7 +1245,7 @@ public class LockSettingsActivity extends BaseActivity implements View.OnClickLi
 	private void onPhysicalDeleteSuccess() {
 		mDeleteTimeoutHandler.removeCallbacks(mDeleteTimeoutRunnable);
 		stopLoading();
-		DeviceDeleteState.set(PeachPreference.readUserId(), mKey.getLockId(), DeviceDeleteState.STATE_PENDING_ACCOUNT);
+		DeviceDeleteState.set(PeachPreference.readUserId(), mKey.getLockId(), DeviceDeleteState.STATE_PENDING_ACCOUNT, mKey.getLockMac());
 		requestAccountRemove();
 	}
 
@@ -1258,7 +1259,7 @@ public class LockSettingsActivity extends BaseActivity implements View.OnClickLi
 	/** 物理删除结果未知(超时/断连):保留"结果待确认"记录,回详情页由用户靠近设备确认 */
 	private void onPhysicalDeleteUnknown() {
 		mDeleteTimeoutHandler.removeCallbacks(mDeleteTimeoutRunnable);
-		DeviceDeleteState.set(PeachPreference.readUserId(), mKey.getLockId(), DeviceDeleteState.STATE_UNKNOWN);
+		DeviceDeleteState.set(PeachPreference.readUserId(), mKey.getLockId(), DeviceDeleteState.STATE_UNKNOWN, mKey.getLockMac());
 		toast(R.string.delete_result_unknown_tip);
 		finish();
 	}
@@ -1322,7 +1323,7 @@ public class LockSettingsActivity extends BaseActivity implements View.OnClickLi
 
 	/** 账号移除未完成:物理锁已重置,记录保留为"待账号移除",提示到设备详情继续 */
 	private void onAccountRemovePending() {
-		DeviceDeleteState.set(PeachPreference.readUserId(), mKey.getLockId(), DeviceDeleteState.STATE_PENDING_ACCOUNT);
+		DeviceDeleteState.set(PeachPreference.readUserId(), mKey.getLockId(), DeviceDeleteState.STATE_PENDING_ACCOUNT, mKey.getLockMac());
 		toast(R.string.delete_pending_account_tip);
 		finish();
 	}
