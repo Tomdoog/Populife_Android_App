@@ -413,6 +413,7 @@ public class EkeyDetailActivity extends BaseActivity implements View.OnClickList
 				title.setText(R.string.modify_name);
 				mEtDialogInput.setText(mName);
 				mEtDialogInput.setSelection(mName.length());
+				DialogUtil.autoPopSoftInput(window, mEtDialogInput);
 
 			}catch (Exception e){
 				e.printStackTrace();

@@ -374,6 +374,7 @@ public class LockManageBluetoothKeyActivity extends BaseActivity implements View
 			mEtDialogInput.setHint(R.string.enter_pwd);
 			mEtDialogInput.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
 			mEtDialogInput.setFilters(new InputFilter[]{new InputFilter.LengthFilter(20)});
+			DialogUtil.autoPopSoftInput(window, mEtDialogInput);
 
 			cancel.setOnClickListener(this);
 			ok.setOnClickListener(this);

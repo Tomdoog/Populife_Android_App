@@ -263,6 +263,7 @@ public class GatewayListActivity extends BaseActivity implements AdapterView.OnI
 			mEtDialogInput.setHint(R.string.enter_gateway_name);
 			mEtDialogInput.setText(mGatewayList.get(mSelectedItemIndex).getAlias());
 			mEtDialogInput.setSelection(mGatewayList.get(mSelectedItemIndex).getAlias().length());
+			DialogUtil.autoPopSoftInput(window, mEtDialogInput);
 			cancel.setOnClickListener(this);
 			ok.setOnClickListener(this);
 		}

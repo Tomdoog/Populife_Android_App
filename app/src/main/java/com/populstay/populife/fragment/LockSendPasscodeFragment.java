@@ -47,6 +47,7 @@ import com.populstay.populife.ui.loader.PeachLoader;
 import com.populstay.populife.util.Utils;
 import com.populstay.populife.util.date.DateUtil;
 import com.populstay.populife.util.device.KeyboardUtil;
+import com.populstay.populife.util.dialog.DialogUtil;
 import com.populstay.populife.util.log.PeachLogger;
 import com.populstay.populife.util.storage.PeachPreference;
 import com.populstay.populife.util.string.StringUtil;
@@ -536,6 +537,7 @@ public class LockSendPasscodeFragment extends BaseFragment implements View.OnCli
 			mEtDialogInput.setInputType(InputType.TYPE_CLASS_NUMBER);
 			//mEtDialogInput.setFilters(new InputFilter[]{new InputFilter.LengthFilter(9)});
 			mEtDialogInput.setMaxLines(1);
+			DialogUtil.autoPopSoftInput(window, mEtDialogInput);
 			cancel.setOnClickListener(this);
 			ok.setOnClickListener(this);
 		}

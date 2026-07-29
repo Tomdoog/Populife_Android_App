@@ -1277,6 +1277,7 @@ public class PasscodeDetailActivity extends BaseActivity implements View.OnClick
 					e.printStackTrace();
 				}
 			}
+			DialogUtil.autoPopSoftInput(window, mEtDialogInput);
 			cancel.setOnClickListener(this);
 			ok.setOnClickListener(this);
 		}
