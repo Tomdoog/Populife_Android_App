@@ -1,6 +1,7 @@
 package com.populstay.populife.common;
 
 import com.populock.manhattan.sdk.constant.LockUrls;
+import com.populstay.populife.BuildConfig;
 import com.populstay.populife.constant.Constant;
 
 /**
@@ -12,9 +13,13 @@ public class Urls {
 	// 旧正式地址 https://server.populife.yigululock.com
 	// 旧测试环境 http://test.server.populife.co
 	// 新测试环境 http://testv2.server.populife.co  http://114.67.117.65:2100 http://47.254.73.159:3110
-	// TODO: 7/1/21 记得改上线 url
-	public static final String BASE_URL = "https://v2.server.populife.co"; // 项目地址
-	//public static final String BASE_URL = "https://server.populife.szmuen.cn";// 备用地址
+
+	/**
+	 * 项目地址,由渠道 flavor 注入(见 app/build.gradle):
+	 * overseas → https://v2.server.populife.co 、domestic → https://server.populife.szmuen.cn
+	 * 原来靠手工改这一行切渠道,漏改就会让国内包连海外服务器,现在交给构建保证。
+	 */
+	public static final String BASE_URL = BuildConfig.BASE_URL;
 	//public static final String BASE_URL = "http://47.254.73.159:3110";// 测试环境
 
 	public static final String APP_CHECK_UPDATE = "app/version/get"; //（post）App 版本更新，获取最新版本

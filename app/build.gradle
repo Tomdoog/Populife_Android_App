@@ -35,6 +35,21 @@ android {
         }
     }
 
+    // 渠道：海外(Google Play) 与 国内应用市场，唯一差异是服务端域名。
+    // 域名只在这里定义一次，代码统一读 BuildConfig.BASE_URL,不要再往 java 里写死。
+    // pplock 模块声明了同名 flavor,由 AGP 自动匹配,那边的 LockUrls 读自己的 BuildConfig。
+    flavorDimensions "channel"
+    productFlavors {
+        overseas {
+            dimension "channel"
+            buildConfigField "String", "BASE_URL", '"https://v2.server.populife.co"'
+        }
+        domestic {
+            dimension "channel"
+            buildConfigField "String", "BASE_URL", '"https://server.populife.szmuen.cn"'
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled false

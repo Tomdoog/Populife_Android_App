@@ -1,13 +1,20 @@
 package com.populock.manhattan.sdk.constant;
 
+import com.populock.manhattan.sdk.BuildConfig;
+
 /**
  * Created by Jerry
  */
 public class LockUrls {
-	public static final String BASE_URL = "https://v2.server.populife.co/";// 项目地址//https://gateway.plop.yigululock.com/
-	//public static final String BASE_URL = "https://server.populife.szmuen.cn/"; //备份地址
+	/**
+	 * 项目地址,由渠道 flavor 注入(见 pplock/build.gradle):
+	 * overseas → https://v2.server.populife.co/ 、domestic → https://server.populife.szmuen.cn/
+	 * 原来靠手工改这一行切渠道,漏改就会让国内包连海外服务器,现在交给构建保证。
+	 */
+	public static final String BASE_URL = BuildConfig.BASE_URL;
 	//public static final String BASE_URL = "http://47.254.73.159:3110";// 测试环境
-	public static final String MANHATTAN_BASE_URL = "https://v2.server.populife.co/";
+	/** 当前无人引用,但一并跟随渠道,免得日后被用上时又成了一个硬编码的漏改点 */
+	public static final String MANHATTAN_BASE_URL = BuildConfig.BASE_URL;
 	public static final String INIT_LOCK_C1_GET = "private-lib/c1-get"; //（get）获取门锁绑定 C1 -- @{@"aesKey":random};//auth/c1/get
 	public static final String AUTH_VERIFY_ADMIN_C1_GET = "auth/admin/get"; //（get）管理员身份认证，获取 C1 -- @{@"userId":userId,@"keyId":keyId,@"lockId":lockId,@"randomStr":random};
 	public static final String AUTH_VERIFY_USERUNLOCK_C1_GET = "auth/user/get"; //（get）普通用户身份认证，获取 C1 -- @{@"userId":userId,@"keyId":keyId,@"lockId":lockId,@"randomStr":random};
