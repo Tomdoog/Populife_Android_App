@@ -30,6 +30,7 @@ import com.populstay.populife.entity.PPLBleSession;
 import com.populstay.populife.enumtype.Operation;
 import com.populstay.populife.eventbus.Event;
 import com.populstay.populife.helper.OfflineLockUploader;
+import com.populstay.populife.manhattanlock.MHILockDeleteLock;
 import com.populstay.populife.ui.loader.PeachLoader;
 import com.populstay.populife.util.date.DateUtil;
 import com.populstay.populife.util.log.PeachLogger;
@@ -136,9 +137,13 @@ public class MyApplication extends BaseApplication {
 					break;
 
 				case DELETE_LOCK:
-				case INIT_LOCK_DELETE:
 					if (CURRENT_KEY != null)
 						sPPLOCK.deleteLock(CURRENT_KEY.getUserId(), String.valueOf(CURRENT_KEY.getLockId()), String.valueOf(CURRENT_KEY.getKeyId()), CURRENT_KEY.getK1());
+					break;
+
+				case INIT_LOCK_DELETE:
+					// 添加设备失败后的回滚重连：lockId/keyId/k1 都还没下发，只能走免认证的初始化回滚
+					sPPLOCK.resetLockAfterInitFail();
 					break;
 
 				case GET_BATTERY_LEVEL:
@@ -279,7 +284,9 @@ public class MyApplication extends BaseApplication {
 					break;
 
 				case DELETE_LOCK:
-					pplBleSession.getmILockDeleteLock().onFinish();
+					if (pplBleSession.getmILockDeleteLock() != null) {
+						pplBleSession.getmILockDeleteLock().onFinish();
+					}
 					break;
 
 				default:
@@ -309,7 +316,13 @@ public class MyApplication extends BaseApplication {
 				String userId = PeachPreference.readUserId();
 				String lockMac =lockInfo.getString("lockMac");
 				String lockName = lockInfo.getString("lockName");
-				PopulifeDBUtil.getInstance(getApplicationContext()).save(new OfflineLock(userId, lockMac, lockName, lockDataJson, -1));
+				boolean saved = PopulifeDBUtil.getInstance(getApplicationContext())
+						.save(new OfflineLock(userId, lockMac, lockName, lockDataJson, -1));
+				if (!saved) {
+					// 这条记录是"锁已被物理初始化"的唯一凭证：丢了就既进不了未同步列表、也补传不了，
+					// 锁却已经不在出厂态。落库失败必须留痕，否则线上完全无从排查。
+					PeachLogger.e(TAG, "save OfflineLock FAILED! mac=" + lockMac + " user=" + userId);
+				}
 
 				EventBus.getDefault().post(new Event(Event.EventType.LOCK_LOCAL_INITIALIZE_SUCCEED, lockDataJson));
 
@@ -320,12 +333,26 @@ public class MyApplication extends BaseApplication {
 
 		@Override
 		public void onDeleteLock(BleDevice device, LockError error) {
+			// 回调可能没被设置（如添加设备失败后的回滚，此前只有详情页删锁流程会 set），
+			// 直接调用会 NPE；而删本地缓存那步在它之前，一崩就变成"记录已删、锁没重置"的孤儿设备。
+			final MHILockDeleteLock callback = pplBleSession.getmILockDeleteLock();
 			if (error == LockError.SUCCESS) {
 				// 锁重置成功，需要删除缓存
-				PopulifeDBUtil.getInstance(BaseApplication.getApplication()).deleteByUserAndMac(PeachPreference.readUserId(), device.getAddress());
-				pplBleSession.getmILockDeleteLock().onSuccess();
+				if (device != null && !StringUtil.isBlank(device.getAddress())) {
+					PopulifeDBUtil.getInstance(BaseApplication.getApplication()).deleteByUserAndMac(PeachPreference.readUserId(), device.getAddress());
+					PeachLogger.d("onDeleteLock success, clear local " + device.getAddress());
+				} else {
+					// 拿不到 mac 就删不掉对应记录，宁可留着让它出现在"未同步设备"里
+					PeachLogger.e(TAG, "onDeleteLock success but device mac is null, local record kept");
+				}
+				if (callback != null) {
+					callback.onSuccess();
+				}
 			} else {
-				pplBleSession.getmILockDeleteLock().onFail();
+				PeachLogger.d("onDeleteLock fail: " + error);
+				if (callback != null) {
+					callback.onFail();
+				}
 			}
 		}
 

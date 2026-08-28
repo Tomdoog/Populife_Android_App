@@ -374,6 +374,35 @@ public class PPLock {
 	}
 
 	/**
+	 * 初始化失败回滚：把刚初始化成功、但云端绑定失败的锁恢复出厂态。
+	 *
+	 * 不能复用 {@link #deleteLock}：那条路要先 authVerify，而 lockId / keyId / k1 都是服务端
+	 * 初始化成功才下发的，此刻根本没有，认证必然失败。刚初始化完的这条连接本身就持管理员权限，
+	 * 直接下发删除指令即可（与 deleteLock 内部 INIT_LOCK_DELETE 分支同一条路径）。
+	 *
+	 * 调用前需确保与锁的连接仍在。
+	 */
+	public void resetLockAfterInitFail() {
+
+		BleService.sLockBleSession.setDeleteLockCallback(new DeleteLockCallback() {
+			@Override
+			public void onSuccess(BleDevice device) {
+				mPPLockCallback.onDeleteLock(mBleService.mBleDevice, LockError.SUCCESS);
+				disconnect();
+			}
+
+			@Override
+			public void onFail(LockError error) {
+				mPPLockCallback.onDeleteLock(mBleService.mBleDevice, error);
+				disconnect();
+			}
+		});
+
+		BleService.sLockBleSession.setLockOperation(LockOperation.DELETE_LOCK);
+		BleService.getBleService().adminDeleteLock();
+	}
+
+	/**
 	 * 查询锁版本
 	 */
 	public void getLockVersion() {

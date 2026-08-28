@@ -1032,6 +1032,11 @@
     <string name="sync">Synchroniser</string>
     <string name="sync_successfully">Synchronisé avec succès</string>
     <string name="sync_fail">Échec de la synchronisation. Veuillez réessayer.</string>
+    <string name="add_fail_rollback_done">La serrure a été réinitialisée aux paramètres d\'usine.</string>
+    <string name="add_fail_rollback_done_detail">Touchez le clavier et attendez que le signe + apparaisse, puis ajoutez à nouveau la serrure.</string>
+    <string name="add_fail_rollback_failed">La serrure n\'a pas pu être réinitialisée automatiquement.</string>
+    <string name="add_fail_rollback_failed_detail">La serrure est toujours associée à ce téléphone. Rapprochez-vous et réessayez. L\'appareil a été conservé dans Moi &gt; Appareils non synchronisés.</string>
+    <string name="device_already_bound">Cet appareil est déjà associé à un autre utilisateur.</string>
     <string name="device_init_loading">Connexion en cours…</string>
     <!--  新需求  -->
     <string name="test_device_init_fail">Échec de la simulation d\'initialisation de l\'appareil (%s)</string>

@@ -1032,6 +1032,11 @@
     <string name="sync">Synchronisieren</string>
     <string name="sync_successfully">Erfolgreich synchronisiert</string>
     <string name="sync_fail">Synchronisation fehlgeschlagen. Bitte versuchen Sie es erneut.</string>
+    <string name="add_fail_rollback_done">Das Schloss wurde auf die Werkseinstellungen zurückgesetzt.</string>
+    <string name="add_fail_rollback_done_detail">Berühren Sie das Tastenfeld und warten Sie, bis das +-Zeichen erscheint. Fügen Sie das Schloss dann erneut hinzu.</string>
+    <string name="add_fail_rollback_failed">Das Schloss konnte nicht automatisch zurückgesetzt werden.</string>
+    <string name="add_fail_rollback_failed_detail">Das Schloss ist weiterhin mit diesem Telefon gekoppelt. Gehen Sie näher heran und versuchen Sie es erneut. Das Gerät wurde unter „Ich“ &gt; „Nicht synchronisierte Geräte“ gespeichert.</string>
+    <string name="device_already_bound">Dieses Gerät wurde bereits mit einem anderen Benutzer verknüpft.</string>
     <string name="device_init_loading">"Verbindung wird hergestellt… "</string>
     <!--  新需求  -->
     <string name="test_device_init_fail">Simulation der Geräteinitialisierung fehlgeschlagen (%s)</string>

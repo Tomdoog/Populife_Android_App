@@ -1032,6 +1032,11 @@
     <string name="sync">Sincronizar</string>
     <string name="sync_successfully">Sincronizado correctamente</string>
     <string name="sync_fail">Fallo de sincronización. Inténtalo de nuevo.</string>
+    <string name="add_fail_rollback_done">La cerradura se ha restablecido a los ajustes de fábrica.</string>
+    <string name="add_fail_rollback_done_detail">Toque el teclado y espere a que aparezca el signo + para volver a añadir la cerradura.</string>
+    <string name="add_fail_rollback_failed">No se ha podido restablecer la cerradura automáticamente.</string>
+    <string name="add_fail_rollback_failed_detail">La cerradura sigue vinculada a este teléfono. Acérquese a ella e inténtelo de nuevo. El dispositivo se ha conservado en Yo &gt; Dispositivos no sincronizados.</string>
+    <string name="device_already_bound">Este dispositivo ya está vinculado a otro usuario.</string>
     <string name="device_init_loading">Conectando…</string>
     <!--  新需求  -->
     <string name="test_device_init_fail">Error al simular la inicialización del dispositivo (%s)</string>

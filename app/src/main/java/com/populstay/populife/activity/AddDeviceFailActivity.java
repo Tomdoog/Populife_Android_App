@@ -15,14 +15,32 @@ import androidx.annotation.Nullable;
 public class AddDeviceFailActivity extends BaseActivity implements View.OnClickListener {
 
 	private static final String KEY_LOCK_TYPE = "KEY_LOCK_TYPE";
+	private static final String KEY_ROLLBACK_STATE = "KEY_ROLLBACK_STATE";
+
+	/** 没有发生过物理回滚：蓝牙都没初始化成功，或属于网络失败、锁留着等自动补传 */
+	public static final int ROLLBACK_NONE = 0;
+	/** 锁已重置回出厂态，可以直接重新添加 */
+	public static final int ROLLBACK_DONE = 1;
+	/** 锁仍是已初始化状态、没能自动恢复，本地记录已保留在"未同步设备"里 */
+	public static final int ROLLBACK_FAILED = 2;
 
 	private TextView mTvTryPairingAgain, mTvBackToSmart;
 	private String mLockType;
+	private int mRollbackState = ROLLBACK_NONE;
 	private TextView tvTheFollowing, tvTheFollowingDetail;
 
 	public static void actionStart(Context context, String lockType) {
+		actionStart(context, lockType, ROLLBACK_NONE);
+	}
+
+	/**
+	 * @param rollbackState 物理锁的回滚结果，决定这一屏告诉用户"锁现在是什么状态、下一步该做什么"。
+	 *                      不带这个信息的话，锁已回出厂态和锁还锁着两种情况看到的是同一句"添加失败"。
+	 */
+	public static void actionStart(Context context, String lockType, int rollbackState) {
 		Intent intent = new Intent(context, AddDeviceFailActivity.class);
 		intent.putExtra(KEY_LOCK_TYPE, lockType);
+		intent.putExtra(KEY_ROLLBACK_STATE, rollbackState);
 		context.startActivity(intent);
 	}
 
@@ -38,6 +56,7 @@ public class AddDeviceFailActivity extends BaseActivity implements View.OnClickL
 
 	private void getIntentData() {
 		mLockType = getIntent().getStringExtra(KEY_LOCK_TYPE);
+		mRollbackState = getIntent().getIntExtra(KEY_ROLLBACK_STATE, ROLLBACK_NONE);
 	}
 
 	private void initView() {
@@ -46,6 +65,18 @@ public class AddDeviceFailActivity extends BaseActivity implements View.OnClickL
 		mTvBackToSmart = findViewById(R.id.tv_back_to_smart);
 		tvTheFollowing = findViewById(R.id.tv_the_following);
 		tvTheFollowingDetail = findViewById(R.id.tv_the_following_detail);
+
+		// 发生过回滚时，锁的实际状态比"重启蓝牙、重启 App"那套通用建议重要得多，优先讲清楚
+		if (mRollbackState == ROLLBACK_DONE) {
+			tvTheFollowing.setText(R.string.add_fail_rollback_done);
+			tvTheFollowingDetail.setText(R.string.add_fail_rollback_done_detail);
+			return;
+		}
+		if (mRollbackState == ROLLBACK_FAILED) {
+			tvTheFollowing.setText(R.string.add_fail_rollback_failed);
+			tvTheFollowingDetail.setText(R.string.add_fail_rollback_failed_detail);
+			return;
+		}
 
 		if (mLockType.startsWith(HomeDeviceInfo.IDeviceName.NAME_GATEWAY)) {
 			tvTheFollowing.setText(R.string.failed_to_add_gateway_hint);

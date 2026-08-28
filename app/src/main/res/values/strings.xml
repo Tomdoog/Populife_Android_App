@@ -1032,6 +1032,12 @@
     <string name="sync">sync</string>
     <string name="sync_successfully">Synced successfully</string>
     <string name="sync_fail">Sync failed. Please try again</string>
+    <!-- 添加失败：物理锁的回滚结果 -->
+    <string name="add_fail_rollback_done">The lock has been reset to factory settings.</string>
+    <string name="add_fail_rollback_done_detail">Touch the keypad and wait for the + sign to appear, then add the lock again.</string>
+    <string name="add_fail_rollback_failed">The lock could not be reset automatically.</string>
+    <string name="add_fail_rollback_failed_detail">The lock is still paired with this phone. Move closer to it and try again. This device has been kept in Me &gt; Unsynced Devices.</string>
+    <string name="device_already_bound">This device has been bound with another user.</string>
     <!--  新需求  -->
     <string name="test_device_init_fail">Simulate device initialization failure (%s)</string>
     <string name="note_get_verification_code_limit1">Too many requests. Please try again later.</string>

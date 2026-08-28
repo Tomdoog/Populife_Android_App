@@ -21,9 +21,11 @@ import com.google.gson.reflect.TypeToken;
 import com.populstay.populife.R;
 import com.populstay.populife.base.BaseActivity;
 import com.populstay.populife.common.Urls;
+import com.populstay.populife.db.PopulifeDBUtil;
 import com.populstay.populife.entity.Gateway;
 import com.populstay.populife.entity.Key;
 import com.populstay.populife.eventbus.Event;
+import com.populstay.populife.helper.OfflineLockUploader;
 import com.populstay.populife.home.entity.Home;
 import com.populstay.populife.home.entity.HomeDevice;
 import com.populstay.populife.home.entity.HomeDeviceInfo;
@@ -337,6 +339,7 @@ public class AddDeviceSuccessActivity extends BaseActivity implements View.OnCli
 						JSONObject result = JSON.parseObject(response);
 						int code = result.getInteger("code");
 						if (code == 200) {
+							completeLockSync();
 							changeSelectHome();
 							EventBus.getDefault().post(new Event(Event.EventType.ADD_DEVICE_SUCCESS));
 							//PeachPreference.getAccountLockNum(PeachPreference.readUserId());
@@ -356,6 +359,17 @@ public class AddDeviceSuccessActivity extends BaseActivity implements View.OnCli
 				})
 				.build()
 				.post();
+	}
+
+	/** 设备完成云端初始化且已归属空间后，才可清除本地待同步记录。 */
+	private void completeLockSync() {
+		if (mKey == null || TextUtils.isEmpty(mKey.getLockMac())) {
+			return;
+		}
+		PopulifeDBUtil.getInstance(getApplicationContext())
+				.deleteByUserAndMac(mKey.getUserId(), mKey.getLockMac());
+		OfflineLockUploader.clearSyncFailed(mKey.getUserId(), mKey.getLockMac());
+		PeachLogger.d("LOCK_BIND_HOME complete, clear local " + mKey.getLockMac());
 	}
 
 	/**

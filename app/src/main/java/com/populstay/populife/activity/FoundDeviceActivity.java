@@ -30,6 +30,7 @@ import com.populstay.populife.adapter.FoundDeviceAdapter;
 import com.populstay.populife.app.MyApplication;
 import com.populstay.populife.base.BaseActivity;
 import com.populstay.populife.base.BaseApplication;
+import com.populstay.populife.manhattanlock.MHILockDeleteLock;
 import com.populstay.populife.helper.DeviceDeleteRecoveryDialog;
 import com.populstay.populife.common.Urls;
 import com.populstay.populife.constant.BleConstant;
@@ -64,6 +65,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.WeakHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import androidx.annotation.RequiresPermission;
 import androidx.appcompat.app.AlertDialog;
@@ -365,6 +367,13 @@ public class FoundDeviceActivity extends BaseActivity implements AdapterView.OnI
 
 	@Override
 	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+		if (!mAdapter.canAdd(position)) {
+			// 设备已被初始化：绑在别人账号下，或上一次添加中断后没能回滚。
+			// 以前这里是靠 Adapter.isEnabled() 屏蔽点击的，用户点了一点反馈都没有。
+			PeachLogger.d(TAG + " 点击了已初始化的设备，不可添加");
+			toast(R.string.device_already_bound);
+			return;
+		}
 		if (isBleNetEnableWithToast()) {
 			final Object obj = mAdapter.getItem(position);
 			PeachLogger.d(TAG + " 点击锁头，开始初始化");
@@ -416,7 +425,13 @@ public class FoundDeviceActivity extends BaseActivity implements AdapterView.OnI
                     lockInfo.put("lockData", s);
                     lockInfo.put("lockVersion", JSON.parseObject(device.getLockVersionJson()));
                     String lockDataJson = lockInfo.toJSONString();
-                    PopulifeDBUtil.getInstance(getApplicationContext()).save(new OfflineLock(userId, lockMac, lockName, lockDataJson, 0));
+                    boolean saved = PopulifeDBUtil.getInstance(getApplicationContext())
+                            .save(new OfflineLock(userId, lockMac, lockName, lockDataJson, 0));
+                    if (!saved) {
+                        // 这条记录是"锁已被物理初始化"的唯一凭证：丢了就既进不了未同步列表、也补传不了，
+                        // 锁却已经不在出厂态。落库失败必须留痕，否则线上完全无从排查。
+                        PeachLogger.e(TAG, "save OfflineLock FAILED! mac=" + lockMac + " user=" + userId);
+                    }
                     EventBus.getDefault().post(new Event(Event.EventType.LOCK_LOCAL_INITIALIZE_SUCCEED, lockDataJson));
                 }
 
@@ -543,7 +558,7 @@ public class FoundDeviceActivity extends BaseActivity implements AdapterView.OnI
 						JSONObject result = JSON.parseObject(response);
 						int code = result.getInteger("code");
 						if (code == 200) {
-							PopulifeDBUtil.getInstance(BaseApplication.getApplication()).deleteByUserAndMac(mKey.getUserId(), mKey.getLockMac());
+							// 账号初始化成功还不等于添加完成；本地记录留到成功绑定空间后再清除。
 							PeachLogger.d(TAG + " initializeLock 提交成功 ");
 							JSONObject data = result.getJSONObject("data");
 							mLockId = data.getInteger("lockId");
@@ -616,7 +631,7 @@ public class FoundDeviceActivity extends BaseActivity implements AdapterView.OnI
 						JSONObject result = JSON.parseObject(response);
 						int code = result.getInteger("code");
 						if (code == 200) {
-							PopulifeDBUtil.getInstance(BaseApplication.getApplication()).deleteByUserAndMac(mKey.getUserId(), mKey.getLockMac());
+							// 账号初始化成功还不等于添加完成；本地记录留到成功绑定空间后再清除。
 							PeachLogger.d(TAG + " initializeLock 提交成功 ");
 							JSONObject data = result.getJSONObject("data");
 							mLockId = data.getInteger("lockId");
@@ -688,18 +703,61 @@ public class FoundDeviceActivity extends BaseActivity implements AdapterView.OnI
 	 */
 	private void keepForRetry() {
 		PeachLogger.d(TAG + " 上传失败(网络类),保留锁绑定与本地记录,等待自动补传");
-		AddDeviceFailActivity.actionStart(this, mLockType);
+		AddDeviceFailActivity.actionStart(this, mLockType, AddDeviceFailActivity.ROLLBACK_NONE);
 	}
 
+	/** 回滚等待超时:蓝牙指令可能永远等不到回调,不能让用户卡在这一屏 */
+	private static final long ROLLBACK_TIMEOUT_MS = 30 * 1000L;
+
+	/** 回滚结果只处理一次 —— 蓝牙回调与超时兜底会抢同一个出口 */
+	private final AtomicBoolean mRollbackHandled = new AtomicBoolean(false);
+
+	private final Runnable mRollbackTimeout = new Runnable() {
+		@Override
+		public void run() {
+			PeachLogger.d(TAG + " reset 超时未收到结果，按失败处理，保留本地记录");
+			finishRollback(false);
+		}
+	};
+
 	/**
-	 * 上传失败，重置锁，数据回滚(仅用于服务端明确拒绝的业务失败)
+	 * 上传失败，重置锁，数据回滚(仅用于服务端明确拒绝的业务失败)。
+	 *
+	 * 回滚成没成功，决定了用户接下来该做什么，所以必须等结果出来再跳失败页:
+	 *  - 成功:锁已回出厂态、本地记录作废，引导重新添加;
+	 *  - 失败:锁仍是已初始化状态，本地记录必须留着，靠"未同步设备"兜底。
+	 * 原来不等结果直接跳页，用户只看到一句"添加失败"，并不知道锁现在是哪种状态。
 	 */
 	private void resetLock() {
 		PeachLogger.d(TAG + " reset 上传失败，重置锁，数据回滚");
 		MyApplication.CURRENT_KEY = mKey;
+		mRollbackHandled.set(false);
+		showLoading();
+		BaseApplication.getHandler().postDelayed(mRollbackTimeout, ROLLBACK_TIMEOUT_MS);
+
 		if (isMHTLock) {
+			MyApplication.pplBleSession.setmILockDeleteLock(new MHILockDeleteLock() {
+				@Override
+				public void onSuccess() {
+					// 本地记录由 MyApplication.onDeleteLock 统一清除
+					PeachLogger.d(TAG + " reset 成功(MHT) " + mKey.getLockMac());
+					finishRollback(true);
+				}
+
+				@Override
+				public void onFail() {
+					PeachLogger.d(TAG + " reset 失败(MHT)，保留本地记录等待兜底 " + mKey.getLockMac());
+					finishRollback(false);
+				}
+
+				@Override
+				public void onFinish() {
+				}
+			});
 			if (sPPLOCK.isConnected(mKey.getLockMac())) {
-				sPPLOCK.deleteLock(mKey.getUserId(), String.valueOf(mKey.getLockId()), String.valueOf(mKey.getKeyId()), mKey.getK1());
+				// lockId/keyId/k1 是服务端初始化成功才下发的，此刻都还没有，
+				// 走不了要 authVerify 的 deleteLock，只能用免认证的初始化回滚
+				sPPLOCK.resetLockAfterInitFail();
 			} else {
 				MyApplication.pplBleSession.setOperation(LockOperation.INIT_LOCK_DELETE);
 				//sPPLOCK.connect(mKey.getLockMac());
@@ -714,16 +772,32 @@ public class FoundDeviceActivity extends BaseActivity implements AdapterView.OnI
                     PopulifeDBUtil.getInstance(BaseApplication.getApplication())
                             .deleteByUserAndMac(mKey.getUserId(), mKey.getLockMac());
                     PeachLogger.d(TAG + " reset 成功,已删除本地待上传记录 " + mKey.getLockMac());
+                    finishRollback(true);
                 }
 
                 @Override
                 public void onFail(LockError error) {
-                    kjxRequestBleConnectPermissionStartConnect(mKey.getLockMac());
+                    PeachLogger.d(TAG + " reset 失败,保留本地记录等待兜底 " + mKey.getLockMac() + " " + error);
+                    finishRollback(false);
                 }
             });
 		}
+	}
 
-		AddDeviceFailActivity.actionStart(this, mLockType);
+	/** 回滚结果统一出口 */
+	private void finishRollback(final boolean rollbackDone) {
+		if (!mRollbackHandled.compareAndSet(false, true)) {
+			return;
+		}
+		BaseApplication.getHandler().removeCallbacks(mRollbackTimeout);
+		runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				stopLoading();
+				AddDeviceFailActivity.actionStart(FoundDeviceActivity.this, mLockType,
+						rollbackDone ? AddDeviceFailActivity.ROLLBACK_DONE : AddDeviceFailActivity.ROLLBACK_FAILED);
+			}
+		});
 	}
 
 	/**

@@ -1030,6 +1030,11 @@
     <string name="sync">同期する</string>
     <string name="sync_successfully">同期に成功しました</string>
     <string name="sync_fail">同期に失敗しました。再試行してください</string>
+    <string name="add_fail_rollback_done">デバイスを工場出荷時の状態に戻しました</string>
+    <string name="add_fail_rollback_done_detail">キーパッドに触れて + マークが表示されるのを待ってから、もう一度追加してください。</string>
+    <string name="add_fail_rollback_failed">デバイスを自動的に初期化できませんでした</string>
+    <string name="add_fail_rollback_failed_detail">デバイスはこの端末とペアリングされたままです。デバイスに近づいてから、もう一度お試しください。この機器は「マイページ &gt; 同期されていないデバイス」に保存されています。</string>
+    <string name="device_already_bound">このデバイスは別のユーザーに登録されています</string>
     <string name="device_init_loading">接続中です…</string>
     <!--  新需求  -->
     <string name="test_device_init_fail">デバイス初期化のシミュレーションに失敗しました (%s)</string>

@@ -148,13 +148,26 @@ public class FoundDeviceAdapter extends BaseAdapter {
 		return position;
 	}
 
+	/**
+	 * 恒定可点。已初始化的设备点下去要能得到一句解释，而在这里返回 false 的话
+	 * ListView 压根不派发点击，用户点一个灰条目毫无反应，只会理解成"设备坏了"。
+	 * 能不能添加改由 {@link #canAdd(int)} 判断，在点击回调里拦截并提示。
+	 */
 	@Override
 	public boolean isEnabled(int position) {
+		return true;
+	}
+
+	/** 该设备是否还处于可添加（未被初始化）状态 */
+	public boolean canAdd(int position) {
 		Object device = getItem(position);
 		if (device instanceof BleDevice) {
 			return ((BleDevice) device).isSettingMode();
 		}
-		return ((ExtendedBluetoothDevice) device).isSettingMode();
+		if (device instanceof ExtendedBluetoothDevice) {
+			return ((ExtendedBluetoothDevice) device).isSettingMode();
+		}
+		return false;
 	}
 
 	@Override

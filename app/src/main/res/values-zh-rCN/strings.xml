@@ -1032,6 +1032,11 @@
     <string name="sync">同步</string>
     <string name="sync_successfully">同步成功</string>
     <string name="sync_fail">同步失败，请重试</string>
+    <string name="add_fail_rollback_done">设备已恢复出厂设置</string>
+    <string name="add_fail_rollback_done_detail">请触摸键盘唤醒设备，待 + 号出现后重新添加。</string>
+    <string name="add_fail_rollback_failed">设备未能自动恢复</string>
+    <string name="add_fail_rollback_failed_detail">设备仍处于已配对状态。请靠近设备后重新添加。该设备已保留在「我的 - 未同步的设备」中。</string>
+    <string name="device_already_bound">该设备已被其他用户绑定</string>
     <!--  新需求  -->
     <string name="test_device_init_fail">模拟初始化设备失败(%s)</string>
     <string name="note_get_verification_code_limit1">请求过于频繁，请稍后再试</string>

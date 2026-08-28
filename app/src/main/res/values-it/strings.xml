@@ -1032,6 +1032,11 @@
     <string name="sync">Sincronizzare</string>
     <string name="sync_successfully">Sincronizzato con successo</string>
     <string name="sync_fail">Sincronizzazione fallita. Riprova, per favore.</string>
+    <string name="add_fail_rollback_done">La serratura è stata ripristinata alle impostazioni di fabbrica.</string>
+    <string name="add_fail_rollback_done_detail">Tocca la tastiera e attendi la comparsa del segno +, quindi aggiungi di nuovo la serratura.</string>
+    <string name="add_fail_rollback_failed">Non è stato possibile ripristinare automaticamente la serratura.</string>
+    <string name="add_fail_rollback_failed_detail">La serratura è ancora associata a questo telefono. Avvicinati e riprova. Il dispositivo è stato conservato in Io &gt; Dispositivi non sincronizzati.</string>
+    <string name="device_already_bound">Questo dispositivo è già associato a un altro utente.</string>
     <string name="device_init_loading">Connessione in corso…</string>
     <!--  新需求  -->
     <string name="test_device_init_fail">Simulazione inizializzazione dispositivo fallita (%s)</string>
