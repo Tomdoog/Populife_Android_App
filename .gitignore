@@ -66,3 +66,17 @@ fastlane/Preview.html
 fastlane/screenshots
 fastlane/test_output
 fastlane/readme.md
+
+# IDE 本机环境：JDK 版本与插件设置因人而异，入库会强制他人跟随
+.idea/compiler.xml
+.idea/misc.xml
+.idea/appInsightsSettings.xml
+.idea/markdown.xml
+.idea/material_theme_project_new.xml
+
+# 排障用的 logcat 导出：含 token / 手机号 / userId，且是一次性产物
+*.logcat
+
+# 汇报与方案材料：二进制不可 diff，改一版仓库里就永久多存一份
+docs/*.pptx
+docs/*.pdf
