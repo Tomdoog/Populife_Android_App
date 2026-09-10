@@ -20,6 +20,8 @@ public class HomeDeviceInfo {
 
 		if (deviceName.startsWith(IDeviceName.NAME_GATEWAY)) {
 			name = R.string.device_name_gateway;
+		} else if (isPadlock(deviceName)) {
+			name = R.string.lock_type_padlock;
 		} else if (HomeDeviceInfo.isDeadboltLack(deviceName)) {
 			name = R.string.lock_type_deadbolt;
 		} else if (HomeDeviceInfo.isKeyBox(deviceName)) {
@@ -47,6 +49,8 @@ public class HomeDeviceInfo {
 
 		if (deviceName.startsWith(IDeviceName.NAME_GATEWAY)) {
 			iconActive = R.drawable.device_card_single_icon_gateway_selector;
+		} else if (isPadlock(deviceName)) {
+			iconActive = R.drawable.padlock_outline;
 		} else if (HomeDeviceInfo.isDeadboltLack(deviceName)) {
 			iconActive = R.drawable.device_card_single_icon_deadbolt_selector;
 		} else if (HomeDeviceInfo.isKeyBox(deviceName)) {
@@ -75,6 +79,8 @@ public class HomeDeviceInfo {
 
 		if (deviceName.startsWith(IDeviceName.NAME_GATEWAY)) {
 			productPicture = R.drawable.product_gateway;
+		} else if (isPadlock(deviceName)) {
+			productPicture = R.drawable.product_padlock;
 		} else if (HomeDeviceInfo.isDeadboltLack(deviceName)) {
 			productPicture = R.drawable.product_deadbolt;
 		} else if (HomeDeviceInfo.isKeyBox(deviceName)) {
@@ -89,6 +95,11 @@ public class HomeDeviceInfo {
 			productPicture = R.drawable.product_door_lock;
 		}
 		return productPicture;
+	}
+
+	public static boolean isPadlock(String lockType) {
+		return lockType != null && lockType.regionMatches(true, 0,
+				IDeviceName.NAME_LOCK_PADLOCK, 0, IDeviceName.NAME_LOCK_PADLOCK.length());
 	}
 
 	public static  boolean isDeadboltLack(String lockType) {
@@ -136,6 +147,9 @@ public class HomeDeviceInfo {
 
 	// 这个不要随便动，需要跟IOS端统一的，用来区分设备类型
 	public interface IDeviceName {
+		// P3_ 开头为蓝牙、指纹挂锁，与 iOS 保持一致（忽略大小写）。
+		String NAME_LOCK_PADLOCK = "P3_";
+
 		// 网关(G2开头的，在添加设备时，转为Gateway)
 		String NAME_GATEWAY = "Gateway";
 

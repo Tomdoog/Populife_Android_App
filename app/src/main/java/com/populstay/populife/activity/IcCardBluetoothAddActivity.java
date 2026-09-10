@@ -265,6 +265,15 @@ public class IcCardBluetoothAddActivity extends BaseActivity {
 			}
 			mTvHintBack.setEnabled(false);
 		}
+		if (HomeDeviceInfo.isPadlock(mLockType)) {
+			mIvAddDevicePic.setImageResource(R.drawable.padlock_outline);
+			mIvAddDevicePic.setAdjustViewBounds(true);
+			mIvAddDevicePic.setMaxHeight((int) (220 * getResources().getDisplayMetrics().density));
+			if (isInit) {
+				mTvPageTitle.setText(R.string.activate_padlock);
+				add_device_activate_hint1.setText(R.string.padlock_wake_hint);
+			}
+		}
 	}
 
 	@Override

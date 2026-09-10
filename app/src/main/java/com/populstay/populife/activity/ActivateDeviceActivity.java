@@ -202,6 +202,15 @@ public class ActivateDeviceActivity extends BaseActivity implements View.OnClick
 	}
 
 	private void initStatus() {
+		if (HomeDeviceInfo.isPadlock(mLockType)) {
+			mTvPageTitle.setText(R.string.activate_padlock);
+			mIvAddDevicePic.setImageResource(R.drawable.padlock_outline);
+			mIvAddDevicePic.setAdjustViewBounds(true);
+			mIvAddDevicePic.setMaxHeight((int) (220 * getResources().getDisplayMetrics().density));
+			add_device_activate_hint1.setText(R.string.padlock_wake_hint);
+			add_device_activate_hint2.setVisibility(View.GONE);
+			return;
+		}
 		if (mFrom == KeyPwdConstant.IFrom.FROM_FINGERPRINT_CARD) { // 添加指纹/门卡
 			if (mFingerprintCardType == KeyPwdConstant.IType.TYPE_FINGERPRINT) { // 添加指纹
 				mTvPageTitle.setText(R.string.activate_moon_lock);

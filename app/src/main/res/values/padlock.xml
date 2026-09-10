@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="lock_type_padlock">Padlock</string>
+    <string name="activate_padlock">Activate the Padlock</string>
+    <string name="padlock_wake_hint">Touch the fingerprint sensor to wake the padlock.</string>
+    <string name="padlock_battery_hint">4. Make sure the padlock has sufficient battery power.</string>
+    <string name="padlock_scan">Scanning nearby padlocks</string>
+    <string name="padlock_scan_wait">Scanning nearby padlocks, please wait.</string>
+    <string name="padlock_not_found">No padlock found. Keep the padlock near your phone and touch the fingerprint sensor, then try again.</string>
+</resources>

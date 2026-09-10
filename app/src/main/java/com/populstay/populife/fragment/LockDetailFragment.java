@@ -485,6 +485,9 @@ public class LockDetailFragment extends BaseFragment implements View.OnClickList
     }
 
     private boolean isSupportRemoteLock() {
+		if (HomeDeviceInfo.isPadlock(mCurKEY.getLockName())) {
+			return false;
+		}
 		boolean isSupportRemoteUnlock = FeatureValueUtil.isSupportFeature(mCurKEY.getLockData(), FeatureValue.GATEWAY_UNLOCK);
 		// 远程开锁关闭，闭锁也不允许操作了
 		if (!isSupportRemoteUnlock) {
@@ -520,6 +523,9 @@ public class LockDetailFragment extends BaseFragment implements View.OnClickList
 	}
 
 	private boolean isSupportRemoteUnlock() {
+		if (HomeDeviceInfo.isPadlock(mCurKEY.getLockName())) {
+			return false;
+		}
 		boolean isSupportRemoteUnlock = FeatureValueUtil.isSupportFeature(mCurKEY.getLockData(), FeatureValue.GATEWAY_UNLOCK)  && mCurKEY.isHasGateway();
 
 		// 不支持远程开锁
@@ -1811,7 +1817,11 @@ public class LockDetailFragment extends BaseFragment implements View.OnClickList
 	 */
 	private void refreshLockActionUI() {
 		refreshBattery();
-		if (HomeDeviceInfo.isDeadboltLack(mCurKEY.getLockName())) {
+		if (HomeDeviceInfo.isPadlock(mCurKEY.getLockName())) {
+			mIvLockImg.setImageResource(R.drawable.product_padlock);
+			mIvLockImg.setAdjustViewBounds(true);
+			mIvLockImg.setMaxHeight((int) (220 * getResources().getDisplayMetrics().density));
+		} else if (HomeDeviceInfo.isDeadboltLack(mCurKEY.getLockName())) {
 			mIvLockImg.setImageResource(R.drawable.product_deadbolt);
 		} else if (HomeDeviceInfo.isKeyBox(mCurKEY.getLockName())) {
 			mIvLockImg.setImageResource(R.drawable.product_keybox);
@@ -1829,7 +1839,8 @@ public class LockDetailFragment extends BaseFragment implements View.OnClickList
 			((LockDetailActivity) mActivity).setTitleName(mCurKEY.getLockAlias());
 		}
 //        网关开关
-        binding.llRemoteOpen.setVisibility(mCurKEY.isHasGateway() ? View.VISIBLE : View.GONE);
+        binding.llRemoteOpen.setVisibility(mCurKEY.isHasGateway()
+                && !HomeDeviceInfo.isPadlock(mCurKEY.getLockName()) ? View.VISIBLE : View.GONE);
         binding.scRemoteOpen.setOnCheckedChangeListener(null);
         binding.scRemoteOpen.setChecked(mCurKEY.getUnlockType() == 1);
         binding.scRemoteOpen.setEnabled(true);
@@ -1929,7 +1940,8 @@ public class LockDetailFragment extends BaseFragment implements View.OnClickList
 //			addFingerprint(true);
 //		}
 
-		if (mCurKEY.getLockName().startsWith(HomeDeviceInfo.IDeviceName.NAME_LOCK_MANHATTAN_MOON_LOCK)
+		if (HomeDeviceInfo.isPadlock(mCurKEY.getLockName())
+				|| mCurKEY.getLockName().startsWith(HomeDeviceInfo.IDeviceName.NAME_LOCK_MANHATTAN_MOON_LOCK)
 				|| mCurKEY.getLockName().startsWith(HomeDeviceInfo.IDeviceName.NAME_LOCK_MANHATTAN_MOON_LOCK_LOWER)) {
 			addFingerprint(true);
 			addEKeyManage(true);
@@ -1949,7 +1961,8 @@ public class LockDetailFragment extends BaseFragment implements View.OnClickList
 	private void initAdminUI() {
 		setUnlockLock();
 		enableLockingColorFiltr(true, false, 0);
-		if (DigitUtil.isSupportFingerPrint(mCurKEY.getSpecialValue())) { // 支持指纹
+		if (HomeDeviceInfo.isPadlock(mCurKEY.getLockName())
+				|| DigitUtil.isSupportFingerPrint(mCurKEY.getSpecialValue())) { // 支持指纹
 			addFingerprint(true);
 		}
 		addPasscodeManage(true);
@@ -1962,6 +1975,9 @@ public class LockDetailFragment extends BaseFragment implements View.OnClickList
 	}
 
 	private void addPasscodeManage(boolean isEnable) {
+		if (HomeDeviceInfo.isPadlock(mCurKEY.getLockName())) {
+			return;
+		}
 		addFunItem(LockAction.LockActionType.PASSCODE_MANAGE,
 				R.drawable.lock_action_pwd, R.string.lock_action_pin_code, isEnable);
 	}
@@ -1982,6 +1998,9 @@ public class LockDetailFragment extends BaseFragment implements View.OnClickList
 	}
 
 	private void addIcCards(boolean isEnable) {
+		if (HomeDeviceInfo.isPadlock(mCurKEY.getLockName())) {
+			return;
+		}
 		addFunItem(LockAction.LockActionType.IC_CARDS,
 				R.drawable.lock_action_ic_card, R.string.lock_action_ic_cards, isEnable);
 	}
@@ -1999,6 +2018,11 @@ public class LockDetailFragment extends BaseFragment implements View.OnClickList
 	 * 判断是否支持 开锁 & 闭锁
 	 */
 	private void setUnlockLock() {
+		if (HomeDeviceInfo.isPadlock(mCurKEY.getLockName())) {
+			mRlUnlocking.setVisibility(View.VISIBLE);
+			mLlUnlockLock.setVisibility(View.GONE);
+			return;
+		}
 		if (mCurKEY.getLockId() < 0) {//曼哈顿
 			if (mCurKEY.getLockName().startsWith(HomeDeviceInfo.IDeviceName.NAME_LOCK_KEY_BOX_3)) {
 				mRlUnlocking.setVisibility(View.VISIBLE);
@@ -2050,7 +2074,8 @@ public class LockDetailFragment extends BaseFragment implements View.OnClickList
 			case "110402"://待接收
 				setUnlockLock();
 				enableLockingColorFiltr(true, false, 0);
-				if (DigitUtil.isSupportFingerPrint(mCurKEY.getSpecialValue())) { // 支持指纹
+				if (HomeDeviceInfo.isPadlock(mCurKEY.getLockName())
+						|| DigitUtil.isSupportFingerPrint(mCurKEY.getSpecialValue())) { // 支持指纹
 					addFingerprint(true);
 				}
 				addPasscodeManage(true);
@@ -2070,7 +2095,8 @@ public class LockDetailFragment extends BaseFragment implements View.OnClickList
 
 				enableLockingColorFiltr(false, true, colorGrayParent);
 
-				if (DigitUtil.isSupportFingerPrint(mCurKEY.getSpecialValue())) { // 支持指纹
+				if (HomeDeviceInfo.isPadlock(mCurKEY.getLockName())
+						|| DigitUtil.isSupportFingerPrint(mCurKEY.getSpecialValue())) { // 支持指纹
 					addFingerprint(false);
 				}
 				addPasscodeManage(false);
@@ -2111,7 +2137,8 @@ public class LockDetailFragment extends BaseFragment implements View.OnClickList
 //				if (DigitUtil.isSupportFingerPrint(mCurKEY.getSpecialValue())) { // 支持指纹
 //					addFingerprint(true);
 //				}
-				if (mCurKEY.getLockName().startsWith(HomeDeviceInfo.IDeviceName.NAME_LOCK_MANHATTAN_MOON_LOCK)
+				if (HomeDeviceInfo.isPadlock(mCurKEY.getLockName())
+						|| mCurKEY.getLockName().startsWith(HomeDeviceInfo.IDeviceName.NAME_LOCK_MANHATTAN_MOON_LOCK)
 						|| mCurKEY.getLockName().startsWith(HomeDeviceInfo.IDeviceName.NAME_LOCK_MANHATTAN_MOON_LOCK_LOWER)) {
 					addFingerprint(true);
 					addEKeyManage(true);
@@ -2137,7 +2164,8 @@ public class LockDetailFragment extends BaseFragment implements View.OnClickList
 //				if (DigitUtil.isSupportFingerPrint(mCurKEY.getSpecialValue())) { // 支持指纹
 //					addFingerprint(false);
 //				}
-				if (mCurKEY.getLockName().startsWith(HomeDeviceInfo.IDeviceName.NAME_LOCK_MANHATTAN_MOON_LOCK)
+				if (HomeDeviceInfo.isPadlock(mCurKEY.getLockName())
+						|| mCurKEY.getLockName().startsWith(HomeDeviceInfo.IDeviceName.NAME_LOCK_MANHATTAN_MOON_LOCK)
 						|| mCurKEY.getLockName().startsWith(HomeDeviceInfo.IDeviceName.NAME_LOCK_MANHATTAN_MOON_LOCK_LOWER)) {
 					addFingerprint(false);
 					addEKeyManage(false);

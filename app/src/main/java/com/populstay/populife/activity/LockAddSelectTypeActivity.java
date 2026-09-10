@@ -50,6 +50,11 @@ public class LockAddSelectTypeActivity extends BaseActivity implements View.OnCl
 		device.setName(HomeDeviceInfo.IDeviceName.NAME_LOCK_PPL_KB4_S);
 		mDeviceList.add(device);
 
+		// P3 指纹挂锁
+		device = new HomeDevice();
+		device.setName(HomeDeviceInfo.IDeviceName.NAME_LOCK_PADLOCK);
+		mDeviceList.add(device);
+
 		// 横闩锁
 		device = new HomeDevice();
 		device.setName(HomeDeviceInfo.IDeviceName.NAME_LOCK_DEADBOLT);
@@ -95,6 +100,7 @@ public class LockAddSelectTypeActivity extends BaseActivity implements View.OnCl
 				} else if (HomeDeviceInfo.isDeadboltLack(device.getName())
 						|| HomeDeviceInfo.isKeyBox(device.getName())
 						|| HomeDeviceInfo.isKeyBoxK4(device.getName())
+						|| HomeDeviceInfo.isPadlock(device.getName())
 						|| device.getName().startsWith(HomeDeviceInfo.IDeviceName.NAME_LOCK_KJX_DOOR_LOCK)
 						|| device.getName().startsWith(HomeDeviceInfo.IDeviceName.NAME_LOCK_MANHATTAN_MOON_LOCK)) {
 					LockAddGuideActivity.actionStartAddLock(LockAddSelectTypeActivity.this, device.getName());

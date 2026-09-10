@@ -179,7 +179,9 @@ public class FoundDeviceActivity extends BaseActivity implements AdapterView.OnI
 			window.findViewById(R.id.et_dialog_input_content).setVisibility(View.GONE);
 			TextView tvDialogContent = window.findViewById(R.id.tv_dialog_content);
 			tvDialogContent.setVisibility(View.VISIBLE);
-			if (HomeDeviceInfo.isDeadboltLack(mLockType)) {
+			if (HomeDeviceInfo.isPadlock(mLockType)) {
+				tvDialogContent.setText(R.string.padlock_not_found);
+			} else if (HomeDeviceInfo.isDeadboltLack(mLockType)) {
 				tvDialogContent.setText(R.string.deadbolt_not_found_try_again);
 			} else if (HomeDeviceInfo.isKeyBox(mLockType)) {
 				tvDialogContent.setText(R.string.keybox_not_found_try_again);
@@ -226,7 +228,9 @@ public class FoundDeviceActivity extends BaseActivity implements AdapterView.OnI
 		mTv_tap_help = findViewById(R.id.tv_tap_help);
 		mTv_tap_help.setOnClickListener(this);
 		mKeepTheKeypadLight = findViewById(R.id.keep_the_keypad_light);
-		if (HomeDeviceInfo.isDeadboltLack(mLockType)) {
+		if (HomeDeviceInfo.isPadlock(mLockType)) {
+			mTvScanDevice.setText(R.string.padlock_scan_wait);
+		} else if (HomeDeviceInfo.isDeadboltLack(mLockType)) {
 			mTvScanDevice.setText(getResources().getString(R.string.scanning_nearby_deadbolt_please_wait));
 		} else if (HomeDeviceInfo.isKeyBox(mLockType)) {
 			mTvScanDevice.setText(getResources().getString(R.string.scanning_nearby_keybox_please_wait));
@@ -294,7 +298,9 @@ public class FoundDeviceActivity extends BaseActivity implements AdapterView.OnI
 	private void setTitleText(boolean isInit) {
 		if (isInit) {
 			mKeepTheKeypadLight.setVisibility(View.GONE);
-			if (HomeDeviceInfo.isDeadboltLack(mLockType)) {
+			if (HomeDeviceInfo.isPadlock(mLockType)) {
+				tvPageTitle.setText(R.string.padlock_scan);
+			} else if (HomeDeviceInfo.isDeadboltLack(mLockType)) {
 				tvPageTitle.setText(getResources().getString(R.string.scanning_nearby_deadbolt));
 			} else if (HomeDeviceInfo.isKeyBox(mLockType)) {
 				tvPageTitle.setText(getResources().getString(R.string.scanning_nearby_keybox));
@@ -308,6 +314,9 @@ public class FoundDeviceActivity extends BaseActivity implements AdapterView.OnI
 			}
 		} else {
 			mKeepTheKeypadLight.setVisibility(View.VISIBLE);
+			if (HomeDeviceInfo.isPadlock(mLockType)) {
+				mKeepTheKeypadLight.setText(R.string.padlock_wake_hint);
+			}
 			tvPageTitle.setText(getResources().getString(R.string.select_a_device));
 		}
 	}

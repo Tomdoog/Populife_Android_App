@@ -124,6 +124,9 @@ public class AddDeviceSuccessActivity extends BaseActivity implements View.OnCli
 		if (null != mKey) {
 			mTvAdminPwd.setText(mKey.getNoKeyPwd());
 		}
+		if (HomeDeviceInfo.isPadlock(deviceName)) {
+			mAdminPwdLl.setVisibility(View.GONE);
+		}
 	}
 
 	private void setListener() {

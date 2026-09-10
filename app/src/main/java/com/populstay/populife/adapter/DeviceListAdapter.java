@@ -67,6 +67,13 @@ public class DeviceListAdapter extends RecyclerView.Adapter<DeviceListAdapter.Vi
             }
         }
         viewHolder.ivDeviceIcon.setImageResource(HomeDeviceInfo.getIconByName(item.getName()));
+        ViewGroup.LayoutParams iconParams = viewHolder.ivDeviceIcon.getLayoutParams();
+        boolean isPadlock = HomeDeviceInfo.isPadlock(item.getName());
+        int padlockIconSize = DensityUtils.dp2px(mContext, 90);
+        iconParams.height = isPadlock ? padlockIconSize : viewHolder.originalIconHeight;
+        iconParams.width = isPadlock && mShowType == SHOW_TYPE_TWO_CARD
+                ? padlockIconSize : viewHolder.originalIconWidth;
+        viewHolder.ivDeviceIcon.setLayoutParams(iconParams);
         viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -81,12 +88,16 @@ public class DeviceListAdapter extends RecyclerView.Adapter<DeviceListAdapter.Vi
 
         public TextView tvDeviceName;
         public ImageView ivDeviceIcon;
+        public final int originalIconHeight;
+        public final int originalIconWidth;
         public ExTextView tvDeviceType;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             tvDeviceName = itemView.findViewById(R.id.tv_device_name);
             ivDeviceIcon = itemView.findViewById(R.id.iv_device_icon);
+            originalIconHeight = ivDeviceIcon.getLayoutParams().height;
+            originalIconWidth = ivDeviceIcon.getLayoutParams().width;
             tvDeviceType = itemView.findViewById(R.id.tv_device_type);
         }
     }

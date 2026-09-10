@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="lock_type_padlock">掛鎖</string>
+    <string name="activate_padlock">啟用掛鎖</string>
+    <string name="padlock_wake_hint">請觸摸指紋識別區，喚醒掛鎖。</string>
+    <string name="padlock_battery_hint">4. 確保掛鎖電量充足。</string>
+    <string name="padlock_scan">掃描附近的掛鎖</string>
+    <string name="padlock_scan_wait">正在掃描附近的掛鎖，請稍候。</string>
+    <string name="padlock_not_found">未找到掛鎖。請將掛鎖靠近手機並觸摸指紋識別區，然後重試。</string>
+</resources>

@@ -221,6 +221,16 @@ public class LockAddGuideActivity extends BluetoothBaseActivity implements View.
 			}
 		}
 
+		if (HomeDeviceInfo.isPadlock(mLockType)) {
+			mIvAddLockGuidePic.setImageResource(R.drawable.padlock_outline);
+			mIvAddLockGuidePic.setAdjustViewBounds(true);
+			mIvAddLockGuidePic.setMaxHeight((int) (220 * getResources().getDisplayMetrics().density));
+			mCkBatteryInstall.setText(R.string.padlock_battery_hint);
+			if (mFrom != KeyPwdConstant.IFrom.FROM_FINGERPRINT_CARD) {
+				mAddLockPreCheckHint.setText(R.string.padlock_wake_hint);
+			}
+		}
+
 		mCbBtOpen.setChecked(isBleEnableWithoutToast());
 		mCbLbsOpen.setChecked(isLbsEnableWithoutToast());
 		mCbNetOpen.setChecked(isNetEnableWithoutToast());

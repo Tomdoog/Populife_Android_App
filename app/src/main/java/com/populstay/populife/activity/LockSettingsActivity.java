@@ -392,6 +392,11 @@ public class LockSettingsActivity extends BaseActivity implements View.OnClickLi
 				}
 			}
 		}
+		if (HomeDeviceInfo.isPadlock(mKey.getLockName())) {
+			mLlAdminPasscode.setVisibility(View.GONE);
+			mLlKeypadVolume.setVisibility(View.GONE);
+			mLlRemoteUnlock.setVisibility(View.GONE);
+		}
 	}
 
 	/**
