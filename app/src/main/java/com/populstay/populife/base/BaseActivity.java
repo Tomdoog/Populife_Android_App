@@ -17,6 +17,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowInsetsController;
 import android.view.WindowManager;
+import android.window.OnBackInvokedCallback;
+import android.window.OnBackInvokedDispatcher;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
@@ -97,10 +99,17 @@ public class BaseActivity extends AppCompatActivity{
 	//	private MessageReceiver mMessageReceiver;
 	private boolean mRemoteLoginChecking;
 	private LocationManager mLocationManager;
+	private OnBackInvokedCallback mSystemBackCallback;
 
 	@Override
 	protected void onCreate(@Nullable Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+			// Android 16 不再派发旧返回事件，将系统手势转交给各页面已有的保存/退出逻辑。
+			mSystemBackCallback = this::onBackPressed;
+			getOnBackInvokedDispatcher().registerOnBackInvokedCallback(
+					OnBackInvokedDispatcher.PRIORITY_DEFAULT, mSystemBackCallback);
+		}
         TTLockClient.getDefault().prepareBTService(getApplicationContext());
 		registerNetStateChangeReceiver();
 		PeachLogger.d("onCreate current activity= " + this.getClass().getSimpleName());
@@ -469,6 +478,9 @@ public class BaseActivity extends AppCompatActivity{
 
 	@Override
 	protected void onDestroy() {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && mSystemBackCallback != null) {
+			getOnBackInvokedDispatcher().unregisterOnBackInvokedCallback(mSystemBackCallback);
+		}
 		super.onDestroy();
 		// 页面退出:与下一条 [PAGE] show 组合即可看出用户是"返回"还是"前进"
 		PeachLogger.d("[PAGE] close " + this.getClass().getSimpleName());

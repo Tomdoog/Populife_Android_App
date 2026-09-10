@@ -7,11 +7,11 @@ def verCode = 242
 
 android {
     namespace "com.rilixtech.widget.countrycodepicker"
-  compileSdkVersion 33
+  compileSdkVersion 36
 
   defaultConfig {
     minSdkVersion 21
-    targetSdkVersion 35
+    targetSdkVersion 36
     versionCode verCode
     versionName version
   }
