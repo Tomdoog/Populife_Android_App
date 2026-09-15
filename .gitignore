@@ -44,10 +44,21 @@ captures/
 .idea/caches
 .diea
 
-# Keystore files
-# Uncomment the following lines if you do not want to check your keystore files in.
-#*.jks
-#*.keystore
+# Keystore and local secrets. Historical tracked files require a separate
+# credential-rotation/history-cleanup decision; these rules prevent new files.
+KeyStore/
+*.jks
+*.keystore
+*.p8
+*.p12
+*.mobileprovision
+.env
+.env.*
+!.env.example
+secrets/
+service-account*.json
+firebase-adminsdk*.json
+google-credentials*.json
 
 # External native build folder generated in Android Studio 2.2 and later
 .externalNativeBuild
