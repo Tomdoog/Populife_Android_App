@@ -1,10 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="lock_type_padlock">掛鎖</string>
-    <string name="activate_padlock">啟用掛鎖</string>
-    <string name="padlock_wake_hint">請觸摸指紋識別區，喚醒掛鎖。</string>
-    <string name="padlock_battery_hint">4. 確保掛鎖電量充足。</string>
+    <string name="activate_padlock">激活掛鎖</string>
+    <string name="padlock_wake_hint">請觸碰指紋識別區，確認鎖發出嘀聲。</string>
+    <string name="padlock_battery_hint">4. 鎖的電量充足。觸碰指紋識別區，確認鎖可以正常解鎖並發出嘀聲。</string>
     <string name="padlock_scan">掃描附近的掛鎖</string>
     <string name="padlock_scan_wait">正在掃描附近的掛鎖，請稍候。</string>
-    <string name="padlock_not_found">未找到掛鎖。請將掛鎖靠近手機並觸摸指紋識別區，然後重試。</string>
+    <string name="padlock_not_found">請打開手機藍牙和網絡，保持鎖與手機距離不超過3米。觸碰指紋識別區，聽到鎖發出嘀聲後重新搜索。請注意鎖梁彈開，配對成功前保持鎖梁打開。</string>
+    <string name="padlock_fingerprint_battery_hint">4. 確保鎖的電量充足。觸碰指紋識別區，確認鎖可以正常解鎖並發出嘀聲。</string>
+    <string name="padlock_distance_hint">5. 確保鎖與手機的藍牙距離不超過3米。</string>
+    <string name="padlock_pairing_safety">配對成功前請保持鎖梁打開。出廠狀態下，任意手指觸碰指紋識別區都可能觸發開鎖，鎖梁會自動彈開，請注意安全。</string>
+    <string name="padlock_fingerprint_safety">錄入過程中保持鎖梁打開，避免鎖梁彈開造成碰撞。</string>
+    <string name="padlock_fingerprint_keep_open">建議在指紋創建成功前保持鎖梁打開。</string>
+    <string name="padlock_fingerprint_activation">請觸碰指紋識別區；聽到鎖發出嘀聲即表示已進入激活狀態。點擊“開始錄入指紋”後，請在20秒內將手指放到指紋識別區。</string>
+    <string name="padlock_start_fingerprint">開始錄入指紋</string>
+    <string name="padlock_pairing_activation">請觸碰指紋識別區；聽到鎖發出嘀聲即表示已進入激活狀態。請在20秒內開始搜索鎖。</string>
+    <string name="padlock_fingerprint_enrollment">請將手指平放在指紋識別區並保持靜止。聽到鎖發出嘀聲，即表示本次錄入成功。請繼續使用同一手指錄入，每次適當調整手指的位置和角度，以提高識別準確度，直至完成錄入。</string>
+    <string name="padlock_fingerprint_progress">已完成 %1$d / %2$d 次錄入</string>
+    <string name="padlock_fingerprint_retry">若出現錯誤提示，請移開手指後重新放到指紋識別區。</string>
+    <string name="padlock_wake_help">請觸碰指紋識別區，確認鎖發出嘀聲。若鎖沒有響應，請確認電量充足後重試；仍無響應時請聯繫客服。</string>
+    <string name="padlock_bluetooth_permission">請在設置中允許 Populife 使用藍牙，以連接鎖。</string>
+    <string name="padlock_help_pairing_title">無法搜索到鎖</string>
+    <string name="padlock_help_pairing">請打開手機藍牙和網絡，並允許 Populife 使用藍牙。保持鎖與手機距離不超過3米，觸碰指紋識別區，聽到鎖發出嘀聲後重新搜索。配對成功前請保持鎖梁打開。若鎖沒有響應，請確認電量充足。</string>
+    <string name="padlock_help_bound_title">鎖已被綁定</string>
+    <string name="padlock_help_bound">請原持有人轉移所有權，或在鎖附近通過 App 設置頁刪除鎖。若無法聯繫原持有人，請準備購買憑證和鎖的實物照片，聯繫客服處理。</string>
+    <string name="padlock_scan_retry">請打開手機藍牙和網絡，保持鎖與手機距離不超過3米。觸碰指紋識別區，聽到鎖發出嘀聲後重新搜索。請注意鎖梁彈開，配對成功前保持鎖梁打開。</string>
+    <string name="padlock_fingerprint_info">請設置指紋資訊，錄入成功後可使用該指紋開鎖。</string>
+    <string name="padlock_permission_check">2. 已允許 Populife 使用藍牙（附近的設備）權限。</string>
+    <string name="padlock_help_wake_title">鎖沒有響應</string>
+    <string name="padlock_fingerprint_failed">指紋錄入失敗。請移開手指，檢查藍牙連接後重新開始錄入。</string>
 </resources>

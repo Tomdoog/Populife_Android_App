@@ -393,9 +393,9 @@ public class LockSettingsActivity extends BaseActivity implements View.OnClickLi
 			}
 		}
 		if (HomeDeviceInfo.isPadlock(mKey.getLockName())) {
+			mLlAutoLocking.setVisibility(View.GONE);
 			mLlAdminPasscode.setVisibility(View.GONE);
 			mLlKeypadVolume.setVisibility(View.GONE);
-			mLlRemoteUnlock.setVisibility(View.GONE);
 		}
 	}
 
@@ -508,6 +508,7 @@ public class LockSettingsActivity extends BaseActivity implements View.OnClickLi
             }
 
         } else if (id == R.id.ll_lock_settings_auto_locking) {
+            if (HomeDeviceInfo.isPadlock(mKey.getLockName())) return;
             if (isBleEnableWithToast()) {
                 isClickAutoLocking = true;
                 searchAutoLockTime();
@@ -610,6 +611,7 @@ public class LockSettingsActivity extends BaseActivity implements View.OnClickLi
 	}
 
 	private void queryKeypadVolume() {
+		if (HomeDeviceInfo.isPadlock(mKey.getLockName())) return;
 		if (isClickKeypadVolume) {
 			showLoading();
 		}
@@ -837,6 +839,8 @@ public class LockSettingsActivity extends BaseActivity implements View.OnClickLi
 	}
 
 	private void searchAutoLockTime() {
+		// P3 不支持自动闭锁，也不查询随后串联的键盘声音设置。
+		if (HomeDeviceInfo.isPadlock(mKey.getLockName())) return;
 		if (isClickAutoLocking) {
 			showLoading();
 		}

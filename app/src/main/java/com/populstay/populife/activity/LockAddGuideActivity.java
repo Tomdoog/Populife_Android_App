@@ -3,7 +3,9 @@ package com.populstay.populife.activity;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import androidx.core.content.ContextCompat;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.CheckBox;
@@ -136,7 +138,7 @@ public class LockAddGuideActivity extends BluetoothBaseActivity implements View.
 	@Override
 	protected void onResume() {
 		super.onResume();
-//		checkBlePermission();
+		if (HomeDeviceInfo.isPadlock(mLockType)) refreshPadlockEnvironment();
 	}
 
 	private void checkBlePermission() {
@@ -145,12 +147,18 @@ public class LockAddGuideActivity extends BluetoothBaseActivity implements View.
 				new PermissionListener() {
 					@Override
 					public void onGranted() {
-						mCbLbsOpen.setChecked(isLbsEnableWithoutToast());
+						if (HomeDeviceInfo.isPadlock(mLockType)) {
+							refreshPadlockEnvironment();
+						} else {
+							mCbLbsOpen.setChecked(isLbsEnableWithoutToast());
+						}
 					}
 
 					@Override
 					public void onDenied(List<String> deniedPermissions) {
-						toast(isAndroid12() ? R.string.note_permission_ble_scan_connect : R.string.note_permission_lbs);
+						toast(isAndroid12() && HomeDeviceInfo.isPadlock(mLockType)
+								? R.string.padlock_bluetooth_permission
+								: isAndroid12() ? R.string.note_permission_ble_scan_connect : R.string.note_permission_lbs);
 						mCbLbsOpen.setChecked(false);
 					}
 				});
@@ -225,10 +233,18 @@ public class LockAddGuideActivity extends BluetoothBaseActivity implements View.
 			mIvAddLockGuidePic.setImageResource(R.drawable.padlock_outline);
 			mIvAddLockGuidePic.setAdjustViewBounds(true);
 			mIvAddLockGuidePic.setMaxHeight((int) (220 * getResources().getDisplayMetrics().density));
-			mCkBatteryInstall.setText(R.string.padlock_battery_hint);
-			if (mFrom != KeyPwdConstant.IFrom.FROM_FINGERPRINT_CARD) {
-				mAddLockPreCheckHint.setText(R.string.padlock_wake_hint);
-			}
+			boolean fingerprint = mFrom == KeyPwdConstant.IFrom.FROM_FINGERPRINT_CARD;
+			mCkBatteryInstall.setText(fingerprint
+					? R.string.padlock_fingerprint_battery_hint : R.string.padlock_battery_hint);
+			mCbConfirmTime.setText(R.string.padlock_distance_hint);
+			mAddLockPreCheckHint.setText(R.string.padlock_wake_hint);
+			TextView safetyHint = findViewById(R.id.padlock_safety_hint);
+			safetyHint.setText(fingerprint ? R.string.padlock_fingerprint_safety : R.string.padlock_pairing_safety);
+			safetyHint.setVisibility(View.VISIBLE);
+			if (isAndroid12()) mCbLbsOpen.setText(R.string.padlock_permission_check);
+			mCbLbsOpen.setOnClickListener(v -> checkBlePermission());
+			refreshPadlockEnvironment();
+			return;
 		}
 
 		mCbBtOpen.setChecked(isBleEnableWithoutToast());
@@ -239,6 +255,10 @@ public class LockAddGuideActivity extends BluetoothBaseActivity implements View.
     @Override
     public void onClick(View view) {
         if (view.getId() == R.id.tv_lock_add_guide_next) {
+            if (HomeDeviceInfo.isPadlock(mLockType)) {
+                refreshPadlockEnvironment();
+                if (!mTvNext.isEnabled()) return;
+            }
             // 添加指纹/门卡或门锁
             if (mFrom == KeyPwdConstant.IFrom.FROM_FINGERPRINT_CARD) {
                 FingerprintIcCardAddConfigActivity.actionStart(
@@ -272,6 +292,23 @@ public class LockAddGuideActivity extends BluetoothBaseActivity implements View.
 		mTvNext.setEnabled(nextEnable);
 	}
 
+	private boolean hasPadlockScanPermission() {
+		if (isAndroid12()) {
+			return ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) == PackageManager.PERMISSION_GRANTED
+					&& ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED;
+		}
+		return ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+	}
+
+	private void refreshPadlockEnvironment() {
+		boolean permissionGranted = hasPadlockScanPermission();
+		mCbBtOpen.setChecked((!isAndroid12() || permissionGranted) && isBleEnableWithoutToast());
+		mCbLbsOpen.setChecked(permissionGranted && (isAndroid12() || isLbsEnableWithoutToast()));
+		mCbLbsOpen.setEnabled(!permissionGranted);
+		mCbNetOpen.setChecked(isNetEnableWithoutToast());
+		setNextBtnEnable();
+	}
+
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
@@ -292,11 +329,19 @@ public class LockAddGuideActivity extends BluetoothBaseActivity implements View.
 
 	@Override
 	public void onBluetoothStateChanged(boolean isOpen) {
+		if (HomeDeviceInfo.isPadlock(mLockType)) {
+			refreshPadlockEnvironment();
+			return;
+		}
 		mCbBtOpen.setChecked(isOpen);
 	}
 
 	@Override
 	public void onLocationStateChanged(boolean isOpen) {
+		if (HomeDeviceInfo.isPadlock(mLockType)) {
+			refreshPadlockEnvironment();
+			return;
+		}
 		mCbLbsOpen.setChecked(isOpen);
 	}
 

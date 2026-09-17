@@ -2,9 +2,31 @@
 <resources>
     <string name="lock_type_padlock">Padlock</string>
     <string name="activate_padlock">Activate the Padlock</string>
-    <string name="padlock_wake_hint">Touch the fingerprint sensor to wake the padlock.</string>
-    <string name="padlock_battery_hint">4. Make sure the padlock has sufficient battery power.</string>
+    <string name="padlock_wake_hint">Touch the fingerprint sensor and listen for a beep from the lock.</string>
+    <string name="padlock_battery_hint">4. Make sure the lock has enough battery. Touch the fingerprint sensor and confirm that the lock unlocks and beeps.</string>
     <string name="padlock_scan">Scanning nearby padlocks</string>
     <string name="padlock_scan_wait">Scanning nearby padlocks, please wait.</string>
-    <string name="padlock_not_found">No padlock found. Keep the padlock near your phone and touch the fingerprint sensor, then try again.</string>
+    <string name="padlock_not_found">Turn on Bluetooth and the phone network. Keep the lock within 3 m (10 ft), touch the fingerprint sensor and listen for a beep, then scan again. Keep clear of the shackle and leave it open until pairing is complete.</string>
+    <string name="padlock_fingerprint_battery_hint">4. Make sure the lock has enough battery. Touch the fingerprint sensor and confirm that the lock unlocks and beeps.</string>
+    <string name="padlock_distance_hint">5. Keep the lock within 3 m (10 ft) of your phone.</string>
+    <string name="padlock_pairing_safety">Keep the shackle open until pairing is complete. In factory mode, touching the fingerprint sensor with any finger may unlock the lock and release the shackle. Keep clear of the shackle.</string>
+    <string name="padlock_fingerprint_safety">Keep the shackle open during fingerprint enrollment to avoid being hit when it springs open.</string>
+    <string name="padlock_fingerprint_keep_open">Keep the shackle open until fingerprint setup is complete.</string>
+    <string name="padlock_fingerprint_activation">Touch the fingerprint sensor. A beep from the lock means it is ready. After tapping “Start fingerprint enrollment,” place your finger on the sensor within 20 seconds.</string>
+    <string name="padlock_start_fingerprint">Start fingerprint enrollment</string>
+    <string name="padlock_pairing_activation">Touch the fingerprint sensor. A beep from the lock means it is ready to pair. Start scanning within 20 seconds.</string>
+    <string name="padlock_fingerprint_enrollment">Place your finger flat on the fingerprint sensor and hold it still. A beep from the lock means that scan was successful. Continue with the same finger, adjusting its position and angle each time, until enrollment is complete.</string>
+    <string name="padlock_fingerprint_progress">Scans completed: %1$d of %2$d</string>
+    <string name="padlock_fingerprint_retry">If an error appears, lift your finger and place it on the fingerprint sensor again.</string>
+    <string name="padlock_wake_help">Touch the fingerprint sensor and listen for a beep from the lock. If the lock does not respond, make sure it has enough battery and try again. If it still does not respond, contact support.</string>
+    <string name="padlock_bluetooth_permission">Allow Populife to use Bluetooth in Settings to connect to the lock.</string>
+    <string name="padlock_help_pairing_title">The lock cannot be found</string>
+    <string name="padlock_help_pairing">Turn on Bluetooth and the phone network, and allow Bluetooth access for Populife. Keep the lock within 3 m (10 ft), touch the fingerprint sensor and listen for a beep, then scan again. Keep the shackle open until pairing is complete. If the lock does not respond, make sure it has enough battery.</string>
+    <string name="padlock_help_bound_title">The lock is already bound</string>
+    <string name="padlock_help_bound">Ask the original owner to transfer ownership or delete the lock from Settings while near the lock. If you cannot contact the owner, contact support with your proof of purchase and a photo of the lock.</string>
+    <string name="padlock_scan_retry">Turn on Bluetooth and the phone network. Keep the lock within 3 m (10 ft), touch the fingerprint sensor and listen for a beep, then scan again. Keep clear of the shackle and leave it open until pairing is complete.</string>
+    <string name="padlock_fingerprint_info">Set the fingerprint information. After enrollment is complete, this fingerprint can be used to unlock the lock.</string>
+    <string name="padlock_permission_check">2. Allow Bluetooth access for Populife (Nearby devices).</string>
+    <string name="padlock_help_wake_title">The lock does not respond</string>
+    <string name="padlock_fingerprint_failed">Fingerprint enrollment failed. Lift your finger, check the Bluetooth connection, then start enrollment again.</string>
 </resources>

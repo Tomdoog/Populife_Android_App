@@ -30,6 +30,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="@dimen/dimens_dp_10"
+                    android:id="@+id/lock_help_title_1"
                     android:text="@string/lock_help_case_title_1"
                     android:textColor="@color/sign_page_title_text"
                     android:textSize="18sp" />
@@ -37,6 +38,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:id="@+id/lock_help_content_1"
                     android:text="@string/lock_help_case_content_1"
                     android:textColor="@color/text_color_222222"
                     android:textSize="14sp" />
@@ -55,6 +57,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="@dimen/dimens_dp_10"
+                    android:id="@+id/lock_help_title_2"
                     android:text="@string/lock_help_case_title_2"
                     android:textColor="@color/sign_page_title_text"
                     android:textSize="18sp" />
@@ -62,6 +65,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:id="@+id/lock_help_content_2"
                     android:text="@string/lock_help_case_content_2"
                     android:textColor="@color/text_color_222222"
                     android:textSize="14sp" />
@@ -80,6 +84,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="@dimen/dimens_dp_10"
+                    android:id="@+id/lock_help_title_3"
                     android:text="@string/lock_help_case_title_3"
                     android:textColor="@color/sign_page_title_text"
                     android:textSize="18sp" />
@@ -87,6 +92,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:id="@+id/lock_help_content_3"
                     android:text="@string/lock_help_case_content_3"
                     android:textColor="@color/text_color_222222"
                     android:textSize="14sp" />
