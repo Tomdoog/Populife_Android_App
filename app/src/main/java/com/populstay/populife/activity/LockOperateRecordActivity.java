@@ -14,6 +14,8 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.populock.manhattan.sdk.constant.LockOperation;
 import com.populstay.populife.R;
+import com.populstay.populife.helper.LockRecordResult;
+import com.populstay.populife.helper.LockRecordUploader;
 import com.populstay.populife.adapter.LockOperateRecordAdapter;
 import com.populstay.populife.app.MyApplication;
 import com.populstay.populife.base.BaseActivity;
@@ -58,7 +60,7 @@ public class LockOperateRecordActivity extends BaseActivity implements View.OnCl
 	private LockOperateRecordAdapter mAdapter;
 	private SwipeRefreshLayout mRefreshLayout;
 
-	private Key mKey = MyApplication.CURRENT_KEY;
+	private Key mKey;
 	private List<String> mGroupList = new ArrayList<>(); // 组元素数据列表（日期）
 	private Map<String, List<LockOperateRecord>> mChildList = new LinkedHashMap<>(); // 子元素数据列表（操作记录）
 
@@ -81,7 +83,7 @@ public class LockOperateRecordActivity extends BaseActivity implements View.OnCl
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_lock_operate_record);
-		getIntentData();
+		if (!getIntentData()) return;
 		initView();
 		initListener();
 		requestLockOperateRecords();
@@ -148,12 +150,21 @@ public class LockOperateRecordActivity extends BaseActivity implements View.OnCl
 		return true;
 	}
 
-	private void getIntentData() {
-		mLockId = getIntent().getIntExtra(KEY_LOCK_ID, 0);
-		if (getIntent().hasExtra(KEY_KEY)){
-			mKey = getIntent().getParcelableExtra(KEY_KEY);
-			MyApplication.CURRENT_KEY = mKey;
+	private boolean getIntentData() {
+		// 查询、上传、搜索与清空统一使用当前钥匙的 lockId，不能混用旧页面 ID。
+		mKey = getIntent().getParcelableExtra(KEY_KEY);
+		if (mKey == null || mKey.getLockId() == 0) {
+			toast(R.string.record_device_unavailable);
+			finish();
+			return false;
 		}
+		mLockId = mKey.getLockId();
+		int requestedId = getIntent().getIntExtra(KEY_LOCK_ID, mLockId);
+		if (requestedId != mLockId) {
+			PeachLogger.w("RECORD_SYNC", "lockId mismatch: page=" + requestedId + " key=" + mLockId);
+		}
+		MyApplication.CURRENT_KEY = mKey;
+		return true;
 	}
 
 	private void initView() {
@@ -284,33 +295,16 @@ public class LockOperateRecordActivity extends BaseActivity implements View.OnCl
 	 * 上传锁密码操作记录
 	 */
 	private void uploadLockOperateLog(String operateLog) {
-		RestClient.builder()
-				.url(Urls.LOCK_OPERATE_LOG_KEYBOARD_ADD)
-				.loader(this)
-				.params("userId", PeachPreference.readUserId())
-				.params("lockId", mKey.getLockId())
-				.params("records", operateLog)
-				.success(new ISuccess() {
-					@Override
-					public void onSuccess(String response) {
-						PeachLogger.d("LOCK_OPERATE_LOG_KEYBOARD_ADD", response);
-						requestLockOperateRecords();
-					}
-				})
-				.failure(new IFailure() {
-					@Override
-					public void onFailure() {
-						toast(R.string.operation_fail);
-					}
-				})
-				.error(new IError() {
-					@Override
-					public void onError(int code, String msg) {
-						toast(R.string.operation_fail);
-					}
-				})
-				.build()
-				.post();
+		showLoading();
+		LockRecordUploader.getInstance().uploadRecords(mKey.getLockId(), operateLog, (uploaded, saved) -> {
+			stopLoading();
+			if (isFinishing() || isDestroyed()) return;
+			if (!uploaded) {
+				toast(saved ? R.string.record_sync_queued : R.string.record_storage_failed);
+				return;
+			}
+			requestLockOperateRecords();
+		});
 	}
 
 	/**
@@ -333,6 +327,12 @@ public class LockOperateRecordActivity extends BaseActivity implements View.OnCl
 						}
 
 						PeachLogger.d("LOCK_OPERATE_RECORDS_GET", response);
+						LockRecordResult queryResult = LockRecordResult.parse(response);
+						if (!queryResult.isSuccess()) {
+							PeachLogger.w("RECORD_QUERY", "query failed: code=" + queryResult.getCode());
+							toast(R.string.record_load_failed);
+							return;
+						}
 						JSONObject result = JSON.parseObject(response);
 						int code = result.getInteger("code");
 						if (code == 200) {
@@ -399,6 +399,7 @@ public class LockOperateRecordActivity extends BaseActivity implements View.OnCl
 				.failure(new IFailure() {
 					@Override
 					public void onFailure() {
+						toast(R.string.record_load_failed);
 						if (mRefreshLayout != null) {
 							mRefreshLayout.setRefreshing(false);
 						}
@@ -407,6 +408,7 @@ public class LockOperateRecordActivity extends BaseActivity implements View.OnCl
 				.error(new IError() {
 					@Override
 					public void onError(int code, String msg) {
+						toast(R.string.record_load_failed);
 						if (mRefreshLayout != null) {
 							mRefreshLayout.setRefreshing(false);
 						}

@@ -14,6 +14,7 @@ import android.widget.TextView;
 import com.google.android.material.tabs.TabLayout;
 import com.populock.manhattan.sdk.constant.LockOperation;
 import com.populstay.populife.R;
+import com.populstay.populife.helper.LockRecordUploader;
 import com.populstay.populife.activity.LockSendEkeyActivity;
 import com.populstay.populife.activity.LockSendPasscodeActivity;
 import com.populstay.populife.activity.LockSendPasscodeNewActivity;
@@ -405,33 +406,17 @@ public class KeyPwdManageActivity extends BaseActivity implements View.OnClickLi
 	 * 上传锁密码操作记录
 	 */
 	private void uploadLockOperateLog(String operateLog) {
-		RestClient.builder()
-				.url(Urls.LOCK_OPERATE_LOG_KEYBOARD_ADD)
-				.loader(this)
-				.params("userId", PeachPreference.readUserId())
-				.params("lockId", mKey.getLockId())
-				.params("records", operateLog)
-				.success(new ISuccess() {
-					@Override
-					public void onSuccess(String response) {
-						toastSuccess();
-						EventBus.getDefault().post(new Event(Event.EventType.SYN_PWD_INFO_SUCCESS));
-					}
-				})
-				.failure(new IFailure() {
-					@Override
-					public void onFailure() {
-						toastFail();
-					}
-				})
-				.error(new IError() {
-					@Override
-					public void onError(int code, String msg) {
-						toastFail();
-					}
-				})
-				.build()
-				.post();
+		showLoading();
+		LockRecordUploader.getInstance().uploadRecords(mKey.getLockId(), operateLog, (uploaded, saved) -> {
+			stopLoading();
+			if (isFinishing() || isDestroyed()) return;
+			if (!uploaded) {
+				toast(saved ? R.string.record_sync_queued : R.string.record_storage_failed);
+				return;
+			}
+			toastSuccess();
+			EventBus.getDefault().post(new Event(Event.EventType.SYN_PWD_INFO_SUCCESS));
+		});
 	}
 
 	/**

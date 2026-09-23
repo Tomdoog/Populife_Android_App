@@ -26,6 +26,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.populock.manhattan.sdk.constant.LockOperation;
 import com.populstay.populife.R;
+import com.populstay.populife.helper.LockRecordUploader;
 import com.populstay.populife.adapter.PasscodeListAdapter;
 import com.populstay.populife.app.MyApplication;
 import com.populstay.populife.base.BaseActivity;
@@ -295,34 +296,17 @@ public class LockManagePasswordActivity extends BaseActivity implements View.OnC
 	 * 上传锁密码操作记录
 	 */
 	private void uploadLockOperateLog(String operateLog) {
-		RestClient.builder()
-				.url(Urls.LOCK_OPERATE_LOG_KEYBOARD_ADD)
-				.loader(this)
-				.params("userId", PeachPreference.readUserId())
-				.params("lockId", mKey.getLockId())
-				.params("records", operateLog)
-				.success(new ISuccess() {
-					@Override
-					public void onSuccess(String response) {
-						PeachLogger.d("LOCK_OPERATE_LOG_KEYBOARD_ADD", response);
-						mRefreshLayout.setRefreshing(true);
-						requestPasscodeList();
-					}
-				})
-				.failure(new IFailure() {
-					@Override
-					public void onFailure() {
-						toastFail();
-					}
-				})
-				.error(new IError() {
-					@Override
-					public void onError(int code, String msg) {
-						toastFail();
-					}
-				})
-				.build()
-				.post();
+		showLoading();
+		LockRecordUploader.getInstance().uploadRecords(mKey.getLockId(), operateLog, (uploaded, saved) -> {
+			stopLoading();
+			if (isFinishing() || isDestroyed()) return;
+			if (!uploaded) {
+				toast(saved ? R.string.record_sync_queued : R.string.record_storage_failed);
+				return;
+			}
+			mRefreshLayout.setRefreshing(true);
+			requestPasscodeList();
+		});
 	}
 
 	private void verifyAccountPwd(String pwd) {

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="record_device_unavailable">裝置資訊不可用，請重新進入裝置後再試。</string>
+    <string name="record_upload_failed_after_operation">開關鎖操作成功，但未能確認記錄上傳成功。請靠近裝置，在開鎖記錄頁同步。</string>
+    <string name="record_load_failed">記錄更新失敗，目前顯示的可能是舊記錄，請稍後重試。</string>
+    <string name="record_sync_queued">記錄已儲存在本機，將在網路可用時自動補傳；若已關閉 App，請重新開啟。</string>
+    <string name="record_storage_failed">未能儲存待補傳記錄，請靠近裝置重新同步。</string>
+    <string name="record_upload_queued_after_operation">開關鎖操作成功，記錄已儲存在本機，將自動重試上傳。</string>
+</resources>

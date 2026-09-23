@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="record_device_unavailable">Device information is unavailable. Reopen the device and try again.</string>
+    <string name="record_upload_failed_after_operation">Lock operation succeeded, but its record could not be confirmed as uploaded. Open Records and sync near the lock.</string>
+    <string name="record_load_failed">Could not refresh records. The displayed records may be out of date. Please try again.</string>
+    <string name="record_sync_queued">Records are saved on this phone and will retry automatically when the network is available. Reopen the app if it was closed.</string>
+    <string name="record_storage_failed">Records could not be saved for retry. Please sync again near the lock.</string>
+    <string name="record_upload_queued_after_operation">Lock operation succeeded. Its record is saved on this phone and will retry uploading automatically.</string>
+</resources>

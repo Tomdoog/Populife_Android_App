@@ -33,6 +33,7 @@ import com.google.gson.reflect.TypeToken;
 import com.orhanobut.logger.Logger;
 import com.populock.manhattan.sdk.constant.LockOperation;
 import com.populstay.populife.R;
+import com.populstay.populife.helper.LockRecordUploader;
 import com.populstay.populife.activity.GatewayBindedLockListActivity;
 import com.populstay.populife.activity.LockAddSelectTypeActivity;
 import com.populstay.populife.activity.LockDetailActivity;
@@ -442,7 +443,7 @@ public class LockDetailFragment extends BaseFragment implements View.OnClickList
 					LockManagePasswordActivity.actionStart(getActivity(), mCurKEY.getLockId(), mCurKEY.getKeyId(),
 							mCurKEY.getLockName(), mCurKEY.getLockMac());
 				}*/
-				LockOperateRecordActivity.actionStart(mActivity, Integer.parseInt(mKeyId), mCurKEY);
+				LockOperateRecordActivity.actionStart(mActivity, mCurKEY.getLockId(), mCurKEY);
 				break;
 
 			case IC_CARDS:
@@ -1160,20 +1161,13 @@ public class LockDetailFragment extends BaseFragment implements View.OnClickList
 	 *                  4：IC 卡开锁
 	 */
 	private void addLockOperateLog(int eventType) {
-		RestClient.builder()
-				.url(Urls.LOCK_OPERATE_APP_LOG_ADD)
-				.params("userId", PeachPreference.readUserId())
-				.params("lockId", mCurKEY.getLockId())
-				.params("event", eventType)
-				.params("keyId", mCurKEY.getUserKeyId())
-				.success(new ISuccess() {
-					@Override
-					public void onSuccess(String response) {
-						PeachLogger.d("LOCK_OPERATE_APP_LOG_ADD", response);
+		LockRecordUploader.getInstance().uploadAppEvent(mCurKEY.getLockId(), mCurKEY.getUserKeyId(),
+				eventType, (uploaded, saved) -> {
+					if (!uploaded && isAdded() && getActivity() != null && !getActivity().isFinishing()) {
+						toast(saved ? R.string.record_upload_queued_after_operation
+								: R.string.record_upload_failed_after_operation);
 					}
-				})
-				.build()
-				.post();
+				});
 	}
 
 	/**
