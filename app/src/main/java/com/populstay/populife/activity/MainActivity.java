@@ -24,6 +24,7 @@ import com.populstay.populife.fragment.MainGeneralFragment;
 import com.populstay.populife.fragment.MainLockFragment;
 import com.populstay.populife.fragment.MainMeFragment;
 import com.populstay.populife.helper.OfflineLockUploader;
+import com.populstay.populife.helper.LockRecordUploader;
 import com.populstay.populife.permission.PermissionListener;
 import com.populstay.populife.push.EventPushService;
 import com.populstay.populife.ui.NoScrollViewPager;
@@ -159,6 +160,7 @@ public class MainActivity extends BaseActivity {
 
 		// 进入主界面时,尝试补传未上传到云端的设备(防止绑定中断导致设备变砖)
 		OfflineLockUploader.getInstance().tryUploadAll("MainActivity");
+		LockRecordUploader.getInstance().retry();
     }
 
 	/**

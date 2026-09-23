@@ -14,6 +14,8 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.populock.manhattan.sdk.constant.LockOperation;
 import com.populstay.populife.R;
+import com.populstay.populife.helper.LockRecordResult;
+import com.populstay.populife.helper.LockRecordUploader;
 import com.populstay.populife.adapter.PasscodeRecordAdapter;
 import com.populstay.populife.app.MyApplication;
 import com.populstay.populife.base.BaseActivity;
@@ -166,6 +168,12 @@ public class PasscodeRecordActivity extends BaseActivity implements View.OnClick
 							mRefreshLayout.setRefreshing(false);
 						}
 
+						LockRecordResult queryResult = LockRecordResult.parse(response);
+						if (!queryResult.isSuccess()) {
+							PeachLogger.w("RECORD_QUERY", "query failed: code=" + queryResult.getCode());
+							toast(R.string.record_load_failed);
+							return;
+						}
 						JSONObject result = JSON.parseObject(response);
 						int code = result.getInteger("code");
 						if (code == 200) {
@@ -213,6 +221,7 @@ public class PasscodeRecordActivity extends BaseActivity implements View.OnClick
 				}).failure(new IFailure() {
 			@Override
 			public void onFailure() {
+				toast(R.string.record_load_failed);
 				if (mRefreshLayout != null) {
 					mRefreshLayout.setRefreshing(false);
 				}
@@ -220,6 +229,7 @@ public class PasscodeRecordActivity extends BaseActivity implements View.OnClick
 		}).error(new IError() {
 			@Override
 			public void onError(int code, String msg) {
+				toast(R.string.record_load_failed);
 				if (mRefreshLayout != null) {
 					mRefreshLayout.setRefreshing(false);
 				}
@@ -362,33 +372,16 @@ public class PasscodeRecordActivity extends BaseActivity implements View.OnClick
 	 * 上传锁密码操作记录
 	 */
 	private void uploadLockOperateLog(String operateLog) {
-		RestClient.builder()
-				.url(Urls.LOCK_OPERATE_LOG_KEYBOARD_ADD)
-				.loader(this)
-				.params("userId", PeachPreference.readUserId())
-				.params("lockId", mKey.getLockId())
-				.params("records", operateLog)
-				.success(new ISuccess() {
-					@Override
-					public void onSuccess(String response) {
-						PeachLogger.d("LOCK_OPERATE_LOG_KEYBOARD_ADD", response);
-						requestPasscodeOperateRecords();
-					}
-				})
-				.failure(new IFailure() {
-					@Override
-					public void onFailure() {
-						toast(R.string.operation_fail);
-					}
-				})
-				.error(new IError() {
-					@Override
-					public void onError(int code, String msg) {
-						toast(R.string.operation_fail);
-					}
-				})
-				.build()
-				.post();
+		showLoading();
+		LockRecordUploader.getInstance().uploadRecords(mKey.getLockId(), operateLog, (uploaded, saved) -> {
+			stopLoading();
+			if (isFinishing() || isDestroyed()) return;
+			if (!uploaded) {
+				toast(saved ? R.string.record_sync_queued : R.string.record_storage_failed);
+				return;
+			}
+			requestPasscodeOperateRecords();
+		});
 	}
 
 

@@ -30,6 +30,7 @@ import com.populstay.populife.entity.PPLBleSession;
 import com.populstay.populife.enumtype.Operation;
 import com.populstay.populife.eventbus.Event;
 import com.populstay.populife.helper.OfflineLockUploader;
+import com.populstay.populife.helper.LockRecordUploader;
 import com.populstay.populife.manhattanlock.MHILockDeleteLock;
 import com.populstay.populife.ui.loader.PeachLoader;
 import com.populstay.populife.util.date.DateUtil;
@@ -617,6 +618,7 @@ public class MyApplication extends BaseApplication {
 			public void onActivityStarted(Activity activity) {
 				if (mStartedCount++ == 0) {
 					OfflineLockUploader.getInstance().tryUploadAll("foreground");
+					LockRecordUploader.getInstance().retry();
 				}
 			}
 
@@ -663,9 +665,17 @@ public class MyApplication extends BaseApplication {
 					.build();
 			cm.registerNetworkCallback(request, new ConnectivityManager.NetworkCallback() {
 				@Override
+				public void onCapabilitiesChanged(Network network, NetworkCapabilities capabilities) {
+					if (capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)) {
+						LockRecordUploader.getInstance().retry();
+					}
+				}
+
+				@Override
 				public void onAvailable(Network network) {
 					super.onAvailable(network);
 					OfflineLockUploader.getInstance().tryUploadAll("network");
+					LockRecordUploader.getInstance().retry();
 				}
 			});
 		} catch (Exception e) {

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="record_device_unavailable">设备信息不可用，请重新进入设备后再试。</string>
+    <string name="record_upload_failed_after_operation">开闭锁操作成功，但未能确认记录上传成功。请靠近设备，在开锁记录页同步。</string>
+    <string name="record_load_failed">记录刷新失败，当前显示的可能是旧记录，请稍后重试。</string>
+    <string name="record_sync_queued">记录已保存在本机，将在网络可用时自动补传；若已关闭 App，请重新打开。</string>
+    <string name="record_storage_failed">未能保存待补传记录，请靠近设备重新同步。</string>
+    <string name="record_upload_queued_after_operation">开闭锁操作成功，记录已保存在本机，将自动重试上传。</string>
+</resources>
