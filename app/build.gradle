@@ -11,6 +11,7 @@ android {
         targetSdkVersion 36
         versionCode 356
         versionName "3.5.6"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         ndkVersion = "27.0.12077973"
         ndk {
             // 设置支持的 SO 库构架
@@ -173,6 +174,11 @@ android {
 //}
 
 dependencies {
+    androidTestImplementation('androidx.test:runner:1.5.2') {
+        exclude group: 'junit', module: 'junit'
+    }
+    // Match the JUnit version already supplied by the application's SDK dependencies.
+    androidTestImplementation 'junit:junit:4.13.1'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     compileOnly fileTree(include: ['*.jar'], dir: 'libs')
     implementation files('libs/jedis-2.9.0.jar')

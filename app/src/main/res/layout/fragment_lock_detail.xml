@@ -152,6 +152,12 @@
                        android:textSize="30sp"
                        android:visibility="gone" />
 
+                   <Space
+                       android:id="@+id/space_padlock_image"
+                       android:layout_width="match_parent"
+                       android:layout_height="32dp"
+                       android:visibility="gone" />
+
                    <ImageView
                        android:id="@+id/iv_lock_img"
                        android:layout_width="wrap_content"
@@ -174,6 +180,12 @@
                        android:textColor="@color/battery_green"
                        android:textSize="14sp" />
 
+
+                   <Space
+                       android:id="@+id/space_padlock_actions"
+                       android:layout_width="match_parent"
+                       android:layout_height="48dp"
+                       android:visibility="gone" />
 
                    <FrameLayout
                        android:layout_width="match_parent"

@@ -216,6 +216,7 @@ public class IcCardBluetoothAddActivity extends BaseActivity {
 			@Override
 			public void onClick(View v) {
 				if (!hasClickToAddFrCard) {
+					if (HomeDeviceInfo.isPadlock(mLockType) && !isBleNetEnableWithToast()) return;
 					addFpCard();
 					hasClickToAddFrCard = true;
 					mTvHintBack.setEnabled(false);
@@ -271,7 +272,12 @@ public class IcCardBluetoothAddActivity extends BaseActivity {
 			mIvAddDevicePic.setMaxHeight((int) (220 * getResources().getDisplayMetrics().density));
 			if (isInit) {
 				mTvPageTitle.setText(R.string.activate_padlock);
-				add_device_activate_hint1.setText(R.string.padlock_wake_hint);
+				add_device_activate_hint1.setText(R.string.padlock_fingerprint_keep_open);
+				add_device_activate_hint2.setText(R.string.padlock_fingerprint_activation);
+				mTvHintSuccess.setText(R.string.padlock_start_fingerprint);
+			} else {
+				add_device_activate_hint1.setText(R.string.padlock_fingerprint_enrollment);
+				add_device_activate_hint2.setText(R.string.padlock_fingerprint_retry);
 			}
 		}
 	}
@@ -469,18 +475,38 @@ public class IcCardBluetoothAddActivity extends BaseActivity {
 
 	private void updateNoteText(int currentCount, int totalCount) {
 		mTotalCount = totalCount;
+		if (HomeDeviceInfo.isPadlock(mLockType)) {
+			String instructions = getString(R.string.padlock_fingerprint_enrollment);
+			if (totalCount > 0) {
+				instructions += "\n\n" + getString(R.string.padlock_fingerprint_progress,
+						Math.max(0, Math.min(currentCount, totalCount)), totalCount);
+			}
+			add_device_activate_hint1.setText(instructions);
+			return;
+		}
 		int leftCount = mTotalCount - currentCount;
 		add_device_activate_hint1.setText(Html.fromHtml(String.format(getString(R.string.adding_fingerprint_hint_1), leftCount == 0 ? "-" : "" + leftCount)));
 	}
 
 	private void mh_updateNoteText(int totalCount) {
+		if (HomeDeviceInfo.isPadlock(mLockType)) {
+			updateNoteText(0, 0);
+			return;
+		}
 		int leftCount = 0;
 		add_device_activate_hint1.setText(Html.fromHtml(String.format(getString(R.string.adding_fingerprint_hint_1), leftCount == 0 ? "-" : "" + leftCount)));
 	}
 
 	private void addFail() {
-		toastFail();
-		finish();
+		runOnUiThread(() -> {
+			stopLoading();
+			if (HomeDeviceInfo.isPadlock(mLockType)) {
+				toast(R.string.padlock_fingerprint_failed);
+			} else {
+				toastFail();
+			}
+			finish();
+		});
 	}
 
 	private void lockAddIcCard() {

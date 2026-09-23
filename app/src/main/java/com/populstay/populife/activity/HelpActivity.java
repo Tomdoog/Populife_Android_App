@@ -8,6 +8,7 @@ import android.widget.TextView;
 
 import com.populstay.populife.R;
 import com.populstay.populife.base.BaseActivity;
+import com.populstay.populife.home.entity.HomeDeviceInfo;
 import com.populstay.populife.permission.PermissionListener;
 import com.populstay.populife.util.log.PeachLogger;
 import com.populstay.populife.util.storage.PeachPreference;
@@ -18,6 +19,8 @@ import java.util.List;
 import androidx.annotation.Nullable;
 
 public class HelpActivity extends BaseActivity {
+
+    public static final String KEY_LOCK_TYPE = "KEY_LOCK_TYPE";
 
     private TextView mTvPageTitle;
     private ImageView mIvNewMsg;
@@ -36,6 +39,14 @@ public class HelpActivity extends BaseActivity {
         mTvPageTitle.setVisibility(View.VISIBLE);
         mTvPageTitle.setText(R.string.lock_paired_goto_help);
         findViewById(R.id.page_title).setVisibility(View.GONE);
+        if (HomeDeviceInfo.isPadlock(getIntent().getStringExtra(KEY_LOCK_TYPE))) {
+            ((TextView) findViewById(R.id.lock_help_title_1)).setText(R.string.padlock_help_pairing_title);
+            ((TextView) findViewById(R.id.lock_help_content_1)).setText(R.string.padlock_help_pairing);
+            ((TextView) findViewById(R.id.lock_help_title_2)).setText(R.string.padlock_help_bound_title);
+            ((TextView) findViewById(R.id.lock_help_content_2)).setText(R.string.padlock_help_bound);
+            ((TextView) findViewById(R.id.lock_help_title_3)).setText(R.string.padlock_help_wake_title);
+            ((TextView) findViewById(R.id.lock_help_content_3)).setText(R.string.padlock_wake_help);
+        }
         initTitleBarRightBtn();
     }
 

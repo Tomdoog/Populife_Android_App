@@ -69,7 +69,8 @@ public class AddDeviceFailActivity extends BaseActivity implements View.OnClickL
 		// 发生过回滚时，锁的实际状态比"重启蓝牙、重启 App"那套通用建议重要得多，优先讲清楚
 		if (mRollbackState == ROLLBACK_DONE) {
 			tvTheFollowing.setText(R.string.add_fail_rollback_done);
-			tvTheFollowingDetail.setText(R.string.add_fail_rollback_done_detail);
+			tvTheFollowingDetail.setText(HomeDeviceInfo.isPadlock(mLockType)
+					? R.string.padlock_scan_retry : R.string.add_fail_rollback_done_detail);
 			return;
 		}
 		if (mRollbackState == ROLLBACK_FAILED) {
@@ -78,7 +79,9 @@ public class AddDeviceFailActivity extends BaseActivity implements View.OnClickL
 			return;
 		}
 
-		if (mLockType.startsWith(HomeDeviceInfo.IDeviceName.NAME_GATEWAY)) {
+		if (HomeDeviceInfo.isPadlock(mLockType)) {
+			tvTheFollowingDetail.setText(R.string.padlock_scan_retry);
+		} else if (mLockType.startsWith(HomeDeviceInfo.IDeviceName.NAME_GATEWAY)) {
 			tvTheFollowing.setText(R.string.failed_to_add_gateway_hint);
 			tvTheFollowingDetail.setVisibility(View.GONE);
 		} else if (HomeDeviceInfo.isDeadboltLack(mLockType)) {

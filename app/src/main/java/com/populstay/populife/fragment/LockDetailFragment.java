@@ -523,9 +523,6 @@ public class LockDetailFragment extends BaseFragment implements View.OnClickList
 	}
 
 	private boolean isSupportRemoteUnlock() {
-		if (HomeDeviceInfo.isPadlock(mCurKEY.getLockName())) {
-			return false;
-		}
 		boolean isSupportRemoteUnlock = FeatureValueUtil.isSupportFeature(mCurKEY.getLockData(), FeatureValue.GATEWAY_UNLOCK)  && mCurKEY.isHasGateway();
 
 		// 不支持远程开锁
@@ -1817,6 +1814,9 @@ public class LockDetailFragment extends BaseFragment implements View.OnClickList
 	 */
 	private void refreshLockActionUI() {
 		refreshBattery();
+		binding.spacePadlockActions.setVisibility(
+				HomeDeviceInfo.isPadlock(mCurKEY.getLockName()) ? View.VISIBLE : View.GONE);
+		binding.spacePadlockImage.setVisibility(binding.spacePadlockActions.getVisibility());
 		if (HomeDeviceInfo.isPadlock(mCurKEY.getLockName())) {
 			mIvLockImg.setImageResource(R.drawable.product_padlock);
 			mIvLockImg.setAdjustViewBounds(true);
@@ -1839,8 +1839,7 @@ public class LockDetailFragment extends BaseFragment implements View.OnClickList
 			((LockDetailActivity) mActivity).setTitleName(mCurKEY.getLockAlias());
 		}
 //        网关开关
-        binding.llRemoteOpen.setVisibility(mCurKEY.isHasGateway()
-                && !HomeDeviceInfo.isPadlock(mCurKEY.getLockName()) ? View.VISIBLE : View.GONE);
+        binding.llRemoteOpen.setVisibility(mCurKEY.isHasGateway() ? View.VISIBLE : View.GONE);
         binding.scRemoteOpen.setOnCheckedChangeListener(null);
         binding.scRemoteOpen.setChecked(mCurKEY.getUnlockType() == 1);
         binding.scRemoteOpen.setEnabled(true);

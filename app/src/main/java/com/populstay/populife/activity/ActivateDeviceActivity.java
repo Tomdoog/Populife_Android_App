@@ -207,8 +207,12 @@ public class ActivateDeviceActivity extends BaseActivity implements View.OnClick
 			mIvAddDevicePic.setImageResource(R.drawable.padlock_outline);
 			mIvAddDevicePic.setAdjustViewBounds(true);
 			mIvAddDevicePic.setMaxHeight((int) (220 * getResources().getDisplayMetrics().density));
-			add_device_activate_hint1.setText(R.string.padlock_wake_hint);
-			add_device_activate_hint2.setVisibility(View.GONE);
+			boolean fingerprint = mFrom == KeyPwdConstant.IFrom.FROM_FINGERPRINT_CARD;
+			add_device_activate_hint1.setText(fingerprint
+					? R.string.padlock_fingerprint_keep_open : R.string.padlock_pairing_safety);
+			add_device_activate_hint2.setText(fingerprint
+					? R.string.padlock_fingerprint_activation : R.string.padlock_pairing_activation);
+			if (fingerprint) mTvNext.setText(R.string.next);
 			return;
 		}
 		if (mFrom == KeyPwdConstant.IFrom.FROM_FINGERPRINT_CARD) { // 添加指纹/门卡
@@ -268,7 +272,7 @@ public class ActivateDeviceActivity extends BaseActivity implements View.OnClick
         if (id == R.id.tv_next) {
             if (mFrom == KeyPwdConstant.IFrom.FROM_FINGERPRINT_CARD) { // 添加指纹/门卡
                 if (mFingerprintCardType == KeyPwdConstant.IType.TYPE_FINGERPRINT) { // 添加指纹
-                    if (isBleNetEnableWithToast() && isLbsEnableWithToast()) {
+                    if (isBleNetEnableWithToast() && ((HomeDeviceInfo.isPadlock(mLockType) && isAndroid12()) || isLbsEnableWithToast())) {
                         IcCardBluetoothAddActivity.actionStart(ActivateDeviceActivity.this,
                                 mFingerprintCardType, mFingerCardName, mFingerCardRemark, mFingerCardValidType,
                                 mStartTime, mEndTime, mKey, mLockType);
@@ -302,7 +306,7 @@ public class ActivateDeviceActivity extends BaseActivity implements View.OnClick
 
                 }
             } else {
-                if (isBleNetEnableWithToast() && isLbsEnableWithToast()) {
+                if (isBleNetEnableWithToast() && ((HomeDeviceInfo.isPadlock(mLockType) && isAndroid12()) || isLbsEnableWithToast())) {
                     FoundDeviceActivity.actionStart(this, mLockType);
                 }
             }

@@ -6,36 +6,6 @@
 
     <include layout="@layout/layout_view_titlebar" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/bg_color_ffe6e7e8"
-        android:orientation="vertical"
-        android:paddingLeft="@dimen/common_page_left_right_space"
-        android:paddingTop="@dimen/dimens_dp_10"
-        android:paddingRight="@dimen/common_page_left_right_space"
-        android:paddingBottom="@dimen/dimens_dp_10">
-
-        <TextView
-            android:id="@+id/add_lock_pre_check_hint"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:lineSpacingMultiplier="1.2"
-            android:text="@string/add_key_box_lock_pre_check_hint"
-            android:textColor="@color/text_color_ffb1b3b6"
-            android:textSize="12sp" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:lineSpacingMultiplier="1.2"
-            android:text="@string/add_lock_pre_check_hint2"
-            android:textColor="@color/text_color_ff0f1110"
-            android:textSize="12sp" />
-
-    </LinearLayout>
-
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -44,67 +14,115 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
             android:orientation="vertical">
 
-            <CheckBox
-                android:id="@+id/cb_bt_open"
-                style="@style/add_device_check_box_autocheck"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:text="@string/bt_open_hint" />
+                android:background="@color/bg_color_ffe6e7e8"
+                android:orientation="vertical"
+                android:paddingLeft="@dimen/common_page_left_right_space"
+                android:paddingTop="@dimen/dimens_dp_10"
+                android:paddingRight="@dimen/common_page_left_right_space"
+                android:paddingBottom="@dimen/dimens_dp_10">
 
-            <CheckBox
-                android:id="@+id/cb_lbs_open"
-                style="@style/add_device_check_box_autocheck"
+                <TextView
+                    android:id="@+id/add_lock_pre_check_hint"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:lineSpacingMultiplier="1.2"
+                    android:text="@string/add_key_box_lock_pre_check_hint"
+                    android:textColor="@color/text_color_ffb1b3b6"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:lineSpacingMultiplier="1.2"
+                    android:text="@string/add_lock_pre_check_hint2"
+                    android:textColor="@color/text_color_ff0f1110"
+                    android:textSize="12sp" />
+
+            </LinearLayout>
+
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:text="@string/bt_lbs_open_hint" />
+                android:gravity="center_horizontal"
+                android:orientation="vertical">
 
-            <CheckBox
-                android:id="@+id/cb_net_open"
-                style="@style/add_device_check_box_autocheck"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:text="@string/net_open_hint" />
+                <CheckBox
+                    android:id="@+id/cb_bt_open"
+                    style="@style/add_device_check_box_autocheck"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:text="@string/bt_open_hint" />
 
-            <CheckBox
-                android:id="@+id/ck_battery_install"
-                style="@style/add_device_check_box"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:text="@string/key_box_battery_install_hint" />
+                <CheckBox
+                    android:id="@+id/cb_lbs_open"
+                    style="@style/add_device_check_box_autocheck"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:text="@string/bt_lbs_open_hint" />
 
-            <CheckBox
-                android:id="@+id/cb_confirm_time"
-                style="@style/add_device_check_box"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:text="@string/key_box_distance_confirm" />
+                <CheckBox
+                    android:id="@+id/cb_net_open"
+                    style="@style/add_device_check_box_autocheck"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:text="@string/net_open_hint" />
 
-            <TextView
-                android:id="@+id/tv_lock_add_guide_next"
-                style="@style/btn_style_main"
-                android:layout_marginLeft="@dimen/common_page_left_right_space"
-                android:layout_marginTop="30dp"
-                android:layout_marginRight="@dimen/common_page_left_right_space"
-                android:enabled="false"
-                android:text="@string/next" />
+                <CheckBox
+                    android:id="@+id/ck_battery_install"
+                    style="@style/add_device_check_box"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:text="@string/key_box_battery_install_hint" />
 
-            <ImageView
-                android:id="@+id/iv_add_lock_guide_pic"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="20dp"
-                android:src="@drawable/keybox_check" />
+                <CheckBox
+                    android:id="@+id/cb_confirm_time"
+                    style="@style/add_device_check_box"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:text="@string/key_box_distance_confirm" />
+
+                <TextView
+                    android:id="@+id/padlock_safety_hint"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/common_page_left_right_space"
+                    android:layout_marginRight="@dimen/common_page_left_right_space"
+                    android:layout_marginTop="20dp"
+                    android:lineSpacingMultiplier="1.2"
+                    android:textColor="@color/common_text_color"
+                    android:textSize="14sp"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/tv_lock_add_guide_next"
+                    style="@style/btn_style_main"
+                    android:layout_marginLeft="@dimen/common_page_left_right_space"
+                    android:layout_marginTop="30dp"
+                    android:layout_marginRight="@dimen/common_page_left_right_space"
+                    android:enabled="false"
+                    android:text="@string/next" />
+
+                <ImageView
+                    android:id="@+id/iv_add_lock_guide_pic"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="20dp"
+                    android:src="@drawable/keybox_check" />
+
+            </LinearLayout>
 
         </LinearLayout>
-
     </ScrollView>
 
 </LinearLayout>

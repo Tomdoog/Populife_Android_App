@@ -264,6 +264,9 @@ public class FingerprintIcCardAddConfigActivity extends BaseActivity implements 
 		} else { // 添加指纹
 			mTvTitle.setText(R.string.fingerprint_config);
 			mTvTips.setText(R.string.add_fingerprint_tips);
+			if (HomeDeviceInfo.isPadlock(mLockType)) {
+				mTvTips.setText(R.string.padlock_fingerprint_info);
+			}
 			mTvName.setText(R.string.fingerprint_user_name);
 			mEtRemarks.setHint(R.string.fingerprint_remarks_hint);
 			mLlRemarks.setVisibility(View.VISIBLE);

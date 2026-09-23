@@ -18,6 +18,7 @@ import com.populstay.populife.R;
 import com.populstay.populife.app.MyApplication;
 import com.populstay.populife.base.BaseActivity;
 import com.populstay.populife.entity.Key;
+import com.populstay.populife.home.entity.HomeDeviceInfo;
 import com.populstay.populife.enumtype.Operation;
 import com.populstay.populife.lock.ILockModifyAutoLockTime;
 import com.populstay.populife.manhattanlock.MHILockModifyAutoLockTime;
@@ -48,6 +49,7 @@ public class LockAutoLockingActivity extends BaseActivity implements View.OnClic
 	 * @param autoLockTime 自动闭锁时间
 	 */
 	public static void actionStart(Activity context, int autoLockTime, int requestCode,Key key) {
+		if (key == null || HomeDeviceInfo.isPadlock(key.getLockName())) return;
 		Intent intent = new Intent(context, LockAutoLockingActivity.class);
 		intent.putExtra(KEY_AUTO_LOCK_TIME, autoLockTime);
 		intent.putExtra(KEY_KEY, key);
@@ -57,8 +59,13 @@ public class LockAutoLockingActivity extends BaseActivity implements View.OnClic
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_lock_auto_locking);
 		getIntentData();
+		// 同时保护直接 Intent 启动与系统恢复页面的入口。
+		if (mKey == null || HomeDeviceInfo.isPadlock(mKey.getLockName())) {
+			finish();
+			return;
+		}
+		setContentView(R.layout.activity_lock_auto_locking);
 		initView();
 		initListener();
 	}
@@ -170,6 +177,7 @@ public class LockAutoLockingActivity extends BaseActivity implements View.OnClic
     }
 
     private void modifyAutoLockTime() {
+		if (mKey == null || HomeDeviceInfo.isPadlock(mKey.getLockName())) return;
 		showLoading();
         if (mKey.getLockId()<0){
 			if (sPPLOCK.isConnected(mKey.getLockMac())) {
@@ -245,6 +253,7 @@ public class LockAutoLockingActivity extends BaseActivity implements View.OnClic
 	}
 
 	private void setResultToBack() {
+		if (mSwitch == null || mKey == null || HomeDeviceInfo.isPadlock(mKey.getLockName())) return;
 		Intent data = new Intent();
 		data.putExtra(LockSettingsActivity.KEY_RESULT_DATA,String.valueOf(mSwitch.isChecked()));
 		setResult(RESULT_OK, data);

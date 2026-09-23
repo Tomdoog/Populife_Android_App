@@ -930,6 +930,7 @@ public class FoundDeviceActivity extends BaseActivity implements AdapterView.OnI
     public void onClick(View v) {
         if (v.getId() == R.id.tv_tap_help) {
             Intent intent = new Intent(this, HelpActivity.class);
+            intent.putExtra(HelpActivity.KEY_LOCK_TYPE, mLockType);
             startActivity(intent);
         }
     }
