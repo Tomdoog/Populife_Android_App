@@ -106,9 +106,7 @@ public class OfflineLockListActivity extends BaseActivity {
 					@Override
 					public void onFail(OfflineLock l, int failType) {
 						stopLoading();
-						toast(failType == OfflineLockUploader.FAIL_NETWORK
-								? R.string.unsync_fail_network
-								: R.string.unsync_fail_business);
+						toast(OfflineLockUploader.failureMessage(failType));
 					}
 				});
 			}

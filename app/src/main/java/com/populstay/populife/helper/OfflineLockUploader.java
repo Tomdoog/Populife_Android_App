@@ -51,6 +51,15 @@ public class OfflineLockUploader {
 	public static final int FAIL_NETWORK = 1;
 	/** 非网络失败:服务端返回非成功、数据异常 —— 提示"同步失败,请重启 App" */
 	public static final int FAIL_BUSINESS = 2;
+    public static final int FAIL_TIME = 3;
+    public static final int FAIL_SERVER_TIME = 4;
+
+    public static int failureMessage(int type) {
+        if (type == FAIL_TIME) return com.populstay.populife.R.string.binding_time_failed;
+        if (type == FAIL_SERVER_TIME) return com.populstay.populife.R.string.binding_server_time_failed;
+        return type == FAIL_NETWORK ? com.populstay.populife.R.string.unsync_fail_network
+                : com.populstay.populife.R.string.unsync_fail_business;
+    }
 
 	/** 同步状态记录(存 SharedPreferences,按 userId + lockMac 区分,不动数据库表) */
 	private static final String KEY_SYNC_FAILED = "unsync_failed_";
@@ -186,7 +195,8 @@ public class OfflineLockUploader {
 			}
 		};
 
-		if (lock == null || StringUtil.isBlank(lock.getLockDataJson())) {
+		// 后台不抢占蓝牙；尚未校时的设备由用户在附近点击“同步”重试。
+        if (lock == null || StringUtil.isBlank(lock.getLockDataJson()) || !BindingTimeSync.verified(lock)) {
 			next.run();
 			return;
 		}
@@ -219,6 +229,32 @@ public class OfflineLockUploader {
 	 * 因此这里必须绑定空间成功后再删本地记录;绑不上就保留记录,设备至少还留在"未同步设备"里可见。
 	 */
 	private void finalizeSync(final OfflineLock lock, final JSONObject data, final InternalCallback callback) {
+        fetchCloudLocks(lock.getUserId(), new CloudLocksCallback() {
+            @Override public void onReady(Map<String, JSONObject> locks) {
+                JSONObject cloud = getCloudLock(lock, locks);
+                JSONObject local = JSON.parseObject(lock.getLockDataJson());
+                if (!BindingTimeSync.verified(lock) || !BindingTimeEvidence.serverMatches(local, cloud)) {
+                    markSyncFailed(lock.getUserId(), lock.getLockMac(), FAIL_SERVER_TIME);
+                    callback.onDone(false, data, FAIL_SERVER_TIME);
+                    return;
+                }
+                PeachLogger.d("BindingTimeSync server verified offsetMillis=" + local.getInteger("timezoneRawOffset")
+                        + " uploadedTimestamp=" + local.getString("timestamp"));
+                JSONObject merged = new JSONObject();
+                if (data != null) merged.putAll(data);
+                for (Map.Entry<String, Object> field : cloud.entrySet()) {
+                    if (field.getValue() != null) merged.put(field.getKey(), field.getValue());
+                }
+                bindVerifiedSpace(lock, merged, callback);
+            }
+            @Override public void onUnavailable() {
+                markSyncFailed(lock.getUserId(), lock.getLockMac(), FAIL_SERVER_TIME);
+                callback.onDone(false, data, FAIL_SERVER_TIME);
+            }
+        });
+    }
+
+    private void bindVerifiedSpace(final OfflineLock lock, final JSONObject data, final InternalCallback callback) {
 		// lock/get 返回带 home 字段:非空表示已归属空间,直接完成(init 返回没有该字段,视为未绑定)
 		if (data != null && data.get("home") != null) {
 			PeachLogger.d(TAG + " already in a space, sync done " + lock.getLockMac());
@@ -351,6 +387,17 @@ public class OfflineLockUploader {
 
 	/** 调用前必须已持有 mUploading 锁 */
 	private void doSyncOne(final OfflineLock lock, final SyncCallback callback) {
+        BindingTimeSync.sync(lock, success -> {
+            if (success) doSyncVerified(lock, callback);
+            else {
+                mUploading.set(false);
+                markSyncFailed(lock.getUserId(), lock.getLockMac(), FAIL_TIME);
+                notifyFail(callback, lock, FAIL_TIME);
+            }
+        });
+    }
+
+    private void doSyncVerified(final OfflineLock lock, final SyncCallback callback) {
 		final String userId = StringUtil.isBlank(lock.getUserId()) ? PeachPreference.readUserId() : lock.getUserId();
 
 		fetchCloudLocks(userId, new CloudLocksCallback() {

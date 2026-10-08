@@ -91,6 +91,12 @@ public class LockSendPasscodeNewActivity extends BaseActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_lock_send_passcode_new);
 		mKey = getIntent().getParcelableExtra(KEY_LOCK_KEY);
+        if (mKey != null && !com.populstay.populife.db.PopulifeDBUtil.getInstance(getApplicationContext())
+                .queryByUserAndMac(com.populstay.populife.util.storage.PeachPreference.readUserId(), mKey.getLockMac()).isEmpty()) {
+            toast(R.string.binding_incomplete_password);
+            finish();
+            return;
+        }
 		mLockId = getIntent().getIntExtra(KEY_LOCK_ID, 0);
 		mKeyId = getIntent().getIntExtra(KEY_KEY_ID, 0);
 		mLockName = getIntent().getStringExtra(KEY_LOCK_NAME);

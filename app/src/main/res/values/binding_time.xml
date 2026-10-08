@@ -1,0 +1,7 @@
+<resources>
+    <string name="lock_timezone_notice">Your phone and lock are in different time zones. Passcode validity times follow the lock’s time zone (%1$s).</string>
+    <string name="binding_time_failed">Lock time or time zone could not be verified. Keep the lock nearby and awake, then retry. Initialization is incomplete. Some locks only support whole-hour time zones.</string>
+    <string name="binding_server_time_failed">The server time zone could not be verified. Initialization is incomplete. Check your connection and retry.</string>
+    <string name="binding_incomplete_password">Device initialization is incomplete. Finish syncing the device before generating passcodes.</string>
+    <string name="binding_timezone_unsupported">This lock does not support the current phone time zone. Binding has not started.</string>
+</resources>

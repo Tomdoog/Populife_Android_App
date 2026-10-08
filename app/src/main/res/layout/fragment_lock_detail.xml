@@ -105,6 +105,19 @@
                    android:gravity="center_horizontal"
                    android:orientation="vertical">
 
+                   <TextView
+                       android:id="@+id/tv_lock_timezone_notice"
+                       android:layout_width="match_parent"
+                       android:layout_height="wrap_content"
+                       android:background="#FFF7E6"
+                       android:paddingStart="@dimen/common_page_left_right_space"
+                       android:paddingEnd="@dimen/common_page_left_right_space"
+                       android:paddingTop="12dp"
+                       android:paddingBottom="12dp"
+                       android:textColor="@color/common_text_color"
+                       android:textSize="14sp"
+                       android:visibility="gone" />
+
                    <LinearLayout
                        android:id="@+id/ll_remote_open"
                        android:layout_width="match_parent"

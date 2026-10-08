@@ -30,42 +30,24 @@ import com.populstay.populife.adapter.FoundDeviceAdapter;
 import com.populstay.populife.app.MyApplication;
 import com.populstay.populife.base.BaseActivity;
 import com.populstay.populife.base.BaseApplication;
-import com.populstay.populife.manhattanlock.MHILockDeleteLock;
-import com.populstay.populife.helper.DeviceDeleteRecoveryDialog;
-import com.populstay.populife.common.Urls;
 import com.populstay.populife.constant.BleConstant;
 import com.populstay.populife.db.PopulifeDBUtil;
-import com.populstay.populife.entity.Key;
 import com.populstay.populife.entity.OfflineLock;
-import com.populstay.populife.enumtype.Operation;
 import com.populstay.populife.eventbus.Event;
-import com.populstay.populife.home.entity.HomeDevice;
 import com.populstay.populife.home.entity.HomeDeviceInfo;
-import com.populstay.populife.net.RestClient;
-import com.populstay.populife.net.callback.IError;
-import com.populstay.populife.net.callback.IFailure;
-import com.populstay.populife.net.callback.ISuccess;
 import com.populstay.populife.permission.PermissionListener;
-import com.populstay.populife.ui.loader.PeachLoader;
 import com.populstay.populife.util.log.PeachLogger;
 import com.populstay.populife.util.storage.PeachPreference;
-import com.populstay.populife.util.string.StringUtil;
 import com.ttlock.bl.sdk.api.ExtendedBluetoothDevice;
 import com.ttlock.bl.sdk.callback.InitLockCallback;
-import com.ttlock.bl.sdk.callback.ResetLockCallback;
 import com.ttlock.bl.sdk.callback.ScanLockCallback;
-import com.ttlock.bl.sdk.entity.Error;
 import com.ttlock.bl.sdk.entity.LockData;
 import com.ttlock.bl.sdk.entity.LockError;
-import com.ttlock.bl.sdk.entity.LockVersion;
 
 import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.WeakHashMap;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import androidx.annotation.RequiresPermission;
 import androidx.appcompat.app.AlertDialog;
@@ -92,7 +74,6 @@ public class FoundDeviceActivity extends BaseActivity implements AdapterView.OnI
 	private FoundDeviceAdapter mAdapter;
 	private AlertDialog DIALOG;
 	private int mCurrentScanProgress = 0;
-	private Key mKey;
 	private String mLockType;
 	private boolean isMHTLock = false;
 	private Runnable mRunnable = new Runnable() {
@@ -145,9 +126,6 @@ public class FoundDeviceActivity extends BaseActivity implements AdapterView.OnI
 			}
 		}
 	};
-	private int mLockId, mKeyId, mBattery;
-	private String mLockName;
-	private HomeDevice mHomeDevice = new HomeDevice();
 
 	public static void actionStart(Context context, String lockType) {
 		Intent intent = new Intent(context, FoundDeviceActivity.class);
@@ -401,11 +379,17 @@ public class FoundDeviceActivity extends BaseActivity implements AdapterView.OnI
 			} else {
 				startConnect(obj);
 			}
-			showLoading();
 		}
 	}
 
 	private void startConnect(Object obj) {
+        final long bindingTime = System.currentTimeMillis();
+        final java.util.TimeZone bindingZone = java.util.TimeZone.getDefault();
+        if (obj instanceof BleDevice) {
+            try { com.populock.manhattan.sdk.util.LockTimeZone.encode(bindingZone.getOffset(bindingTime)); }
+            catch (IllegalArgumentException e) { toast(R.string.binding_timezone_unsupported); return; }
+        }
+        showLoading();
 		if (obj instanceof BleDevice) {//曼哈顿锁走曼哈顿SDK连接方法
 			MyApplication.pplBleSession.setOperation(LockOperation.ADD_ADMIN);
 			sPPLOCK.connect((BleDevice) obj);
@@ -421,7 +405,12 @@ public class FoundDeviceActivity extends BaseActivity implements AdapterView.OnI
 			mTTLockAPI.initLock(device, new InitLockCallback() {
                 @Override
                 public void onInitLockSuccess(String s) {
-                    LockData lockData = new LockData();
+                    LockData lockData = com.ttlock.bl.sdk.util.EncryptionUtil.parseLockData(s);
+                    if (lockData == null) {
+                        EventBus.getDefault().post(new Event(Event.EventType.LOCK_LOCAL_INITIALIZE_FAIL));
+                        return;
+                    }
+                    lockData.setTimezoneRawOffset(bindingZone.getOffset(bindingTime));
                     mTTLockAPI.stopScanLock();
                     // 保存锁信息
                     String userId = PeachPreference.readUserId();
@@ -431,7 +420,9 @@ public class FoundDeviceActivity extends BaseActivity implements AdapterView.OnI
                     lockData.setLockName(lockName);
                     String defaultLockDataJson = lockData.toJson();
                     JSONObject lockInfo = JSON.parseObject(defaultLockDataJson);
-                    lockInfo.put("lockData", s);
+                    lockInfo.put("lockData", lockData.encodeLockData());
+                    lockInfo.put("bindingTimeVerified", false);
+                    lockInfo.put("bindingTimeZoneId", bindingZone.getID());
                     lockInfo.put("lockVersion", JSON.parseObject(device.getLockVersionJson()));
                     String lockDataJson = lockInfo.toJSONString();
                     boolean saved = PopulifeDBUtil.getInstance(getApplicationContext())
@@ -503,7 +494,7 @@ public class FoundDeviceActivity extends BaseActivity implements AdapterView.OnI
 		super.onEventSub(event);
 		switch (event.type) {
 			case Event.EventType.LOCK_LOCAL_INITIALIZE_SUCCEED:
-				PeachLogger.d(TAG + " onEventSub LOCK_LOCAL_INITIALIZE_SUCCEED event.obj = " + event.obj);
+				PeachLogger.d(TAG + " physical initialization complete; verifying time and server");
 				if (null == event.obj) {
 					//toast(R.string.note_lock_init_fail);
 					AddDeviceFailActivity.actionStart(this, mLockType);
@@ -525,398 +516,40 @@ public class FoundDeviceActivity extends BaseActivity implements AdapterView.OnI
 				PeachLogger.d(TAG + " onEventSub LOCK_LOCAL_INITIALIZE_FAIL");
 				AddDeviceFailActivity.actionStart(this, mLockType);
 				break;
-			case Event.EventType.INIT_LOCK_FAIL_RESET_WHEN_CONNECT:
-				if (isMHTLock) {
-					sPPLOCK.deleteLock(mKey.getUserId(), String.valueOf(mKey.getLockId()), String.valueOf(mKey.getKeyId()), mKey.getK1());
-				} else {
 
-					mTTLockAPI.resetLock(mKey.getLockData(), mKey.getLockMac(),new ResetLockCallback() {
-                        @Override
-                        public void onResetLockSuccess() {
-                        }
-
-                        @Override
-                        public void onFail(LockError error) {
-                        }
-                    });
-				}
-				break;
 		}
 
 	}
 
-	/**
-	 * 请求服务器，初始化锁
-	 */
-	private void initializeKJXLock(final String lockDataJson) {
-		final WeakHashMap<String, Object> requestParams = parseLockData(lockDataJson);
-		PeachLogger.d(TAG + " initializeLock 开始提交服务器 " + requestParams.toString());
-		/*final CustomProgress customProgress = CustomProgress.show(this,
-				getString(R.string.note_lock_init_ing), false, null);*/
-		showLoading();
-		RestClient.builder()
-				.url(Urls.LOCK_INIT)
-				.params(requestParams)
-				.success(new ISuccess() {
-					@Override
-					public void onSuccess(String response) {
-						//customProgress.cancel();
-						stopLoading();
-						PeachLogger.d(TAG + " initializeLock response=" + response);
+    private void initializeKJXLock(String json) { initializeWithTime(json, false); }
+    private void initializeMHTLock(String json) { initializeWithTime(json, true); }
 
-						JSONObject result = JSON.parseObject(response);
-						int code = result.getInteger("code");
-						if (code == 200) {
-							// 账号初始化成功还不等于添加完成；本地记录留到成功绑定空间后再清除。
-							PeachLogger.d(TAG + " initializeLock 提交成功 ");
-							JSONObject data = result.getJSONObject("data");
-							mLockId = data.getInteger("lockId");
-							String lockVersion = mKey.getLockVersion();
-							JSONObject lockInfo = JSON.parseObject(lockVersion);
-							if (null != lockInfo) {
-								lockInfo.put("lockId", mLockId);
-								mKey.setLockVersion(lockInfo.toJSONString());
-							}
-                            if (data.containsKey("noKeyPwd")) {
-                                mKey.setNoKeyPwd(data.getString("noKeyPwd"));
-                            }
-
-							mKey.setLockId(mLockId);
-							// 这把锁已重新绑到账号上,之前那笔没删干净的记录作废,否则新设备一进详情页就被判成"待账号移除"
-							DeviceDeleteRecoveryDialog.onSameLockReAdded(mKey.getUserId(), mLockId, mKey.getLockMac());
-							mHomeDevice.setDeviceId(String.valueOf(mLockId));
-							mHomeDevice.setName(mLockName);
-							PeachPreference.setBoolean(PeachPreference.HAVE_NEW_MESSAGE, true);
-							toast(R.string.note_lock_init_success);
-							EventBus.getDefault().post(new Event(Event.EventType.ADD_DEVICE_SUCCESS));
-							AddDeviceSuccessActivity.actionStart(FoundDeviceActivity.this, HomeDeviceInfo.IDeviceName.NAME_LOCK_DEADBOLT, mHomeDevice, mKey);
-						} else {
-							PeachLogger.d(TAG + " initializeLock 提交失败 ");
-							resetLock();
-							toast(R.string.note_lock_init_fail);
-						}
-					}
-				})
-				.failure(new IFailure() {
-					@Override
-					public void onFailure() {
-						PeachLogger.d(TAG + " initializeLock 提交失败 onFailure");
-						keepForRetry();
-						stopLoading();
-						//customProgress.cancel();
-						toast(R.string.note_lock_init_fail);
-					}
-				})
-				.error(new IError() {
-					@Override
-					public void onError(int code, String msg) {
-						PeachLogger.d(TAG + " initializeLock 提交失败 onError");
-						keepForRetry();
-						stopLoading();
-						//customProgress.cancel();
-						toast(R.string.note_lock_init_fail);
-					}
-				})
-				.build()
-				.post();
-	}
-
-	/**
-	 * 曼哈顿请求服务器，初始化锁
-	 */
-	private void initializeMHTLock(final String lockDataJson) {
-		final WeakHashMap<String, Object> requestParams = mhParseLockData(lockDataJson);
-		PeachLogger.d(TAG + " initializeLock 开始提交服务器 " + requestParams.toString());
-		showLoading();
-		RestClient.builder()
-				.url(Urls.MH_LOCK_INIT)
-				.params(requestParams)
-				.success(new ISuccess() {
-					@Override
-					public void onSuccess(String response) {
-						//customProgress.cancel();
-						stopLoading();
-						PeachLogger.d(TAG + " initializeLock response=" + response);
-						JSONObject result = JSON.parseObject(response);
-						int code = result.getInteger("code");
-						if (code == 200) {
-							// 账号初始化成功还不等于添加完成；本地记录留到成功绑定空间后再清除。
-							PeachLogger.d(TAG + " initializeLock 提交成功 ");
-							JSONObject data = result.getJSONObject("data");
-							mLockId = data.getInteger("lockId");
-							mKeyId = data.getInteger("keyId");
-							String noKeyPwd = data.getString("noKeyPwd");
-							String k1 = data.getString("k1");
-							String k2 = data.getString("k2");
-
-//							String lockVersion = mKey.getLockVersion();
-//							JSONObject lockInfo = JSON.parseObject(lockVersion);
-//							if (null != lockInfo) {
-//								lockInfo.put("lockId", mLockId);
-//								mKey.setLockVersion(lockInfo.toJSONString());
-//							}
-
-							mKey.setLockVersion("11111");
-							mKey.setLockId(mLockId);
-							// 这把锁已重新绑到账号上,之前那笔没删干净的记录作废,否则新设备一进详情页就被判成"待账号移除"
-							DeviceDeleteRecoveryDialog.onSameLockReAdded(mKey.getUserId(), mLockId, mKey.getLockMac());
-							mKey.setKeyId(mKeyId);
-							mKey.setNoKeyPwd(noKeyPwd);
-							mKey.setK1(k1);
-							mKey.setK2(k2);
-							mBattery = (int) requestParams.get("electricQuantity");
-							mHomeDevice.setDeviceId(String.valueOf(mLockId));
-							mHomeDevice.setName(mLockName);
-							PeachPreference.setBoolean(PeachPreference.HAVE_NEW_MESSAGE, true);
-							toast(R.string.note_lock_init_success);
-							MyApplication.pplBleSession.setOperation(LockOperation.GET_BATTERY_LEVEL);
-							EventBus.getDefault().post(new Event(Event.EventType.ADD_DEVICE_SUCCESS));
-							AddDeviceSuccessActivity.actionStart(FoundDeviceActivity.this, HomeDeviceInfo.IDeviceName.NAME_LOCK_KEY_BOX_3, mHomeDevice, mKey);
-						} else {
-							PeachLogger.d(TAG + " initializeLock 提交失败 ");
-							resetLock();
-							toast(R.string.note_lock_init_fail);
-						}
-					}
-				})
-				.failure(new IFailure() {
-					@Override
-					public void onFailure() {
-						PeachLogger.d(TAG + " initializeLock 提交失败 onFailure");
-						keepForRetry();
-						stopLoading();
-						//customProgress.cancel();
-						toast(R.string.note_lock_init_fail);
-					}
-				})
-				.error(new IError() {
-					@Override
-					public void onError(int code, String msg) {
-						PeachLogger.d(TAG + " initializeLock 提交失败 onError");
-						keepForRetry();
-						stopLoading();
-						//customProgress.cancel();
-						toast(R.string.note_lock_init_fail);
-					}
-				})
-				.build()
-				.post();
-	}
-
-	/**
-	 * 网络类上传失败(断网/超时/服务端未明确拒绝):不重置物理锁、保留本地待上传记录,
-	 * 等联网后由 OfflineLockUploader 自动补传。
-	 *
-	 * 注意:此处绝不能调 resetLock() —— 一旦重置物理锁,本地那份 lockData 立即作废,
-	 * 后续补传只会在云端造出一把"列表里有、实际打不开"的幽灵锁。
-	 */
-	private void keepForRetry() {
-		PeachLogger.d(TAG + " 上传失败(网络类),保留锁绑定与本地记录,等待自动补传");
-		AddDeviceFailActivity.actionStart(this, mLockType, AddDeviceFailActivity.ROLLBACK_NONE);
-	}
-
-	/** 回滚等待超时:蓝牙指令可能永远等不到回调,不能让用户卡在这一屏 */
-	private static final long ROLLBACK_TIMEOUT_MS = 30 * 1000L;
-
-	/** 回滚结果只处理一次 —— 蓝牙回调与超时兜底会抢同一个出口 */
-	private final AtomicBoolean mRollbackHandled = new AtomicBoolean(false);
-
-	private final Runnable mRollbackTimeout = new Runnable() {
-		@Override
-		public void run() {
-			PeachLogger.d(TAG + " reset 超时未收到结果，按失败处理，保留本地记录");
-			finishRollback(false);
-		}
-	};
-
-	/**
-	 * 上传失败，重置锁，数据回滚(仅用于服务端明确拒绝的业务失败)。
-	 *
-	 * 回滚成没成功，决定了用户接下来该做什么，所以必须等结果出来再跳失败页:
-	 *  - 成功:锁已回出厂态、本地记录作废，引导重新添加;
-	 *  - 失败:锁仍是已初始化状态，本地记录必须留着，靠"未同步设备"兜底。
-	 * 原来不等结果直接跳页，用户只看到一句"添加失败"，并不知道锁现在是哪种状态。
-	 */
-	private void resetLock() {
-		PeachLogger.d(TAG + " reset 上传失败，重置锁，数据回滚");
-		MyApplication.CURRENT_KEY = mKey;
-		mRollbackHandled.set(false);
-		showLoading();
-		BaseApplication.getHandler().postDelayed(mRollbackTimeout, ROLLBACK_TIMEOUT_MS);
-
-		if (isMHTLock) {
-			MyApplication.pplBleSession.setmILockDeleteLock(new MHILockDeleteLock() {
-				@Override
-				public void onSuccess() {
-					// 本地记录由 MyApplication.onDeleteLock 统一清除
-					PeachLogger.d(TAG + " reset 成功(MHT) " + mKey.getLockMac());
-					finishRollback(true);
-				}
-
-				@Override
-				public void onFail() {
-					PeachLogger.d(TAG + " reset 失败(MHT)，保留本地记录等待兜底 " + mKey.getLockMac());
-					finishRollback(false);
-				}
-
-				@Override
-				public void onFinish() {
-				}
-			});
-			if (sPPLOCK.isConnected(mKey.getLockMac())) {
-				// lockId/keyId/k1 是服务端初始化成功才下发的，此刻都还没有，
-				// 走不了要 authVerify 的 deleteLock，只能用免认证的初始化回滚
-				sPPLOCK.resetLockAfterInitFail();
-			} else {
-				MyApplication.pplBleSession.setOperation(LockOperation.INIT_LOCK_DELETE);
-				//sPPLOCK.connect(mKey.getLockMac());
-				startLockActionScan();
-			}
-		} else {
-            mTTLockAPI.resetLock(mKey.getLockData(), mKey.getLockMac(),new ResetLockCallback() {
-                @Override
-                public void onResetLockSuccess() {
-                    // 物理锁已被重置,本地那份 lockData 随之作废;必须同步删掉本地待上传记录,
-                    // 否则后续手动 Sync / 自动上传会把失效数据传上云端,造出一把"列表里有、实际打不开"的幽灵锁
-                    PopulifeDBUtil.getInstance(BaseApplication.getApplication())
-                            .deleteByUserAndMac(mKey.getUserId(), mKey.getLockMac());
-                    PeachLogger.d(TAG + " reset 成功,已删除本地待上传记录 " + mKey.getLockMac());
-                    finishRollback(true);
-                }
-
-                @Override
-                public void onFail(LockError error) {
-                    PeachLogger.d(TAG + " reset 失败,保留本地记录等待兜底 " + mKey.getLockMac() + " " + error);
-                    finishRollback(false);
-                }
-            });
-		}
-	}
-
-	/** 回滚结果统一出口 */
-	private void finishRollback(final boolean rollbackDone) {
-		if (!mRollbackHandled.compareAndSet(false, true)) {
-			return;
-		}
-		BaseApplication.getHandler().removeCallbacks(mRollbackTimeout);
-		runOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-				stopLoading();
-				AddDeviceFailActivity.actionStart(FoundDeviceActivity.this, mLockType,
-						rollbackDone ? AddDeviceFailActivity.ROLLBACK_DONE : AddDeviceFailActivity.ROLLBACK_FAILED);
-			}
-		});
-	}
-
-	/**
-	 * 解析锁的数据
-	 */
-	private WeakHashMap<String, Object> parseLockData(String lockDataJson) {
-
-		JSONObject lockInfo = JSON.parseObject(lockDataJson);
-		final WeakHashMap<String, Object> params = new WeakHashMap<>();
-		params.put("userId", PeachPreference.readUserId());
-		String lockName = lockInfo.getString("lockName");
-
-		//todo
-		params.put("name", lockName);
-		mLockName = lockName;
-		params.put("mac", lockInfo.getString("lockMac"));
-        params.put("lockData", lockInfo.getString("lockData"));
-        params.put("lockAlias", lockName);
-		JSONObject lockVersion = lockInfo.getJSONObject("lockVersion");
-
-
-		// 这些数据用于重置锁
-		mKey = new Key();
-		lockVersion.put("lockId", lockInfo.getInteger("lockId"));
-		lockVersion.put("showAdminKbpwdFlag", null);
-		lockVersion.put("showAdminKbpwdFlag", null);
-		mKey.setLockVersion(lockVersion.toJSONString());
-		mKey.setAdminPwd(lockInfo.getString("adminPwd"));
-		if (lockInfo.containsKey("noKeyPwd")) {
-			mKey.setNoKeyPwd(lockInfo.getString("noKeyPwd"));
-		}
-		mKey.setLockKey(lockInfo.getString("lockKey"));
-		mKey.setLockFlagPos(lockInfo.getInteger("lockFlagPos"));
-		mKey.setAesKeyStr(lockInfo.getString("aesKeyStr"));
-        mKey.setLockMac(lockInfo.getString("lockMac"));
-        mKey.setLockData(lockInfo.getString("lockData"));
-		mKey.setUserId(PeachPreference.readUserId());
-		if (lockInfo.containsKey("keyId")) {
-			mKey.setKeyId(lockInfo.getInteger("keyId"));
-		}
-		if (lockInfo.containsKey("userKeyId")) {
-			mKey.setUserKeyId(lockInfo.getInteger("userKeyId"));
-		}
-
-		// Retrofit 的 FieldMap 不接受 null 值(否则抛 "Field map contained null value" 走 onFailure),剔除 null 项再提交
-		params.values().removeAll(Collections.singleton(null));
-		return params;
-	}
-
-	/**
-	 * 解析锁的数据
-	 */
-	private WeakHashMap<String, Object> mhParseLockData(String lockDataJson) {
-
-		JSONObject lockInfo = JSON.parseObject(lockDataJson);
-		final WeakHashMap<String, Object> params = new WeakHashMap<>();
-		params.put("userId", PeachPreference.readUserId());
-		String lockName = lockInfo.getString("lockName");
-
-		//todo
-		params.put("name", lockName);
-		params.put("lockName", lockName);
-		mLockName = lockName;
-		params.put("alias", lockName);
-		params.put("mac", lockInfo.getString("lockMac"));
-		//params.put("key", lockInfo.getString("lockKey"));
-		//params.put("flagPos", lockInfo.getInteger("lockFlagPos"));
-		params.put("aesKey", lockInfo.getString("aesKey"));
-		params.put("timestamp", lockInfo.getString("timestamp"));
-		params.put("specialValue", 1230);
-		params.put("electricQuantity", lockInfo.getInteger("batteryLevel"));//batteryLevel,electricQuantity
-		params.put("timezoneRawOffSet", String.valueOf(lockInfo.getInteger("timezoneRawOffset")));
-		params.put("modelNum", lockInfo.getString("modelNum"));
-		mHomeDevice.setAlias(lockName);
-		mHomeDevice.setModelNum(lockInfo.getString("modelNum"));
-		params.put("hardwareRevision", lockInfo.getString("hardwareVersion"));
-		params.put("firmwareRevision", lockInfo.getString("firmwareVersion"));//firmwareVersion -> 1.0.0.1108
-		params.put("protocolVersion", 1);
-
-
-		// 这些数据用于重置锁
-		mKey = new Key();
-//		lockVersion.put("lockId", lockInfo.getInteger("lockId"));
-//		lockVersion.put("showAdminKbpwdFlag", null);
-//		lockVersion.put("showAdminKbpwdFlag", null);
-//		mKey.setLockVersion(lockVersion.toJSONString());
-//		mKey.setAdminPwd(lockInfo.getString("adminPwd"));
-		mKey.setLockVersion("11111");
-		mKey.setAdminPwd("111111");
-		if (lockInfo.containsKey("noKeyPwd")) {
-			mKey.setNoKeyPwd(lockInfo.getString("noKeyPwd"));
-		}
-		mKey.setLockKey(lockInfo.getString("aesKey"));
-		//mKey.setLockFlagPos(lockInfo.getInteger("lockFlagPos"));
-		mKey.setLockFlagPos(1);
-		mKey.setAesKeyStr(lockInfo.getString("aesKey"));
-		mKey.setLockMac(lockInfo.getString("lockMac"));
-        mKey.setLockData(lockInfo.getString("lockData"));
-		mKey.setUserId(PeachPreference.readUserId());
-		if (lockInfo.containsKey("keyId")) {
-			mKey.setKeyId(lockInfo.getInteger("keyId"));
-		}
-		if (lockInfo.containsKey("userKeyId")) {
-			mKey.setUserKeyId(lockInfo.getInteger("userKeyId"));
-		}
-		mKey.setUserKeyId(2222);
-		// Retrofit 的 FieldMap 不接受 null 值(否则抛 "Field map contained null value" 走 onFailure),剔除 null 项再提交
-		params.values().removeAll(Collections.singleton(null));
-		return params;
-	}
+    private void initializeWithTime(String json, boolean mht) {
+        JSONObject info = JSON.parseObject(json);
+        OfflineLock lock = new OfflineLock(PeachPreference.readUserId(), info.getString("lockMac"),
+                info.getString("lockName"), json, mht ? -1 : 0);
+        showLoading();
+        com.populstay.populife.helper.OfflineLockUploader.getInstance().syncOne(lock,
+                new com.populstay.populife.helper.OfflineLockUploader.SyncCallback() {
+            @Override public void onSuccess(OfflineLock saved, JSONObject data) {
+                stopLoading();
+                toast(R.string.note_lock_init_success);
+                com.populstay.populife.helper.UnsyncedDeviceDialog.openSuccessPage(
+                        FoundDeviceActivity.this, saved, data);
+                finish();
+            }
+            @Override public void onFail(OfflineLock saved, int failType) {
+                stopLoading();
+                if (isFinishing() || isDestroyed()) return;
+                new AlertDialog.Builder(FoundDeviceActivity.this)
+                        .setMessage(com.populstay.populife.helper.OfflineLockUploader.failureMessage(failType))
+                        .setPositiveButton(R.string.try_again, (dialog, which) ->
+                                initializeWithTime(saved.getLockDataJson(), mht))
+                        .setNegativeButton(R.string.cancel, (dialog, which) -> finish())
+                        .setCancelable(false).show();
+            }
+        });
+    }
 
 	private void getIntentData() {
 		mLockType = getIntent().getStringExtra(KEY_LOCK_TYPE);

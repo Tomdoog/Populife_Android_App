@@ -1087,7 +1087,7 @@ public class BleService extends Service {
 							JSONObject object = parseLockInfo(stringBuilder.toString());
 							mLockData = getLockDataObj();
 							// 初始化锁成功，校准锁时间
-							setLockTime(System.currentTimeMillis());
+							// 时间同步由应用持久化初始化凭据后执行，回读成功前不得提交绑定。
 //							sLockBleSession.getGetLockInfoCallback().onSuccess(object.toString());
 							PPLock.getPPLockCallback().onInitLock(mBleDevice, mLockData, LockError.SUCCESS);
 							sLockBleSession.setLockOperation(LockOperation.INIT_LOCK_DELETE);
@@ -1156,6 +1156,10 @@ public class BleService extends Service {
 	 * 查询锁时间
 	 */
 	public void getLockTime() {
+        getLockTime(sLockBleSession.getTimezoneRawOffset());
+    }
+
+    public void getLockTime(final Integer expectedOffset) {
 		int commandID = ConfigUtil.getCommandId(this);
 		commandID++;
 		ConfigUtil.setCommandId(this, commandID);
@@ -1178,6 +1182,8 @@ public class BleService extends Service {
 			@Override
 			public void onFail() {
 				LogUtil.e("查询锁时间发送失败");
+                if (sLockBleSession.getGetLockTimeCallback() != null)
+                    sLockBleSession.getGetLockTimeCallback().onFail(LockError.FAIL);
 			}
 
 			@Override
@@ -1219,8 +1225,16 @@ public class BleService extends Service {
 							} catch (JSONException e) {
 								e.printStackTrace();
 							}
-							long lockTime = DateUtil.getStringToDate(year + "-" + month + "-"
-									+ day + " " + hour + ":" + minute + ":" + second, DateUtil.DATE_FORMAT_YYYY_MM_DD_HH_MM_SS);
+							if (expectedOffset != null && timeZone != com.populock.manhattan.sdk.util.LockTimeZone.encode(expectedOffset)) {
+                                sLockBleSession.getGetLockTimeCallback().onFail(LockError.FAIL);
+                                return;
+                            }
+                            java.util.TimeZone zone = expectedOffset == null ? java.util.TimeZone.getDefault()
+                                    : new java.util.SimpleTimeZone(expectedOffset, "Lock");
+                            Calendar value = Calendar.getInstance(zone);
+                            value.clear();
+                            value.set(year, month - 1, day, hour, minute, second);
+                            long lockTime = value.getTimeInMillis();
 							sLockBleSession.getGetLockTimeCallback().onSuccess(lockTime);
 						}
 					}
@@ -2207,9 +2221,35 @@ public class BleService extends Service {
 	 *
 	 * @param time 时间毫秒值
 	 */
+    private java.util.TimeZone lockTimeZone() {
+        Integer offset = sLockBleSession.getTimezoneRawOffset();
+        return offset == null ? java.util.TimeZone.getDefault() : new java.util.SimpleTimeZone(offset, "Lock");
+    }
+
+    private String formatLockDate(long time) {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy:MM:dd:HH:mm:ss", java.util.Locale.US);
+        format.setTimeZone(lockTimeZone());
+        return format.format(new Date(time));
+    }
+
 	public void setLockTime(long time) {
+        Integer offset = sLockBleSession.getTimezoneRawOffset();
+        setLockTime(time, offset == null ? java.util.TimeZone.getDefault().getOffset(time) : offset);
+    }
+
+    public void setLockTime(long time, int offsetMillis) {
+        final int zone;
+        try { zone = com.populock.manhattan.sdk.util.LockTimeZone.encode(offsetMillis); }
+        catch (IllegalArgumentException e) {
+            if (sLockBleSession.getSetLockTimeCallback() != null)
+                sLockBleSession.getSetLockTimeCallback().onFail(LockError.FAIL);
+            return;
+        }
+        sLockBleSession.setTimezoneRawOffset(offsetMillis);
 		// 按照协议格式，解析时间数据
-		String dateStr = DateUtil.getDateToString(time, "yyyy:MM:dd:HH:mm:ss");
+		SimpleDateFormat format = new SimpleDateFormat("yyyy:MM:dd:HH:mm:ss", java.util.Locale.US);
+        format.setTimeZone(new java.util.SimpleTimeZone(offsetMillis, "Lock"));
+        String dateStr = format.format(new Date(time));
 		LogUtil.e("dateStr: " + dateStr);
 		String[] dateArr = dateStr.split(":");
 		int year = Integer.valueOf(dateArr[0]) - 2000;
@@ -2220,13 +2260,10 @@ public class BleService extends Service {
 		int minute = Integer.valueOf(dateArr[4]);
 		int second = Integer.valueOf(dateArr[5]);
 
-		Calendar calendar = Calendar.getInstance();
-		int weekday = calendar.get(Calendar.DAY_OF_WEEK) - 1;
-		int zone = DateUtil.getTimeZone();
-		if (zone < 0 && zone > -12) {
-			zone -= 12;
-		}
-		zone = Math.abs(zone);
+		Calendar calendar = Calendar.getInstance(new java.util.SimpleTimeZone(offsetMillis, "Lock"));
+        calendar.setTimeInMillis(time);
+        int weekday = calendar.get(Calendar.DAY_OF_WEEK) - 1;
+
 
 		String yearStr = HexUtil.int2HexStr(year, 1);
 		String monthStr = HexUtil.int2HexStr(month, 1);
@@ -2260,6 +2297,8 @@ public class BleService extends Service {
 			@Override
 			public void onFail() {
 				LogUtil.e("设置锁时间发送失败");
+                if (sLockBleSession.getSetLockTimeCallback() != null)
+                    sLockBleSession.getSetLockTimeCallback().onFail(LockError.FAIL);
 			}
 
 			@Override
@@ -2451,7 +2490,7 @@ public class BleService extends Service {
 
 		if (startTimeMillis > 0) {
 			// 按照协议格式，解析时间数据
-			String startDateStr = DateUtil.getDateToString(startTimeMillis, "yyyy:MM:dd:HH:mm:ss");
+			String startDateStr = formatLockDate(startTimeMillis);
 			LogUtil.e("dateStr: " + startDateStr);
 			String[] startDateArr = startDateStr.split(":");
 			int startYear = Integer.valueOf(startDateArr[0]) - 2018;
@@ -2466,7 +2505,7 @@ public class BleService extends Service {
 			String startHourStr = HexUtil.int2HexStr(startHour, 1);
 
 			// 按照协议格式，解析时间数据
-			String endDateStr = DateUtil.getDateToString(endTimeMillis, "yyyy:MM:dd:HH:mm:ss");
+			String endDateStr = formatLockDate(endTimeMillis);
 			LogUtil.e("dateStr: " + startDateStr);
 			String[] endDateArr = endDateStr.split(":");
 			int endYear = Integer.valueOf(endDateArr[0]) - 2018;
@@ -2670,7 +2709,7 @@ public class BleService extends Service {
 
 		if (startTimeMillis > 0) {
 			// 按照协议格式，解析时间数据
-			String startDateStr = DateUtil.getDateToString(startTimeMillis, "yyyy:MM:dd:HH:mm:ss");
+			String startDateStr = formatLockDate(startTimeMillis);
 			LogUtil.e("dateStr: " + startDateStr);
 			String[] startDateArr = startDateStr.split(":");
 			int startYear = Integer.valueOf(startDateArr[0]) - 2018;
@@ -2685,7 +2724,7 @@ public class BleService extends Service {
 			String startHourStr = HexUtil.int2HexStr(startHour, 1);
 
 			// 按照协议格式，解析时间数据
-			String endDateStr = DateUtil.getDateToString(endTimeMillis, "yyyy:MM:dd:HH:mm:ss");
+			String endDateStr = formatLockDate(endTimeMillis);
 			LogUtil.e("dateStr: " + endDateStr);
 			String[] endDateArr = endDateStr.split(":");
 			int endYear = Integer.valueOf(endDateArr[0]) - 2018;
@@ -2884,7 +2923,7 @@ public class BleService extends Service {
 
 		if (startTimeMillis > 0) {
 			// 按照协议格式，解析时间数据
-			String startDateStr = DateUtil.getDateToString(startTimeMillis, "yyyy:MM:dd:HH:mm:ss");
+			String startDateStr = formatLockDate(startTimeMillis);
 			LogUtil.e("dateStr: " + startDateStr);
 			String[] startDateArr = startDateStr.split(":");
 			int startYear = Integer.valueOf(startDateArr[0]) - 2021;
@@ -2901,7 +2940,7 @@ public class BleService extends Service {
 			String startMintuneStr = HexUtil.int2HexStr(startMintune, 1);
 
 			// 按照协议格式，解析时间数据
-			String endDateStr = DateUtil.getDateToString(endTimeMillis, "yyyy:MM:dd:HH:mm:ss");
+			String endDateStr = formatLockDate(endTimeMillis);
 			LogUtil.e("dateStr: " + endDateStr);
 			String[] endDateArr = endDateStr.split(":");
 			int endYear = Integer.valueOf(endDateArr[0]) - 2021;
@@ -3067,7 +3106,7 @@ public class BleService extends Service {
 
 		if (startTimeMillis > 0) {
 			// 按照协议格式，解析时间数据
-			String startDateStr = DateUtil.getDateToString(startTimeMillis, "yyyy:MM:dd:HH:mm:ss");
+			String startDateStr = formatLockDate(startTimeMillis);
 			LogUtil.e("dateStr: " + startDateStr);
 			String[] startDateArr = startDateStr.split(":");
 			int startYear = Integer.valueOf(startDateArr[0]) - 2021;
@@ -3084,7 +3123,7 @@ public class BleService extends Service {
 			String startMintuneStr = HexUtil.int2HexStr(startMintune, 1);
 
 			// 按照协议格式，解析时间数据
-			String endDateStr = DateUtil.getDateToString(endTimeMillis, "yyyy:MM:dd:HH:mm:ss");
+			String endDateStr = formatLockDate(endTimeMillis);
 			LogUtil.e("dateStr: " + endDateStr);
 			String[] endDateArr = endDateStr.split(":");
 			int endYear = Integer.valueOf(endDateArr[0]) - 2021;
@@ -3535,7 +3574,7 @@ public class BleService extends Service {
 		LogUtil.d("mhs---addKeyboardPwd 密码转16进制2: pwdStr = " + pwdStr);
 
 		// 开始时间
-		Calendar startCalendar = Calendar.getInstance();
+		Calendar startCalendar = Calendar.getInstance(lockTimeZone());
 		startCalendar.setTimeInMillis(startDate);
 		int startYear = startCalendar.get(Calendar.YEAR) - 2018; // 年相对值（以 2018 年为基准）
 		int startMonth = startCalendar.get(Calendar.MONTH) + 1;
@@ -3545,7 +3584,7 @@ public class BleService extends Service {
 		LogUtil.d("mhs---addKeyboardPwd 开始时间处理: startYear = " + startYear + ",startMonth = " + startMonth + ",startDay="+ startDay + ",startHour="+startHour);
 
 		// 结束时间
-		Calendar endCalendar = Calendar.getInstance();
+		Calendar endCalendar = Calendar.getInstance(lockTimeZone());
 		endCalendar.setTimeInMillis(endDate);
 		int endYear = endCalendar.get(Calendar.YEAR) - 2018; // 年相对值（以 2018 年为基准）
 		int endMonth = endCalendar.get(Calendar.MONTH) + 1;
@@ -4420,9 +4459,19 @@ public class BleService extends Service {
 		}
 	}
 
-	private LockData getLockDataObj() {
+	private long initializationTimestamp;
+    private int initializationOffset;
+
+    public void setInitializationClock(long timestamp, int offsetMillis) {
+        initializationTimestamp = timestamp;
+        initializationOffset = offsetMillis;
+    }
+
+    private LockData getLockDataObj() {
 		LockData lockData = new LockData();
-		lockData.setLockName(mBleDevice.getName());
+		lockData.setTimestamp(initializationTimestamp);
+        lockData.setTimezoneRawOffset(initializationOffset);
+        lockData.setLockName(mBleDevice.getName());
 		lockData.setLockMac(mBleDevice.getAddress());
 		lockData.setAesKey(aesKeyStr);
 		lockData.setBatteryLevel(mBleDevice.getBatteryLevel());

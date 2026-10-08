@@ -109,8 +109,15 @@ public class MyApplication extends BaseApplication {
 
 		@Override
 		public void onDeviceConnected(BleDevice device) {
+            com.populock.manhattan.sdk.service.BleService.sLockBleSession.setTimezoneRawOffset(
+                    CURRENT_KEY != null && device.getAddress().equalsIgnoreCase(CURRENT_KEY.getLockMac())
+                            ? CURRENT_KEY.getTimezoneRawOffset() : null);
 			Log.e("", "connected");
 			switch (pplBleSession.getOperation()) {
+				case INIT_LOCK_TIME:
+                    com.populstay.populife.helper.BindingTimeSync.onMhtConnected(device.getAddress());
+                    break;
+
 				case ADD_ADMIN:
 					sPPLOCK.initLock(device, PeachPreference.readUserId());
 					PeachLogger.e("aaa", "连接成功");
@@ -306,6 +313,10 @@ public class MyApplication extends BaseApplication {
 				//AddDeviceSuccessActivity.actionStart(getApplication(), HomeDeviceInfo.IDeviceModel.MODEL_LOCK_DEADBOLT)
 				sPPLOCK.stopScan();
 				String lockDataJson = lockData.toJson();
+                JSONObject timeInfo = JSON.parseObject(lockDataJson);
+                timeInfo.put("bindingTimeVerified", false);
+                timeInfo.put("bindingTimeZoneId", java.util.TimeZone.getDefault().getID());
+                lockDataJson = timeInfo.toJSONString();
 				PeachLogger.e("lockData", lockDataJson);
 //				Intent intent = new Intent(getApplication(), LockNameAddActivity.class);
 //				intent.putExtra(LockNameAddActivity.KEY_LOCK_INIT_DATA, lockDataJson);

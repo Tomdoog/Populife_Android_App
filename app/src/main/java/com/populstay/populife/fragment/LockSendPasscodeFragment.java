@@ -46,6 +46,7 @@ import com.populstay.populife.net.callback.ISuccess;
 import com.populstay.populife.ui.loader.PeachLoader;
 import com.populstay.populife.util.Utils;
 import com.populstay.populife.util.date.DateUtil;
+import com.populstay.populife.util.date.LockTime;
 import com.populstay.populife.util.device.KeyboardUtil;
 import com.populstay.populife.util.dialog.DialogUtil;
 import com.populstay.populife.util.log.PeachLogger;
@@ -211,7 +212,7 @@ public class LockSendPasscodeFragment extends BaseFragment implements View.OnCli
 			if (time <= 0) {
 				timeStr = String.format(getResources().getString(R.string.device_current_date), getResources().getString(R.string.unknown));
 			} else {
-				timeStr = String.format(getResources().getString(R.string.device_current_date), DateUtil.getDateToString(time, DateUtil.DATE_TIME_PATTERN_1));
+				timeStr = String.format(getResources().getString(R.string.device_current_date), LockTime.format(time, DateUtil.DATE_TIME_PATTERN_1, mKey.getTimezoneRawOffset()));
 			}
 			tv_current_device_time.setText(timeStr);
 		}
@@ -219,11 +220,13 @@ public class LockSendPasscodeFragment extends BaseFragment implements View.OnCli
 
 	private void initTimePicker() {
 		// 获取当前时间
-		long now = DateUtil.getCurTimeMillis();
+		long now = DateUtil.getStringToDate(LockTime.format(System.currentTimeMillis(),
+                DateUtil.DATE_TIME_PATTERN_1, mKey.getTimezoneRawOffset()), DateUtil.DATE_TIME_PATTERN_1);
 		mStartTime = new Date(now);
 		mEndTime = new Date(now + 3600 * 1000);
 
 		Calendar selectedDate = Calendar.getInstance();
+        selectedDate.setTimeInMillis(now);
 		selectedDate.set(selectedDate.get(Calendar.YEAR), selectedDate.get(Calendar.MONTH),
 				selectedDate.get(Calendar.DAY_OF_MONTH), selectedDate.get(Calendar.HOUR_OF_DAY),
 				selectedDate.get(Calendar.MINUTE));
@@ -548,8 +551,8 @@ public class LockSendPasscodeFragment extends BaseFragment implements View.OnCli
 	 */
 	private void addKeyboardPasscode(String pwd) {
 		PeachLoader.showLoading(getActivity());
-		long startDate = DateUtil.getStringToDate(mTvStartTime.getText().toString(), "yyyy-MM-dd HH:mm");
-		long endDate = DateUtil.getStringToDate(mTvEndTime.getText().toString(), "yyyy-MM-dd HH:mm");
+		long startDate = LockTime.parse(mTvStartTime.getText().toString(), "yyyy-MM-dd HH:mm", mKey.getTimezoneRawOffset());
+		long endDate = LockTime.parse(mTvEndTime.getText().toString(), "yyyy-MM-dd HH:mm", mKey.getTimezoneRawOffset());
 		if (mKey.getLockId()<0) {
 			if (sPPLOCK.isConnected(mKey.getLockMac())) {
 				setAddPwdLockCallback(startDate, endDate, pwd);
@@ -649,7 +652,7 @@ public class LockSendPasscodeFragment extends BaseFragment implements View.OnCli
 				.params("keyboardPwd", keyboardPwd)
 				.params("startDate", mTvStartTime.getText().toString())
 				.params("endDate", mTvEndTime.getText().toString())
-				.params("timeZone", DateUtil.getTimeZone())
+				.params("timeZone", LockTime.hours(mKey.getTimezoneRawOffset()))
 				.params("keyId", mKey.getUserKeyId())
 				.params("alias", mEtName.getText().toString().trim())
 				.params("mediumType", mediumType)
@@ -784,8 +787,8 @@ public class LockSendPasscodeFragment extends BaseFragment implements View.OnCli
 
 	private String getShareContent() {
 		long createTime = mCreateTime != null ? mCreateTime.getTime() : 0;
-		long startTime = mStartTime != null ? mStartTime.getTime() : 0;
-		long endTime = mEndTime != null ? mEndTime.getTime() : 0;
+		long startTime = mStartTime != null ? LockTime.parse(DateUtil.getDateToString(mStartTime, DateUtil.DATE_TIME_PATTERN_1), DateUtil.DATE_TIME_PATTERN_1, mKey.getTimezoneRawOffset()) : 0;
+		long endTime = mEndTime != null ? LockTime.parse(DateUtil.getDateToString(mEndTime, DateUtil.DATE_TIME_PATTERN_1), DateUtil.DATE_TIME_PATTERN_1, mKey.getTimezoneRawOffset()) : 0;
 		return Utils.getShareContent(getActivity(), mPasscodeType, currentNewPwd, createTime, startTime, endTime, mLockName);
 	}
 
@@ -841,7 +844,7 @@ public class LockSendPasscodeFragment extends BaseFragment implements View.OnCli
 			params.put("endDate", mTvEndTime.getText().toString());
 		}
 
-		params.put("timeZone", DateUtil.getTimeZone());
+		params.put("timeZone", LockTime.hours(mKey.getTimezoneRawOffset()));
 
 		return params;
 	}
@@ -882,11 +885,11 @@ public class LockSendPasscodeFragment extends BaseFragment implements View.OnCli
 					keyPwd.setKeyboardPwd(currentNewPwd);
 					keyPwd.setKeyboardPwdType(mPasscodeType);
 					if (null != mStartTime) {
-						keyPwd.setStartDate(mStartTime.getTime());
+						keyPwd.setStartDate(LockTime.parse(DateUtil.getDateToString(mStartTime, DateUtil.DATE_TIME_PATTERN_1), DateUtil.DATE_TIME_PATTERN_1, mKey.getTimezoneRawOffset()));
 					}
 
 					if (null != mEndTime) {
-						keyPwd.setEndDate(mEndTime.getTime());
+						keyPwd.setEndDate(LockTime.parse(DateUtil.getDateToString(mEndTime, DateUtil.DATE_TIME_PATTERN_1), DateUtil.DATE_TIME_PATTERN_1, mKey.getTimezoneRawOffset()));
 					}
 
 					if (null != mCreateTime) {
@@ -916,7 +919,7 @@ public class LockSendPasscodeFragment extends BaseFragment implements View.OnCli
 		if (2 == mPasscodeType || 1 == mPasscodeType || -1 == mPasscodeType) {
 			mCreatePwdKeyActionInfo.setTabCategory(CreatePwdKeyActionInfo.TAB_CATEGORY_0);
 		} else if (3 == mPasscodeType || 15 == mPasscodeType) {
-			if (mStartTime.getTime() > System.currentTimeMillis()) {
+			if (LockTime.parse(DateUtil.getDateToString(mStartTime, DateUtil.DATE_TIME_PATTERN_1), DateUtil.DATE_TIME_PATTERN_1, mKey.getTimezoneRawOffset()) > System.currentTimeMillis()) {
 				mCreatePwdKeyActionInfo.setTabCategory(CreatePwdKeyActionInfo.TAB_CATEGORY_1);
 			} else {
 				mCreatePwdKeyActionInfo.setTabCategory(CreatePwdKeyActionInfo.TAB_CATEGORY_0);

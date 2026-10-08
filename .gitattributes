@@ -1,2 +1,4 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+# 补丁需原样保留后端快照的换行及上下文空白。
+docs/backend-cycle-timezone/*.patch -text -whitespace

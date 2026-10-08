@@ -1,0 +1,7 @@
+<resources>
+    <string name="lock_timezone_notice">当前手机与锁的时区不同，密码有效时间以锁的时区（%1$s）为准。</string>
+    <string name="binding_time_failed">锁的时间或时区同步验证失败，设备尚未初始化完成。请靠近并唤醒锁后重试；部分锁不支持非整小时时区。</string>
+    <string name="binding_server_time_failed">服务器时区验证失败，设备尚未初始化完成。请检查网络后重试。</string>
+    <string name="binding_incomplete_password">设备初始化尚未完成，请先在未同步设备中完成同步，再生成密码。</string>
+    <string name="binding_timezone_unsupported">此锁暂不支持手机当前时区，尚未开始绑定。</string>
+</resources>

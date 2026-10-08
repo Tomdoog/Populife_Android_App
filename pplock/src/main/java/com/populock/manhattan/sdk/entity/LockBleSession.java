@@ -41,6 +41,10 @@ import com.populock.manhattan.sdk.constant.LockOperation;
  * Created by Jerry
  */
 public class LockBleSession {
+    private Integer timezoneRawOffset;
+    public Integer getTimezoneRawOffset() { return timezoneRawOffset; }
+    public void setTimezoneRawOffset(Integer value) { timezoneRawOffset = value; }
+
 
 	private LockOperation mLockOperation;
 

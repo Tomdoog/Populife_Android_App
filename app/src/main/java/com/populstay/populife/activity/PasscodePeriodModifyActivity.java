@@ -31,6 +31,7 @@ import com.populstay.populife.net.callback.IError;
 import com.populstay.populife.net.callback.IFailure;
 import com.populstay.populife.net.callback.ISuccess;
 import com.populstay.populife.util.date.DateUtil;
+import com.populstay.populife.util.date.LockTime;
 import com.populstay.populife.util.log.PeachLogger;
 import com.populstay.populife.util.storage.PeachPreference;
 import com.ttlock.bl.sdk.callback.ModifyFingerprintPeriodCallback;
@@ -115,13 +116,15 @@ public class PasscodePeriodModifyActivity extends BaseActivity implements View.O
 //			mStartTime = now;
 //			mEndTime = now + 3600 * 1000;
 //		}
-		mTvStartTime.setText(DateUtil.getDateToString(mStartTime, mDatePattern));
-		mTvEndTime.setText(DateUtil.getDateToString(mEndTime, mDatePattern));
+		mTvStartTime.setText(LockTime.format(mStartTime, mDatePattern, mKey.getTimezoneRawOffset()));
+		mTvEndTime.setText(LockTime.format(mEndTime, mDatePattern, mKey.getTimezoneRawOffset()));
 		initTimePicker();
 	}
 
 	private void initTimePicker() {
 		Calendar selectedDate = Calendar.getInstance();
+        selectedDate.setTimeInMillis(DateUtil.getStringToDate(LockTime.format(System.currentTimeMillis(),
+                DateUtil.DATE_TIME_PATTERN_1, mKey.getTimezoneRawOffset()), DateUtil.DATE_TIME_PATTERN_1));
 		selectedDate.set(selectedDate.get(Calendar.YEAR), selectedDate.get(Calendar.MONTH),
 				selectedDate.get(Calendar.DAY_OF_MONTH), selectedDate.get(Calendar.HOUR_OF_DAY),
 				selectedDate.get(Calendar.MINUTE));
@@ -134,9 +137,9 @@ public class PasscodePeriodModifyActivity extends BaseActivity implements View.O
 
                 int id = v.getId();
                 if (id == R.id.tv_passcode_period_modify_start_time) {
-                    mStartTime = DateUtil.getStringToDate(time, mDatePattern);
+                    mStartTime = LockTime.parse(time, mDatePattern, mKey.getTimezoneRawOffset());
                 } else if (id == R.id.tv_passcode_period_modify_end_time) {
-                    mEndTime = DateUtil.getStringToDate(time, mDatePattern);
+                    mEndTime = LockTime.parse(time, mDatePattern, mKey.getTimezoneRawOffset());
                 }
             }
         })
@@ -215,7 +218,8 @@ public class PasscodePeriodModifyActivity extends BaseActivity implements View.O
 
 	private void setPickerSelectedTime(boolean isStart, View view) {
 		Calendar cal = Calendar.getInstance();
-		cal.setTimeInMillis(isStart ? mStartTime : mEndTime);
+		cal.setTimeInMillis(DateUtil.getStringToDate(LockTime.format(isStart ? mStartTime : mEndTime,
+                DateUtil.DATE_TIME_PATTERN_1, mKey.getTimezoneRawOffset()), DateUtil.DATE_TIME_PATTERN_1));
 		mTimePicker.setDate(cal);
 		mTimePicker.show(view);
 	}
@@ -502,7 +506,7 @@ public class PasscodePeriodModifyActivity extends BaseActivity implements View.O
 				.params("changeType", 1)
 				.params("startDate", mTvStartTime.getText().toString())
 				.params("endDate", mTvEndTime.getText().toString())
-				.params("timeZone", DateUtil.getTimeZone())
+				.params("timeZone", LockTime.hours(mKey.getTimezoneRawOffset()))
 				.success(new ISuccess() {
 					@Override
 					public void onSuccess(String response) {
@@ -553,9 +557,9 @@ public class PasscodePeriodModifyActivity extends BaseActivity implements View.O
 		params.put("userId", PeachPreference.readUserId());
 		params.put("lockId", mKey.getLockId());
 		params.put("changeType", changeType);
-		params.put("startDate", DateUtil.getDateToString(mStartTime, DateUtil.DATE_FORMAT_YYYY_MM_DD_HH_MM));
-		params.put("endDate", DateUtil.getDateToString(mEndTime, DateUtil.DATE_FORMAT_YYYY_MM_DD_HH_MM));
-		params.put("timeZone", DateUtil.getTimeZone());
+		params.put("startDate", LockTime.format(mStartTime, DateUtil.DATE_FORMAT_YYYY_MM_DD_HH_MM, mKey.getTimezoneRawOffset()));
+		params.put("endDate", LockTime.format(mEndTime, DateUtil.DATE_FORMAT_YYYY_MM_DD_HH_MM, mKey.getTimezoneRawOffset()));
+		params.put("timeZone", LockTime.hours(mKey.getTimezoneRawOffset()));
 
 		RestClient.builder()
 				.url(Urls.IC_CARD_INFO_UPDATE)
@@ -603,9 +607,9 @@ public class PasscodePeriodModifyActivity extends BaseActivity implements View.O
 		//params.put("userId", PeachPreference.readUserId());
 		params.put("lockId", mKey.getLockId());
 		params.put("changeType", changeType);
-		params.put("startDate", DateUtil.getDateToString(mStartTime, DateUtil.DATE_FORMAT_YYYY_MM_DD_HH_MM));
-		params.put("endDate", DateUtil.getDateToString(mEndTime, DateUtil.DATE_FORMAT_YYYY_MM_DD_HH_MM));
-		params.put("timeZone", DateUtil.getTimeZone());
+		params.put("startDate", LockTime.format(mStartTime, DateUtil.DATE_FORMAT_YYYY_MM_DD_HH_MM, mKey.getTimezoneRawOffset()));
+		params.put("endDate", LockTime.format(mEndTime, DateUtil.DATE_FORMAT_YYYY_MM_DD_HH_MM, mKey.getTimezoneRawOffset()));
+		params.put("timeZone", LockTime.hours(mKey.getTimezoneRawOffset()));
 
 		RestClient.builder()
 				.url(Urls.FINGERPRINT_INFO_UPDATE)

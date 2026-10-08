@@ -1,0 +1,5 @@
+33f52876869734f7f22481735a58411705b1aeea9bdac656d88f5493df507649  populife-app-v2/src/main/java/com/igloo/smarthome/controller/KeyboardController.java
+fd1598a8e01fc86ee918f5bdcf586ec07c1d1a47ecff52b466b77314cf1e5599  populife-core-v2/src/main/java/com/igloo/smarthome/service/KeyboardService.java
+e7b0e8450770c87c35f19ea805b77029d1880aa48f5a2235ba2591c60b8444e8  populife-core-v2/src/main/java/com/igloo/smarthome/service/mhd/MhdKeyboardPasswordService.java
+d4ce9332e2a85a5dcfe1539e69515bf492802f7fbbae42c5850dd3b012d43eff  populife-open-api-v2/src/main/java/com/igloo/smarthome/controller/PasswordController.java
+8b2d34f058c33dad22f4e718ac8aeea2b937e033107ffdb871f92e4e43839b8e  populife-saas-v2/src/main/java/com/igloo/smarthome/controller/device/KeyBoardPasswordController.java

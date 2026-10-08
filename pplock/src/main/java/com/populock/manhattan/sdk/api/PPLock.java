@@ -283,6 +283,12 @@ public class PPLock {
 	 * 初始化锁
 	 */
 	public void initLock(final BleDevice bleDevice, final String userId) {
+        long timestamp = System.currentTimeMillis();
+        initLock(bleDevice, userId, timestamp, java.util.TimeZone.getDefault().getOffset(timestamp));
+    }
+
+    public void initLock(final BleDevice bleDevice, final String userId, final long timestamp, final int offsetMillis) {
+        BleService.getBleService().setInitializationClock(timestamp, offsetMillis);
 		LogUtil.d("bleDevice = " + bleDevice.toString());
 		if (!bleDevice.isSettingMode()) {
 			LockError lockError = LockError.LOCK_NOT_IN_SETTING_MODE;
@@ -302,7 +308,7 @@ public class PPLock {
 					mInitLockRetryCount++;
 					if (mInitLockRetryCount < 2) {
 						LogUtil.e("首次初始化锁请求失败，尝试二次请求");
-						initLock(bleDevice,userId);
+						initLock(bleDevice, userId, timestamp, offsetMillis);
 					} else {
 						LogUtil.e("初始化锁二次请求失败");
 						mInitLockRetryCount = 0; // 重置“重试次数”

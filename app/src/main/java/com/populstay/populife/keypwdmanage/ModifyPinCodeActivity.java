@@ -24,6 +24,7 @@ import com.populstay.populife.net.callback.ISuccess;
 import com.populstay.populife.ui.loader.PeachLoader;
 import com.populstay.populife.ui.widget.exedittext.ExEditText;
 import com.populstay.populife.util.date.DateUtil;
+import com.populstay.populife.util.date.LockTime;
 import com.populstay.populife.util.log.PeachLogger;
 import com.populstay.populife.util.storage.PeachPreference;
 import com.populstay.populife.util.string.StringUtil;
@@ -237,7 +238,7 @@ public class ModifyPinCodeActivity extends BaseActivity {
 				.params("keyboardPwdId", mPasscode.getId())
 				.params("changeType", 1)
 				.params("newKeyboardPwd", newPwd)
-				.params("timeZone", DateUtil.getTimeZone())
+				.params("timeZone", LockTime.hours(mKey.getTimezoneRawOffset()))
 				.success(new ISuccess() {
 					@Override
 					public void onSuccess(String response) {

@@ -121,9 +121,7 @@ public class UnsyncedDeviceDialog {
 						}
 						btnSync.setEnabled(true);
 						btnLater.setEnabled(true);
-						tvError.setText(failType == OfflineLockUploader.FAIL_NETWORK
-								? R.string.unsync_fail_network
-								: R.string.unsync_fail_business);
+						tvError.setText(OfflineLockUploader.failureMessage(failType));
 						tvError.setVisibility(View.VISIBLE);
 					}
 				});
@@ -202,6 +200,7 @@ public class UnsyncedDeviceDialog {
 		key.setLockMac(firstNonBlank(lock.getLockMac(), str(data, "lockMac"), str(data, "mac")));
 		// lockData:科技侠改密码必需
 		key.setLockData(firstNonBlank(str(local, "lockData"), str(data, "lockData")));
+        key.setTimezoneRawOffset(intOf(num(local, "timezoneRawOffset"), num(data, "timezoneRawOffSet"), num(data, "timezoneRawOffset")));
 		key.setAesKeyStr(firstNonBlank(str(local, "aesKeyStr"), str(data, "aesKeyStr"), str(data, "aesKey")));
 		key.setLockKey(firstNonBlank(str(local, "lockKey"), str(data, "lockKey"), str(data, "key")));
 		key.setAdminPwd(firstNonBlank(str(local, "adminPwd"), str(data, "adminPwd")));

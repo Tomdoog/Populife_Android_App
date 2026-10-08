@@ -349,6 +349,7 @@ public class AddDeviceSuccessActivity extends BaseActivity implements View.OnCli
 							goToNewActivity(MainActivity.class);
 							//LockDetailActivity.actionStart(getActivity(), homeDevice.getDeviceId(),homeDevice.getName());
 							LockDetailActivity.actionStart(AddDeviceSuccessActivity.this, String.valueOf(mKey.getLockId()), mHomeDevice.getName());
+							finish();
 						} else {
 							toast(R.string.note_lock_name_add_fail);
 						}

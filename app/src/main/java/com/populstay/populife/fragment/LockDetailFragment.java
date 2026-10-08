@@ -101,7 +101,9 @@ import com.ttlock.bl.sdk.util.FeatureValueUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
+import java.util.TimeZone;
 import java.util.WeakHashMap;
 
 import androidx.annotation.NonNull;
@@ -130,6 +132,7 @@ public class LockDetailFragment extends BaseFragment implements View.OnClickList
 	private static final String KEY_TAG = "key_tag";
 	private static final String HOME_ID = "home_id";
 	private Key mCurKEY;
+	private Integer mNoticeLockOffset;
 	private SwipeRefreshLayout mRefreshLayout;
 	private MyGridView mGridView;
 	private LockActionAdapter mAdapter;
@@ -161,6 +164,8 @@ public class LockDetailFragment extends BaseFragment implements View.OnClickList
 			if (EventPushService.ACTION_KEY_STATUS_CHANGE.equals(action)) { // 钥匙状态发生变化
 				//requestUserLockInfo(mKeyId);
 				requestDeviceData();
+			} else if (Intent.ACTION_TIMEZONE_CHANGED.equals(action)) {
+				updateTimezoneNotice();
 			}
 		}
 	};
@@ -284,6 +289,7 @@ public class LockDetailFragment extends BaseFragment implements View.OnClickList
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentLockDetailBinding.inflate(inflater, container, false);
+        mNoticeLockOffset = null;
         View view = binding.getRoot();
 		getIntentData();
 		initView(view);
@@ -341,7 +347,38 @@ public class LockDetailFragment extends BaseFragment implements View.OnClickList
 	private IntentFilter getIntentFilter() {
 		final IntentFilter intentFilter = new IntentFilter();
 		intentFilter.addAction(EventPushService.ACTION_KEY_STATUS_CHANGE);
+		intentFilter.addAction(Intent.ACTION_TIMEZONE_CHANGED);
 		return intentFilter;
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+		updateTimezoneNotice();
+	}
+
+	private void readTimezoneNotice(JSONObject lockInfo) {
+		// 缺少服务端时区时不能把默认值 0 当成锁位于 UTC。
+		mNoticeLockOffset = null;
+		try {
+			mNoticeLockOffset = lockInfo.getInteger("timezoneRawOffSet");
+		} catch (RuntimeException ignored) {
+			// 无有效时区信息时不显示差异提示。
+		}
+		updateTimezoneNotice();
+	}
+
+	private void updateTimezoneNotice() {
+		if (binding == null || !isAdded()) return;
+		boolean different = mNoticeLockOffset != null
+				&& mNoticeLockOffset != TimeZone.getDefault().getOffset(System.currentTimeMillis());
+		binding.tvLockTimezoneNotice.setVisibility(different ? View.VISIBLE : View.GONE);
+		if (different) {
+			long minutes = Math.abs((long) mNoticeLockOffset) / 60000;
+			String zone = String.format(Locale.ROOT, "UTC%s%02d:%02d",
+					mNoticeLockOffset < 0 ? "-" : "+", minutes / 60, minutes % 60);
+			binding.tvLockTimezoneNotice.setText(getString(R.string.lock_timezone_notice, zone));
+		}
 	}
 
 	private void getIntentData() {
@@ -1498,6 +1535,7 @@ public class LockDetailFragment extends BaseFragment implements View.OnClickList
 	}
 
     private void parseKJXLockInfo(@NonNull JSONObject lockInfo) {
+        readTimezoneNotice(lockInfo);
         // 科技侠的锁id
         int lockId = JSONSafe.getInt(lockInfo, "lockId", 0);
 
@@ -1657,6 +1695,7 @@ public class LockDetailFragment extends BaseFragment implements View.OnClickList
     }
 
 	private void parseMHTLockInfo(@NonNull JSONObject lockInfo) {
+		readTimezoneNotice(lockInfo);
 		int lockId = lockInfo.getInteger("lockId");//科技侠的锁id
 		String lockName = lockInfo.getString("name");//锁的蓝牙名称
 		String lockAlias = lockInfo.getString("alias");//锁别名

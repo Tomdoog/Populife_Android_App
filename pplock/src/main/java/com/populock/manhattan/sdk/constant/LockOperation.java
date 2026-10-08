@@ -156,4 +156,5 @@ public enum LockOperation {
 	 * 添加管理员,绑定锁
 	 */
 	ADD_ADMIN,
+    INIT_LOCK_TIME,
 }
