@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="lock_timezone">Lock timezone</string>
+    <string name="calibrate_timezone">Calibrate timezone</string>
+    <string name="calibrate_timezone_hint">Sync the lock timezone and clock with this phone. Existing password time windows may change.</string>
+    <string name="calibrate_time_only_hint">Calibrates the clock without changing the lock timezone.</string>
+    <string name="calibrate_timezone_in_progress">Syncing timezone. Please wait.</string>
+    <string name="calibrate_timezone_success">Lock timezone synced</string>
+    <string name="calibrate_timezone_incomplete">Timezone sync is incomplete. Check the network and Bluetooth connection or gateway, then retry.</string>
+</resources>

@@ -118,6 +118,7 @@ public class Urls {
 	public static final String GATEWAY_DELETE = "gateway/delete"; //（post）根据网关id删除网关
 	public static final String GATEWAY_BINDED_LOCK_LIST = "gateway/lock/list"; //（get）根据网关id查询网关下的锁列表信息
 	public static final String GATEWAY_LOCK_TIME_READ = "lock/queryDate"; //（post）网关读取锁时间
+	public static final String LOCK_TIMEZONE_CALIBRATE = "lock/changeTimezoneRawOffset"; // 同步锁时区，偏移单位为毫秒
 	public static final String GATEWAY_LOCK_TIME_CALIBRATE = "lock/updateDate"; //（post）网关校准锁时间
 	public static final String GATEWAY_REMOTE_UNLOCK = "gateway/unlock"; //（post）网关远程开锁，利用网关远程打开锁id对应的锁
 	public static final String GATEWAY_LOCK_FREEZE = "gateway/freeze"; //（post）利用网关远程冻结锁，冻结后，所有开锁方式都禁用，但蓝牙还是可以连接的，以便冻结后还可以解冻

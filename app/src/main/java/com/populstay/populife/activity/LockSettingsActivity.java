@@ -1530,7 +1530,14 @@ public class LockSettingsActivity extends BaseActivity implements View.OnClickLi
 					}
 					break;
 				case REQUEST_CODE_ADJUST_LOCK_TIME:
-					tv_read_lock_time.setText(DateUtil.getDateToString(Long.valueOf(dataResult), DateUtil.DATE_TIME_PATTERN_1));
+                    if (data != null && data.hasExtra(LockTimeActivity.KEY_KEY)) {
+                        mKey = data.getParcelableExtra(LockTimeActivity.KEY_KEY);
+                        CURRENT_KEY = mKey;
+                    }
+                    tv_read_lock_time.setText(mKey.getLockId() > 0
+                            ? com.populstay.populife.util.date.LockTime.format(Long.parseLong(dataResult),
+                                    DateUtil.DATE_TIME_PATTERN_1, mKey.getTimezoneRawOffset())
+                            : DateUtil.getDateToString(Long.parseLong(dataResult), DateUtil.DATE_TIME_PATTERN_1));
 					break;
 				case REQUEST_CODE_AUTO_LOCKING:
 					if (Boolean.valueOf(dataResult)) {

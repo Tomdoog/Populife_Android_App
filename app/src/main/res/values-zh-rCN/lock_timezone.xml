@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="lock_timezone">锁时区</string>
+    <string name="calibrate_timezone">校准时区</string>
+    <string name="calibrate_timezone_hint">将锁的时区和时间同步为手机当前设置。已有密码的有效时段可能随之变化。</string>
+    <string name="calibrate_time_only_hint">只校准时钟，不改变锁的时区。</string>
+    <string name="calibrate_timezone_in_progress">正在同步时区，请稍候。</string>
+    <string name="calibrate_timezone_success">锁时区同步成功</string>
+    <string name="calibrate_timezone_incomplete">时区同步尚未完成，请检查网络及蓝牙连接或网关后重试。</string>
+</resources>
