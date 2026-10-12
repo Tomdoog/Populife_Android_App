@@ -15,6 +15,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.populock.manhattan.sdk.constant.LockOperation;
 import com.populstay.populife.R;
+import com.populstay.populife.net.BackendError;
 import com.populstay.populife.app.MyApplication;
 import com.populstay.populife.base.BaseActivity;
 import com.populstay.populife.base.BaseApplication;
@@ -498,13 +499,14 @@ public class IcCardBluetoothAddActivity extends BaseActivity {
 	}
 
 	private void addFail() {
+        addFail(HomeDeviceInfo.isPadlock(mLockType)
+                ? R.string.padlock_fingerprint_failed : R.string.operation_fail);
+    }
+
+    private void addFail(int messageRes) {
 		runOnUiThread(() -> {
 			stopLoading();
-			if (HomeDeviceInfo.isPadlock(mLockType)) {
-				toast(R.string.padlock_fingerprint_failed);
-			} else {
-				toastFail();
-			}
+            toast(messageRes);
 			finish();
 		});
 	}
@@ -728,7 +730,9 @@ public class IcCardBluetoothAddActivity extends BaseActivity {
 								}
 							}, 1000);
 						} else {
-							addFail();
+							addFail(BackendError.messageRes(code,
+                                    HomeDeviceInfo.isPadlock(mLockType) ? R.string.padlock_fingerprint_failed : R.string.operation_fail,
+                                    BackendError.Credential.FINGERPRINT));
 						}
 					}
 				})
@@ -780,7 +784,7 @@ public class IcCardBluetoothAddActivity extends BaseActivity {
 								}
 							}, 1000);
 						} else {
-							toast(R.string.adding_ic_card_operation_fail);
+							toastBackendError(code, R.string.adding_ic_card_operation_fail, BackendError.Credential.CARD);
 							finish();
 						}
 					}

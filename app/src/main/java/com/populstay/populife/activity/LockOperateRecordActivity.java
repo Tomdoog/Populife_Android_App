@@ -451,7 +451,7 @@ public class LockOperateRecordActivity extends BaseActivity implements View.OnCl
 								mLlNoData.setVisibility(View.VISIBLE);
 							}
 						} else {
-							toast(R.string.note_delete_record_fail);
+							toastBackendError(code, R.string.note_delete_record_fail);
 						}
 					}
 				})
@@ -488,7 +488,7 @@ public class LockOperateRecordActivity extends BaseActivity implements View.OnCl
 							setClearVisible(false);
 							mLlNoData.setVisibility(View.VISIBLE);
 						} else {
-							toast(R.string.note_clear_records_fail);
+							toastBackendError(code, R.string.note_clear_records_fail);
 						}
 					}
 				})

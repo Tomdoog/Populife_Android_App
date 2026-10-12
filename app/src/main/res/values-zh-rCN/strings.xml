@@ -1141,4 +1141,15 @@
     <string name="delete_dlg_remove">从账号移除</string>
     <string name="delete_dlg_later">稍后</string>
     <string name="delete_removed_success">设备已移除</string>
+    <string name="backend_error_authorization_expired">当前授权已失效。请重新登录。如果仍无法继续，请联系设备管理员。</string>
+    <string name="backend_error_admin_required">需要管理员权限。只有设备管理员可以完成此操作。</string>
+    <string name="backend_error_gateway_not_connected">设备未连接到网关。请确认网关在线并能够连接到设备，然后重试。</string>
+    <string name="backend_error_gateway_unavailable">网关暂时不可用。请确认网关在线，稍后重试。</string>
+    <string name="backend_error_remote_unlock_unavailable">当前无法使用远程开锁。请在设备附近通过蓝牙检查远程开锁设置。如果设置已开启但仍无法使用，请联系客服。</string>
+    <string name="backend_error_passcode_full">密码存储空间已满。请删除不再使用的密码，然后重试。</string>
+    <string name="backend_error_fingerprint_full">指纹存储空间已满。请删除不再使用的指纹，然后重试。</string>
+    <string name="backend_error_card_full">门卡存储空间已满。请删除不再使用的门卡，然后重试。</string>
+    <string name="backend_error_service">服务出现异常。请稍后重试。如果问题持续，请联系客服。</string>
+    <string name="backend_error_period_deleted">该时间段的随机密码已生成并删除，无法再次生成。请选择其他整点时间段。</string>
+    <string name="backend_error_generic">暂时无法完成操作。请稍后重试。</string>
 </resources>

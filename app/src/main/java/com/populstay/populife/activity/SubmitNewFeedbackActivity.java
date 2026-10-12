@@ -99,7 +99,7 @@ public class SubmitNewFeedbackActivity extends BaseActivity {
 							setResult(RESULT_OK, intent);
 							finish();
 						} else {
-							toast(R.string.note_submit_feedback_fail);
+							toastBackendError(code, R.string.note_submit_feedback_fail);
 						}
 					}
 				})

@@ -643,7 +643,7 @@ public class LockDetailFragment extends BaseFragment implements View.OnClickList
 						} else if (code == 951) {
 							toast(R.string.note_gateway_donot_exists);
 						} else {
-							toast(R.string.operation_fail);
+							toastBackendError(code, R.string.operation_fail);
 						}
 					}
 				}).failure(new IFailure() {
@@ -704,7 +704,7 @@ public class LockDetailFragment extends BaseFragment implements View.OnClickList
                             if (code == 951) {
                                 toast(R.string.note_gateway_donot_exists);
                             } else {
-                                toast(R.string.operation_fail);
+                                toastBackendError(code, R.string.operation_fail);
                             }
                             if (tryBle) {
                                 task.run();

@@ -118,7 +118,7 @@ public class ResetPwdActivity extends BaseActivity implements TextWatcher, View.
 						} else if (code == 955) {
                             toast(Utils.get955CodeLimit(mContext, msg));
                         } else {
-							toast(R.string.note_get_verification_code_fail);
+							toastBackendError(code, R.string.note_get_verification_code_fail);
 						}
 					}
 				})
@@ -173,7 +173,7 @@ public class ResetPwdActivity extends BaseActivity implements TextWatcher, View.
 						} else if (code == 954 || code == 953) {
 							toast(R.string.note_verifiction_code_invalid);
 						} else {
-							toast(R.string.note_reset_pwd_fail);
+							toastBackendError(code, R.string.note_reset_pwd_fail);
 						}
 					}
 				})

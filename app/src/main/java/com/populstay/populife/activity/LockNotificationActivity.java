@@ -90,12 +90,11 @@ public class LockNotificationActivity extends BaseActivity {
 
                         JSONObject result = JSON.parseObject(response);
                         String data = result.getString("data");
-                        String msg = result.getString("msg");
                         int code = result.getInteger("code");
                         if (code == 200) {
                             setOpen(Objects.equals(data, "true"));
                         } else {
-                            toast(msg);
+                            toastBackendError(code, R.string.backend_error_generic);
                         }
                     }
                 })
@@ -124,11 +123,10 @@ public class LockNotificationActivity extends BaseActivity {
                         binding.scOpen.setEnabled(true);
                         JSONObject result = JSON.parseObject(response);
                         JSONObject data = result.getJSONObject("data");
-                        String msg = result.getString("msg");
                         int code = result.getInteger("code");
                         if (code == 200) {
                         } else {
-                            toast(msg);
+                            toastBackendError(code, R.string.backend_error_generic);
                         }
                     }
                 })

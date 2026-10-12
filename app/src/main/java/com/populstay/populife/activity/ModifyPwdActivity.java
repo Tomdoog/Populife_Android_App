@@ -140,7 +140,7 @@ public class ModifyPwdActivity extends BaseActivity {
 						} else if (code == 910) {
 							toast(R.string.note_current_pwd_incorrect);
 						} else {
-							toast(R.string.note_modify_pwd_fail);
+							toastBackendError(code, R.string.note_modify_pwd_fail);
 						}
 					}
 				})

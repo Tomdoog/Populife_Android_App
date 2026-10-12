@@ -112,7 +112,6 @@ public class EkeyPermissionModifyActivity extends BaseActivity {
 
                         JSONObject result = JSON.parseObject(response);
                         JSONObject data = result.getJSONObject("data");
-                        String msg = result.getString("msg");
                         int code = result.getInteger("code");
                         if (code == 200) {
                             binding.vppPermission.llContainer.setVisibility(View.VISIBLE);
@@ -126,7 +125,7 @@ public class EkeyPermissionModifyActivity extends BaseActivity {
                             if (data.containsKey("allowCalibrateTime"))
                                 binding.vppPermission.stv4.setChecked(data.getBoolean("allowCalibrateTime"));
                         } else {
-                            toast(msg);
+                            toastBackendError(code, R.string.backend_error_generic);
                         }
                     }
                 })
@@ -164,13 +163,12 @@ public class EkeyPermissionModifyActivity extends BaseActivity {
                         PeachLogger.d("LOCK_EKEY_PERMISSION_POST", response);
 
                         JSONObject result = JSON.parseObject(response);
-                        String msg = result.getString("msg");
                         int code = result.getInteger("code");
                         if (code == 200) {
                             returnData();
                             finish();
                         } else {
-                            toast(msg);
+                            toastBackendError(code, R.string.backend_error_generic);
                         }
                     }
                 })

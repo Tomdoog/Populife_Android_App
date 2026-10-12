@@ -165,7 +165,7 @@ public class LoginVerifyActivity extends BaseActivity implements View.OnClickLis
 						} else if (code == 955) {
                             toast(Utils.get955CodeLimit(mContext, msg));
                         } else {
-							toast(R.string.note_get_verification_code_fail);
+							toastBackendError(code, R.string.note_get_verification_code_fail);
 						}
 					}
 				})
@@ -208,7 +208,7 @@ public class LoginVerifyActivity extends BaseActivity implements View.OnClickLis
 								toast(R.string.note_verifiction_code_invalid);
 							}
 						} else {
-							toast(R.string.operation_fail);
+							toastBackendError(code, R.string.operation_fail);
 						}
 					}
 				})

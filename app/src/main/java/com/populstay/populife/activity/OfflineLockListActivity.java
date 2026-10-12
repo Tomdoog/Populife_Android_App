@@ -169,7 +169,7 @@ public class OfflineLockListActivity extends BaseActivity {
 							AddDeviceSuccessActivity.actionStart(OfflineLockListActivity.this, HomeDeviceInfo.IDeviceName.NAME_LOCK_DEADBOLT, mHomeDevice, mKey);
 						} else {
 							PeachLogger.d(TAG + " initializeLock 提交失败 ");
-							toast(R.string.sync_fail);
+							toastBackendError(code, R.string.sync_fail);
 						}
 					}
 				})
@@ -248,7 +248,7 @@ public class OfflineLockListActivity extends BaseActivity {
 							AddDeviceSuccessActivity.actionStart(OfflineLockListActivity.this, HomeDeviceInfo.IDeviceName.NAME_LOCK_KEY_BOX_3, mHomeDevice, mKey);
 						} else {
 							PeachLogger.d(TAG + " initializeLock 提交失败 ");
-							toast(R.string.sync_fail);
+							toastBackendError(code, R.string.sync_fail);
 						}
 					}
 				})

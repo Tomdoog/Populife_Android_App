@@ -252,7 +252,7 @@ public class LockRemoteUnlockConfigActivity extends BaseActivity {
 								mTvSwitch.setChecked(true);
 							}
 						} else {
-							toast(R.string.operation_fail);
+							toastBackendError(code, R.string.operation_fail);
 						}
 					}
 				})
@@ -298,7 +298,7 @@ public class LockRemoteUnlockConfigActivity extends BaseActivity {
                                 mTvSwitch.setChecked(true);
                             }
                         } else {
-                            toast(R.string.operation_fail);
+                            toastBackendError(code, R.string.operation_fail);
                         }
                     }
                 })

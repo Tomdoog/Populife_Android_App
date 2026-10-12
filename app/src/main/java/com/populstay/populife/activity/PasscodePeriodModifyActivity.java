@@ -328,7 +328,7 @@ public class PasscodePeriodModifyActivity extends BaseActivity implements View.O
 				setModifyIcCardPeriodCallback(cardNumber,cardType);
 				sPPLOCK.modifyCardPeriod(PeachPreference.readUserId(),String.valueOf(mKey.getLockId()),
 						String.valueOf(mKey.getKeyId()),mKeyPwd.getCardNumber(),
-						cardType,mKeyPwd.getStartDate(),mKeyPwd.getEndDate(),mKey.getK1());
+						cardType,mStartTime,mEndTime,mKey.getK1());
 			} else {
 				setModifyIcCardPeriodCallback(cardNumber,cardType);
 				startLockActionScan();
@@ -418,7 +418,7 @@ public class PasscodePeriodModifyActivity extends BaseActivity implements View.O
 			setMHModifyFingerprintPeriodCallback(fingerType);
 			sPPLOCK.modifyFingerprintPeriod(PeachPreference.readUserId(),String.valueOf(mKey.getLockId()),
 					String.valueOf(mKey.getKeyId()),
-					mKeyPwd.getFingerprintId(),fingerType,mKeyPwd.getStartDate(),mKeyPwd.getEndDate(),mKey.getK1());
+					mKeyPwd.getFingerprintId(),fingerType,mStartTime,mEndTime,mKey.getK1());
 		} else {
 			setMHModifyFingerprintPeriodCallback(fingerType);
 			startLockActionScan();
@@ -518,7 +518,7 @@ public class PasscodePeriodModifyActivity extends BaseActivity implements View.O
 						if (code == 200) {
 							setResult();
 						} else {
-							toast(R.string.note_modify_period_fail);
+							toastBackendError(code, R.string.note_modify_period_fail);
 						}
 					}
 				})
@@ -576,7 +576,7 @@ public class PasscodePeriodModifyActivity extends BaseActivity implements View.O
 							setResult();
 						} else {
 							stopLoading();
-							toast(R.string.note_modify_period_fail);
+							toastBackendError(code, R.string.note_modify_period_fail);
 						}
 					}
 				})
@@ -625,7 +625,7 @@ public class PasscodePeriodModifyActivity extends BaseActivity implements View.O
 							setResult();
 						} else {
 							stopLoading();
-							toast(R.string.note_modify_period_fail);
+							toastBackendError(code, R.string.note_modify_period_fail);
 						}
 					}
 				})

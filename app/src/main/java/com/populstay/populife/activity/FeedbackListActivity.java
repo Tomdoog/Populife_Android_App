@@ -181,7 +181,7 @@ public class FeedbackListActivity extends BaseActivity implements FeedbackListAd
 								mLlNoData.setVisibility(View.VISIBLE);
 							}
 						} else {
-							toast(R.string.note_delete_feedback_fail);
+							toastBackendError(code, R.string.note_delete_feedback_fail);
 						}
 					}
 				})

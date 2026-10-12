@@ -38,6 +38,7 @@ import com.bigkoo.pickerview.view.OptionsPickerView;
 import com.bigkoo.pickerview.view.TimePickerView;
 import com.populock.manhattan.sdk.constant.LockOperation;
 import com.populstay.populife.R;
+import com.populstay.populife.net.BackendError;
 import com.populstay.populife.app.MyApplication;
 import com.populstay.populife.base.BaseFragment;
 import com.populstay.populife.common.Urls;
@@ -767,7 +768,7 @@ public class LockSendPasscodeNewFragment extends BaseFragment implements View.On
                     //toast(R.string.note_password_exist);
                     showShareKeyDialog(keyboardPwd);
                 } else {
-                    toastServerFail(R.string.note_passcode_customize_fail, code, result.getString("msg"));
+                    toastBackendError(code, R.string.note_passcode_customize_fail, BackendError.Credential.PASSCODE);
                 }
             }
         }).failure(new IFailure() {
@@ -781,21 +782,6 @@ public class LockSendPasscodeNewFragment extends BaseFragment implements View.On
                 .post();
 	}
 
-	/**
-	 * 服务端返回失败时的提示：在原文案后附带 code / msg
-	 * 线上无远程日志，只能靠用户截图定位，故必须把服务端返回原样吐出来
-	 *
-	 * @param tipRes 原有的失败文案
-	 * @param code   服务端返回码
-	 * @param msg    服务端返回的错误描述，可能为空
-	 */
-	private void toastServerFail(int tipRes, int code, String msg) {
-		String tip = getString(tipRes) + " (" + code;
-		if (!StringUtil.isBlank(msg)) {
-			tip += ": " + msg;
-		}
-		toast(tip + ")");
-	}
 
 	public boolean isPasscodeGenerated() {
 		return !StringUtil.isBlank(currentNewPwd);
@@ -835,7 +821,7 @@ public class LockSendPasscodeNewFragment extends BaseFragment implements View.On
 							showShareKeyDialog(passcodeInfo.getString("keyboardPwd"));
 
 						} else {
-							toastServerFail(R.string.create_password_fail, code, result.getString("msg"));
+							toastBackendError(code, R.string.create_password_fail, BackendError.Credential.PASSCODE);
 						}
 					}
 				})

@@ -274,10 +274,10 @@ public class KeyPwdMoreActivity extends BaseActivity implements View.OnClickList
 											}
 										}, null);
 							} else {
-								toast(R.string.note_pwd_invalid);
+								toastBackendError(code, R.string.note_pwd_invalid);
 							}
 						} else {
-							toast(R.string.note_pwd_invalid);
+							toastBackendError(code, R.string.note_pwd_invalid);
 						}
 					}
 				})
@@ -476,7 +476,7 @@ public class KeyPwdMoreActivity extends BaseActivity implements View.OnClickList
 							EventBus.getDefault().post(new Event(Event.EventType.DELETE_PWD));
 							finish();
 						} else {
-							toastFail();
+							toastBackendError(code, R.string.operation_fail);
 						}
 					}
 				})
@@ -517,7 +517,7 @@ public class KeyPwdMoreActivity extends BaseActivity implements View.OnClickList
 							EventBus.getDefault().post(new Event(Event.EventType.DELETE_PWD));
 							finish();
 						} else {
-							toastFail();
+							toastBackendError(code, R.string.operation_fail);
 						}
 					}
 				})
@@ -636,7 +636,7 @@ public class KeyPwdMoreActivity extends BaseActivity implements View.OnClickList
 								toastSuccess();
 								finish();
 							} else {
-								toastFail();
+								toastBackendError(code, R.string.operation_fail);
 							}
 						}
 					})
@@ -675,7 +675,7 @@ public class KeyPwdMoreActivity extends BaseActivity implements View.OnClickList
 								toastSuccess();
 								finish();
 							} else {
-								toastFail();
+								toastBackendError(code, R.string.operation_fail);
 							}
 						}
 					})
@@ -714,7 +714,7 @@ public class KeyPwdMoreActivity extends BaseActivity implements View.OnClickList
 							EventBus.getDefault().post(new Event(Event.EventType.CLEAR_KEYS));
 							toast(R.string.note_bluetooth_keys_clear_success);
 						} else {
-							toast(R.string.note_bluetooth_keys_clear_fail);
+							toastBackendError(code, R.string.note_bluetooth_keys_clear_fail);
 							finish();
 						}
 					}

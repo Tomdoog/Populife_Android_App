@@ -240,7 +240,7 @@ public class MessageListActivity extends BaseActivity implements View.OnClickLis
 							mTvClear.setVisibility(View.GONE);
 							mLlNoData.setVisibility(View.VISIBLE);
 						} else {
-							toast(R.string.note_clear_notifications_fail);
+							toastBackendError(code, R.string.note_clear_notifications_fail);
 						}
 					}
 				})
@@ -291,7 +291,7 @@ public class MessageListActivity extends BaseActivity implements View.OnClickLis
 								mLlNoData.setVisibility(View.VISIBLE);
 							}
 						} else {
-							toast(R.string.note_delete_notification_fail);
+							toastBackendError(code, R.string.note_delete_notification_fail);
 						}
 					}
 				})

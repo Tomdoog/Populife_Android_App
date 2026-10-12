@@ -259,7 +259,7 @@ public class LockManageBluetoothKeyActivity extends BaseActivity implements View
 							mLlNoData.setVisibility(View.VISIBLE);
 							toast(R.string.note_bluetooth_keys_clear_success);
 						} else {
-							toast(R.string.note_bluetooth_keys_clear_fail);
+							toastBackendError(code, R.string.note_bluetooth_keys_clear_fail);
 						}
 					}
 				})
@@ -328,7 +328,7 @@ public class LockManageBluetoothKeyActivity extends BaseActivity implements View
 							mLlNoData.setVisibility(View.VISIBLE);
 							toast(R.string.note_ekey_reset_success);
 						} else {
-							toast(R.string.note_ekey_reset_fail);
+							toastBackendError(code, R.string.note_ekey_reset_fail);
 						}
 					}
 				})

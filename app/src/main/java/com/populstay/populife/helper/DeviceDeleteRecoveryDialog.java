@@ -14,6 +14,7 @@ import android.widget.Toast;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.populstay.populife.R;
+import com.populstay.populife.net.BackendError;
 import com.populstay.populife.common.Urls;
 import com.populstay.populife.eventbus.Event;
 import com.populstay.populife.net.RestClient;
@@ -273,19 +274,19 @@ public class DeviceDeleteRecoveryDialog {
 					@Override
 					public void onSuccess(String response) {
 						boolean ok = false;
-						String msg = null;
+						int errorRes = R.string.unsync_fail_business;
 						try {
 							JSONObject result = JSON.parseObject(response);
 							Integer code = result.getInteger("code");
 							ok = code != null && code == 200;
-							msg = result.getString("msg");
+							if (code != null) errorRes = BackendError.messageRes(code, errorRes, BackendError.Credential.UNKNOWN);
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
 						if (ok) {
 							requestAccountRemove(activity, userId, lockId, onRemoved);
 						} else {
-							Toast.makeText(activity, StringUtil.isBlank(msg) ? activity.getString(R.string.unsync_fail_business) : msg, Toast.LENGTH_SHORT).show();
+							Toast.makeText(activity, errorRes, Toast.LENGTH_SHORT).show();
 						}
 					}
 				})
@@ -317,9 +318,11 @@ public class DeviceDeleteRecoveryDialog {
 					public void onSuccess(String response) {
 						PeachLogger.d(TAG + " del/v2 " + response);
 						boolean ok = false;
+                        int errorRes = R.string.unsync_fail_business;
 						try {
 							JSONObject result = JSON.parseObject(response);
 							Integer code = result.getInteger("code");
+                            if (code != null) errorRes = BackendError.messageRes(code, errorRes, BackendError.Credential.UNKNOWN);
 							Boolean success = result.getBoolean("success");
 							ok = code != null && code == 200 && Boolean.TRUE.equals(success);
 						} catch (Exception e) {
@@ -338,7 +341,7 @@ public class DeviceDeleteRecoveryDialog {
 							}
 						} else {
 							// 保留记录,下次可重试
-							Toast.makeText(activity, R.string.unsync_fail_business, Toast.LENGTH_SHORT).show();
+							Toast.makeText(activity, errorRes, Toast.LENGTH_SHORT).show();
 						}
 					}
 				})

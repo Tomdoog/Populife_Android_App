@@ -29,6 +29,7 @@ import androidx.core.content.ContextCompat;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.populstay.populife.R;
+import com.populstay.populife.net.BackendError;
 import com.populstay.populife.activity.LoginVerifyActivity;
 import com.populstay.populife.activity.SignActivity;
 import com.populstay.populife.activity.SplashActivity;
@@ -288,6 +289,15 @@ public class BaseActivity extends AppCompatActivity{
 	public void toastFail() {
 		toast(R.string.operation_fail);
 	}
+
+    protected void toastBackendError(int code, int fallbackRes) {
+        toastBackendError(code, fallbackRes, BackendError.Credential.UNKNOWN);
+    }
+
+    protected void toastBackendError(int code, int fallbackRes,
+            BackendError.Credential credential) {
+        toast(BackendError.messageRes(code, fallbackRes, credential));
+    }
 
 	/**
 	 * 是否为 Android12 系统

@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 
 import com.orhanobut.logger.Logger;
 import com.populstay.populife.R;
+import com.populstay.populife.net.BackendError;
 import com.populstay.populife.app.MyApplication;
 import com.populstay.populife.eventbus.Event;
 import com.populstay.populife.permission.PermissionListener;
@@ -123,6 +124,15 @@ public abstract class BaseFragment extends Fragment {
 	public void toastFail() {
 		toast(R.string.operation_fail);
 	}
+
+    protected void toastBackendError(int code, int fallbackRes) {
+        toastBackendError(code, fallbackRes, BackendError.Credential.UNKNOWN);
+    }
+
+    protected void toastBackendError(int code, int fallbackRes,
+            BackendError.Credential credential) {
+        toast(BackendError.messageRes(code, fallbackRes, credential));
+    }
 
 	/**
 	 * 是否为 Android12 系统

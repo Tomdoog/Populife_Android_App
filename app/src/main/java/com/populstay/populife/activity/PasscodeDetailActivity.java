@@ -1038,7 +1038,7 @@ public class PasscodeDetailActivity extends BaseActivity implements View.OnClick
 							refreshUI();
 							toast(R.string.operation_success);
 						} else {
-							toast(R.string.operation_fail);
+							toastBackendError(code, R.string.operation_fail);
 						}
 					}
 				})
@@ -1068,7 +1068,7 @@ public class PasscodeDetailActivity extends BaseActivity implements View.OnClick
 							EventBus.getDefault().post(new Event(Event.EventType.MODIFY_LOCK_PASSCODE_NAME, passcodeAlias));
 							refreshUI();
 						} else {
-							toast(R.string.note_modify_name_fail);
+							toastBackendError(code, R.string.note_modify_name_fail);
 						}
 					}
 				})
@@ -1121,7 +1121,7 @@ public class PasscodeDetailActivity extends BaseActivity implements View.OnClick
 							EventBus.getDefault().post(new Event(Event.EventType.MODIFY_LOCK_PASSCODE_NAME, alias));
 							refreshUI();
 						} else {
-							toast(R.string.note_modify_name_fail);
+							toastBackendError(code, R.string.note_modify_name_fail);
 						}
 					}
 				})
@@ -1180,7 +1180,7 @@ public class PasscodeDetailActivity extends BaseActivity implements View.OnClick
 							EventBus.getDefault().post(new Event(Event.EventType.MODIFY_LOCK_PASSCODE_NAME, alias));
 							refreshUI();
 						} else {
-							toast(mModifyPasscodeType == 1 ? R.string.note_modify_name_fail : R.string.note_modify_remark_fail);
+							toastBackendError(code, mModifyPasscodeType == 1 ? R.string.note_modify_name_fail : R.string.note_modify_remark_fail);
 						}
 					}
 				})

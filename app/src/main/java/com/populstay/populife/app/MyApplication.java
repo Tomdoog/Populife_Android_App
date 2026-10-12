@@ -15,6 +15,7 @@ import android.util.Log;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.bigkoo.pickerview.view.WheelTime;
 import com.orhanobut.logger.Logger;
 import com.populock.manhattan.sdk.BleDevice;
 import com.populock.manhattan.sdk.api.PPLock;
@@ -22,6 +23,7 @@ import com.populock.manhattan.sdk.callback.PPLockCallback;
 import com.populock.manhattan.sdk.constant.LockOperation;
 import com.populock.manhattan.sdk.entity.LockError;
 import com.populstay.populife.base.BaseApplication;
+import com.populstay.populife.util.date.TimePickerDateFormat;
 import com.populstay.populife.constant.BleConstant;
 import com.populstay.populife.db.PopulifeDBUtil;
 import com.populstay.populife.entity.Key;
@@ -611,6 +613,7 @@ public class MyApplication extends BaseApplication {
 	public void onCreate() {
 		super.onCreate();
 		MultiDex.install(this);
+		WheelTime.dateFormat = new TimePickerDateFormat();
 		init();
 		initBleLock();
 		registerNetworkCallback();

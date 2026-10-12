@@ -1142,4 +1142,15 @@
     <string name="delete_dlg_remove">Remove</string>
     <string name="delete_dlg_later">Later</string>
     <string name="delete_removed_success">Lock removed successfully</string>
+    <string name="backend_error_authorization_expired">Your authorization is no longer valid. Sign in again. If access is still unavailable, contact the device administrator.</string>
+    <string name="backend_error_admin_required">Admin permission is required. Only the device administrator can complete this action.</string>
+    <string name="backend_error_gateway_not_connected">The device is not connected to a gateway. Make sure the gateway is online and can connect to the device, then try again.</string>
+    <string name="backend_error_gateway_unavailable">The gateway is temporarily unavailable. Make sure it is online, then try again shortly.</string>
+    <string name="backend_error_remote_unlock_unavailable">Remote unlock is currently unavailable. Check the Remote Unlock setting over Bluetooth while near the device. If it is already on, contact customer support.</string>
+    <string name="backend_error_passcode_full">Passcode storage is full. Delete an unused passcode, then try again.</string>
+    <string name="backend_error_fingerprint_full">Fingerprint storage is full. Delete an unused fingerprint, then try again.</string>
+    <string name="backend_error_card_full">Card storage is full. Delete an unused card, then try again.</string>
+    <string name="backend_error_service">A service error occurred. Try again later. If the issue continues, contact customer support.</string>
+    <string name="backend_error_period_deleted">A random passcode for this time period was previously generated and deleted and cannot be generated again. Choose another time period starting on the hour.</string>
+    <string name="backend_error_generic">Unable to complete the action. Try again shortly.</string>
 </resources>

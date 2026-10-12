@@ -194,7 +194,7 @@ public class LockTransferConfirmActivity extends BaseActivity {
                         } else if (code == 920) {
                             toast(R.string.setting_transfer_request_920);
                         } else {
-                            toast(R.string.operation_fail);
+                            toastBackendError(code, R.string.operation_fail);
                         }
                     }
                 }).failure(new IFailure() {

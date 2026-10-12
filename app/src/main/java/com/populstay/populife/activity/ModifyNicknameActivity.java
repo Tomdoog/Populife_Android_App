@@ -122,7 +122,7 @@ public class ModifyNicknameActivity extends BaseActivity {
 							setResult(RESULT_OK, intent);
 							finish();
 						} else {
-							toast(R.string.note_modify_nickname_fail);
+							toastBackendError(code, R.string.note_modify_nickname_fail);
 						}
 					}
 				})

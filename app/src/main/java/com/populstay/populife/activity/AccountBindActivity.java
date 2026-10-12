@@ -241,7 +241,7 @@ public class AccountBindActivity extends BaseActivity
 
 							default:
 								resetGetCodeView();
-								toast(R.string.note_get_verification_code_fail);
+								toastBackendError(code, R.string.note_get_verification_code_fail);
 								break;
 						}
 					}
@@ -316,7 +316,7 @@ public class AccountBindActivity extends BaseActivity
 								break;
 
 							default:
-								toast(getString(R.string.note_account_bind_fail));
+								toastBackendError(code, R.string.note_account_bind_fail);
 								break;
 						}
 

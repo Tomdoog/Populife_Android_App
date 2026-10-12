@@ -862,7 +862,7 @@ public class KeyPwdListFragment extends BaseFragment {
 							toast(R.string.ekey_delete_success);
 							refreshData();
 						} else {
-							toast(R.string.ekey_delete_fail);
+							toastBackendError(code, R.string.ekey_delete_fail);
 						}
 					}
 				})

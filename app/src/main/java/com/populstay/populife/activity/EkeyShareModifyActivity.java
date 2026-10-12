@@ -310,7 +310,7 @@ public class EkeyShareModifyActivity extends BaseActivity implements View.OnClic
 								break;
 
 							default:
-								toast(R.string.send_ekey_fail);
+								toastBackendError(code, R.string.send_ekey_fail);
 								break;
 						}
 					}

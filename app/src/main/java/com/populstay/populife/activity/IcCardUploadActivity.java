@@ -107,7 +107,7 @@ public class IcCardUploadActivity extends BaseActivity {
 						if (code == 200) {
 							toast(R.string.operation_success);
 						} else {
-							toast(R.string.operation_fail);
+							toastBackendError(code, R.string.operation_fail);
 						}
 					}
 				})

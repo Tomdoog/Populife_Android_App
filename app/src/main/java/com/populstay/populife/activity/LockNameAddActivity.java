@@ -124,7 +124,7 @@ public class LockNameAddActivity extends BaseActivity implements View.OnClickLis
 							toast(R.string.note_lock_init_success);
 							mIvUpload.setVisibility(View.INVISIBLE);
 						} else {
-							toast(R.string.note_lock_init_fail);
+							toastBackendError(code, R.string.note_lock_init_fail);
 							mIvUpload.setVisibility(View.VISIBLE);
 						}
 					}
@@ -244,7 +244,7 @@ public class LockNameAddActivity extends BaseActivity implements View.OnClickLis
 							mTvBattery.setTextColor(txtColor);
 							mLlSuccessfully.setVisibility(View.VISIBLE);
 						} else {
-							toast(R.string.note_lock_name_add_fail);
+							toastBackendError(code, R.string.note_lock_name_add_fail);
 						}
 					}
 				})
@@ -277,7 +277,7 @@ public class LockNameAddActivity extends BaseActivity implements View.OnClickLis
 						if (code == 200) {
 							goToNewActivity(MainActivity.class);
 						} else {
-							toast(R.string.note_lock_name_add_fail);
+							toastBackendError(code, R.string.note_lock_name_add_fail);
 						}
 					}
 				})

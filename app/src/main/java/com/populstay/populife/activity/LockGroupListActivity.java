@@ -199,7 +199,7 @@ public class LockGroupListActivity extends BaseActivity implements View.OnClickL
 							mGroupList.remove(position);
 							mAdapter.notifyDataSetChanged();
 						} else {
-							toast(R.string.note_delete_group_fail);
+							toastBackendError(code, R.string.note_delete_group_fail);
 						}
 					}
 				})
