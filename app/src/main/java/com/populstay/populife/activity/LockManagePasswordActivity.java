@@ -491,7 +491,7 @@ public class LockManagePasswordActivity extends BaseActivity implements View.OnC
 							mIvSync.setVisibility(View.GONE);
 							toast(R.string.note_passcode_reset_success);
 						} else {
-							toastBackendError(code, R.string.note_passcode_reset_fail);
+							toastBackendError(result, R.string.note_passcode_reset_fail);
 						}
 					}
 				})

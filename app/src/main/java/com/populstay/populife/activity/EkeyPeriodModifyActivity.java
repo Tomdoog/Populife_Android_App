@@ -260,7 +260,7 @@ public class EkeyPeriodModifyActivity extends BaseActivity implements View.OnCli
 							toast(R.string.note_modify_period_success);
 							finish();
 						} else {
-							toastBackendError(code, R.string.note_modify_period_fail);
+							toastBackendError(result, R.string.note_modify_period_fail);
 						}
 					}
 				})

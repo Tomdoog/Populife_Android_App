@@ -216,7 +216,7 @@ public class ModifyAdminPasscodeActivity extends BaseActivity {
 							setResult(RESULT_OK, intent);
 							finish();
 						} else {
-							toastBackendError(code, R.string.note_modify_admin_passcode_fail);
+							toastBackendError(result, R.string.note_modify_admin_passcode_fail);
 						}
 					}
 				})

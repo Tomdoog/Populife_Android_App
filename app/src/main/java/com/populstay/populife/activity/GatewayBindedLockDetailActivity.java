@@ -220,7 +220,7 @@ public class GatewayBindedLockDetailActivity extends BaseActivity implements Vie
 							toast(R.string.note_lock_not_found);
 						} else {
 							mTvTimeTitle.setText(R.string.calibrate_lock_time_fail);
-							toastBackendError(code, R.string.operation_fail);
+							toastBackendError(result, R.string.operation_fail);
 						}
 					}
 				})
@@ -262,7 +262,7 @@ public class GatewayBindedLockDetailActivity extends BaseActivity implements Vie
 						} else if (code == 951) {
 							toast(R.string.note_gateway_donot_exists);
 						} else {
-							toastBackendError(code, R.string.operation_fail);
+							toastBackendError(result, R.string.operation_fail);
 						}
 					}
 				})
@@ -292,7 +292,7 @@ public class GatewayBindedLockDetailActivity extends BaseActivity implements Vie
 						} else if (code == 951) {
 							toast(R.string.note_gateway_donot_exists);
 						} else {
-							toastBackendError(code, R.string.operation_fail);
+							toastBackendError(result, R.string.operation_fail);
 						}
 					}
 				})
@@ -332,7 +332,7 @@ public class GatewayBindedLockDetailActivity extends BaseActivity implements Vie
 						} else {
 							mTvLockStatus.setText(R.string.unknown);
 							if (isNeedHint){
-								toastBackendError(code, R.string.operation_fail);
+								toastBackendError(result, R.string.operation_fail);
 							}
 						}
 						readLockTime();
@@ -370,7 +370,7 @@ public class GatewayBindedLockDetailActivity extends BaseActivity implements Vie
 						if (code == 200) {
 							toast(R.string.operation_success);
 						} else {
-							toastBackendError(code, R.string.operation_fail);
+							toastBackendError(result, R.string.operation_fail);
 						}
 					}
 				})
@@ -397,7 +397,7 @@ public class GatewayBindedLockDetailActivity extends BaseActivity implements Vie
 						if (code == 200) {
 							toast(R.string.operation_success);
 						} else {
-							toastBackendError(code, R.string.operation_fail);
+							toastBackendError(result, R.string.operation_fail);
 						}
 					}
 				})

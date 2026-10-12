@@ -279,7 +279,7 @@ public class DeviceDeleteRecoveryDialog {
 							JSONObject result = JSON.parseObject(response);
 							Integer code = result.getInteger("code");
 							ok = code != null && code == 200;
-							if (code != null) errorRes = BackendError.messageRes(code, errorRes, BackendError.Credential.UNKNOWN);
+							if (code != null) errorRes = BackendError.messageRes(result, errorRes, BackendError.Credential.UNKNOWN);
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
@@ -322,7 +322,7 @@ public class DeviceDeleteRecoveryDialog {
 						try {
 							JSONObject result = JSON.parseObject(response);
 							Integer code = result.getInteger("code");
-                            if (code != null) errorRes = BackendError.messageRes(code, errorRes, BackendError.Credential.UNKNOWN);
+                            if (code != null) errorRes = BackendError.messageRes(result, errorRes, BackendError.Credential.UNKNOWN);
 							Boolean success = result.getBoolean("success");
 							ok = code != null && code == 200 && Boolean.TRUE.equals(success);
 						} catch (Exception e) {

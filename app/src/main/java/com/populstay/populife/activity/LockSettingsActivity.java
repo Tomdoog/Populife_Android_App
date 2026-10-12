@@ -596,7 +596,7 @@ public class LockSettingsActivity extends BaseActivity implements View.OnClickLi
 							tv_lock_settings_space.setText(currentHome.getName());
 							mKey.setHome(currentHome);
 						} else {
-							toastBackendError(code, R.string.change_space_fail);
+							toastBackendError(result, R.string.change_space_fail);
 						}
 					}
 				})
@@ -807,7 +807,7 @@ public class LockSettingsActivity extends BaseActivity implements View.OnClickLi
 							}
 						} else {
 							if (isClickReadTime) {
-								toastBackendError(code, R.string.operation_fail);
+								toastBackendError(result, R.string.operation_fail);
 							} else {
 								tv_read_lock_time.setText(R.string.unknown);
 							}
@@ -985,7 +985,7 @@ public class LockSettingsActivity extends BaseActivity implements View.OnClickLi
 //							}
 							goToNewActivity(MainActivity.class);
 						} else {
-							toastBackendError(code, R.string.ekey_delete_fail);
+							toastBackendError(result, R.string.ekey_delete_fail);
 						}
 					}
 				})

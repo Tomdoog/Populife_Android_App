@@ -518,7 +518,7 @@ public class PasscodePeriodModifyActivity extends BaseActivity implements View.O
 						if (code == 200) {
 							setResult();
 						} else {
-							toastBackendError(code, R.string.note_modify_period_fail);
+							toastBackendError(result, R.string.note_modify_period_fail);
 						}
 					}
 				})
@@ -576,7 +576,7 @@ public class PasscodePeriodModifyActivity extends BaseActivity implements View.O
 							setResult();
 						} else {
 							stopLoading();
-							toastBackendError(code, R.string.note_modify_period_fail);
+							toastBackendError(result, R.string.note_modify_period_fail);
 						}
 					}
 				})
@@ -625,7 +625,7 @@ public class PasscodePeriodModifyActivity extends BaseActivity implements View.O
 							setResult();
 						} else {
 							stopLoading();
-							toastBackendError(code, R.string.note_modify_period_fail);
+							toastBackendError(result, R.string.note_modify_period_fail);
 						}
 					}
 				})

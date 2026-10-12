@@ -1152,4 +1152,5 @@
     <string name="backend_error_service">服务出现异常。请稍后重试。如果问题持续，请联系客服。</string>
     <string name="backend_error_period_deleted">该时间段的随机密码已生成并删除，无法再次生成。请选择其他整点时间段。</string>
     <string name="backend_error_generic">暂时无法完成操作。请稍后重试。</string>
+    <string name="backend_error_invalid_parameters">参数不正确。请检查填写内容后重试。</string>
 </resources>

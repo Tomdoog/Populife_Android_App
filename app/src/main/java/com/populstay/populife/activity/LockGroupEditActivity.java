@@ -119,7 +119,7 @@ public class LockGroupEditActivity extends BaseActivity {
 						} else if (code == 910) {
 							toast(R.string.note_name_already_exists);
 						} else {
-							toastBackendError(code, R.string.note_add_group_fail);
+							toastBackendError(result, R.string.note_add_group_fail);
 						}
 					}
 				})
@@ -159,7 +159,7 @@ public class LockGroupEditActivity extends BaseActivity {
 						} else if (code == 910) {
 							toast(R.string.note_name_already_exists);
 						} else {
-							toastBackendError(code, R.string.note_modify_group_fail);
+							toastBackendError(result, R.string.note_modify_group_fail);
 						}
 					}
 				})

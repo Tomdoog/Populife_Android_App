@@ -154,7 +154,7 @@ public class ModifyPinCodeActivity extends BaseActivity {
 						} else if (code == 910) {
 							toast(R.string.note_current_pwd_incorrect);
 						} else {
-							toastBackendError(code, R.string.note_modify_pwd_fail);
+							toastBackendError(result, R.string.note_modify_pwd_fail);
 						}
 					}
 				})
@@ -250,7 +250,7 @@ public class ModifyPinCodeActivity extends BaseActivity {
 							mPasscode.setKeyboardPwd(newPwd);
 							toast(R.string.operation_success);
 						} else {
-							toastBackendError(code, R.string.operation_fail);
+							toastBackendError(result, R.string.operation_fail);
 						}
 					}
 				})

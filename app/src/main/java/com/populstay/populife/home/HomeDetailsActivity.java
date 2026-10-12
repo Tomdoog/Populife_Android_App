@@ -151,7 +151,7 @@ public class HomeDetailsActivity extends BaseActivity implements View.OnClickLis
                         if (code == 500){
                             toast(R.string.delete_space_hint3);
                         } else if (code != 200) {
-                            toastBackendError(code, R.string.note_delete_group_fail);
+                            toastBackendError(result, R.string.note_delete_group_fail);
                         } else {
                             EventBus.getDefault().post(new Event(Event.EventType.DELETE_SPACE));
                             finish();

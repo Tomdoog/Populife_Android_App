@@ -103,7 +103,7 @@ public class DeleteAccountActivity extends BaseActivity implements View.OnClickL
 								toast(R.string.note_verifiction_code_invalid);
 							}
 						} else {
-							toastBackendError(code, R.string.operation_fail);
+							toastBackendError(result, R.string.operation_fail);
 						}
 					}
 				})
@@ -139,7 +139,7 @@ public class DeleteAccountActivity extends BaseActivity implements View.OnClickL
 						} else if (code==955) {
 							toast(R.string.note_get_verification_code_time_limit);
 						} else {
-							toastBackendError(code, R.string.note_get_verification_code_fail);
+							toastBackendError(result, R.string.note_get_verification_code_fail);
 						}
 					}
 				})
@@ -199,7 +199,7 @@ public class DeleteAccountActivity extends BaseActivity implements View.OnClickL
 								}
 							});
 						} else {
-							toastBackendError(code, R.string.note_delete_account_fail);
+							toastBackendError(result, R.string.note_delete_account_fail);
 						}
 					}
 				})

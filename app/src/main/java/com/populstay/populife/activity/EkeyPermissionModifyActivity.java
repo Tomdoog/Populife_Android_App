@@ -125,7 +125,7 @@ public class EkeyPermissionModifyActivity extends BaseActivity {
                             if (data.containsKey("allowCalibrateTime"))
                                 binding.vppPermission.stv4.setChecked(data.getBoolean("allowCalibrateTime"));
                         } else {
-                            toastBackendError(code, R.string.backend_error_generic);
+                            toastBackendError(result, R.string.backend_error_generic);
                         }
                     }
                 })
@@ -168,7 +168,7 @@ public class EkeyPermissionModifyActivity extends BaseActivity {
                             returnData();
                             finish();
                         } else {
-                            toastBackendError(code, R.string.backend_error_generic);
+                            toastBackendError(result, R.string.backend_error_generic);
                         }
                     }
                 })

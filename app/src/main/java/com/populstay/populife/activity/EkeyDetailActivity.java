@@ -374,7 +374,7 @@ public class EkeyDetailActivity extends BaseActivity implements View.OnClickList
 							mName = ekeyAlias;
 							refreshUI();
 						} else {
-							toastBackendError(code, R.string.note_modify_name_fail);
+							toastBackendError(result, R.string.note_modify_name_fail);
 						}
 					}
 				})
@@ -519,7 +519,7 @@ public class EkeyDetailActivity extends BaseActivity implements View.OnClickList
 						} else if (code == 951) {
 							toast(R.string.note_pending_ekey_cannot_freeze);
 						} else {
-							toastBackendError(code, R.string.ekey_freeze_fail);
+							toastBackendError(result, R.string.ekey_freeze_fail);
 						}
 					}
 				})
@@ -556,7 +556,7 @@ public class EkeyDetailActivity extends BaseActivity implements View.OnClickList
 							EventBus.getDefault().post(new Event(Event.EventType.RESTORE_KEY));
 							finish();
 						} else {
-							toastBackendError(code, R.string.ekey_un_freeze_fail);
+							toastBackendError(result, R.string.ekey_un_freeze_fail);
 						}
 					}
 				})
@@ -590,7 +590,7 @@ public class EkeyDetailActivity extends BaseActivity implements View.OnClickList
 							toast(R.string.ekey_authorize_success);
 							finish();
 						} else {
-							toastBackendError(code, R.string.ekey_authorize_fail);
+							toastBackendError(result, R.string.ekey_authorize_fail);
 						}
 					}
 				})
@@ -624,7 +624,7 @@ public class EkeyDetailActivity extends BaseActivity implements View.OnClickList
 							toast(R.string.ekey_un_authorize_success);
 							finish();
 						} else {
-							toastBackendError(code, R.string.ekey_un_authorize_fail);
+							toastBackendError(result, R.string.ekey_un_authorize_fail);
 						}
 					}
 				})
@@ -671,7 +671,7 @@ public class EkeyDetailActivity extends BaseActivity implements View.OnClickList
 							toast(R.string.ekey_delete_success);
 							finish();
 						} else {
-							toastBackendError(code, R.string.ekey_delete_fail);
+							toastBackendError(result, R.string.ekey_delete_fail);
 						}
 					}
 				})

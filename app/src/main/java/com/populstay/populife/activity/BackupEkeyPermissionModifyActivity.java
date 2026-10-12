@@ -116,7 +116,7 @@ public class BackupEkeyPermissionModifyActivity extends BaseActivity implements 
                             returnData();
                             finish();
                         } else {
-                            toastBackendError(code, R.string.ekey_authorize_fail);
+                            toastBackendError(result, R.string.ekey_authorize_fail);
                         }
                     }
                 })
@@ -152,7 +152,7 @@ public class BackupEkeyPermissionModifyActivity extends BaseActivity implements 
                             returnData();
                             finish();
                         } else {
-                            toastBackendError(code, R.string.ekey_un_authorize_fail);
+                            toastBackendError(result, R.string.ekey_un_authorize_fail);
                         }
                     }
                 })

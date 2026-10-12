@@ -294,7 +294,7 @@ public class LockManageIcCardActivity extends BaseActivity implements View.OnCli
 							}
 							requestIcCardList();
 						} else {
-							toastBackendError(code, R.string.operation_fail);
+							toastBackendError(result, R.string.operation_fail);
 						}
 					}
 				})
@@ -393,7 +393,7 @@ public class LockManageIcCardActivity extends BaseActivity implements View.OnCli
 							mAdapter.notifyDataSetChanged();
 							mLlNoData.setVisibility(View.VISIBLE);
 						} else {
-							toastBackendError(code, R.string.operation_fail);
+							toastBackendError(result, R.string.operation_fail);
 						}
 					}
 				})

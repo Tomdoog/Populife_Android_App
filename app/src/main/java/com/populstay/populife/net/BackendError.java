@@ -1,8 +1,10 @@
 package com.populstay.populife.net;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.populstay.populife.R;
 
-/** 仅映射后端业务码；HTTP 状态码和蓝牙 SDK 错误不能传入此处。 */
+/** 仅在后端 code=960 时映射 msg JSON 中的 errcode，保留外层业务码的原有处理。 */
 public final class BackendError {
     private BackendError() {}
 
@@ -19,6 +21,7 @@ public final class BackendError {
         CARD_STORAGE_FULL(R.string.backend_error_card_full),
         SERVICE_ERROR(R.string.backend_error_service),
         RANDOM_PASSCODE_PERIOD_DELETED(R.string.backend_error_period_deleted),
+        INVALID_PARAMETERS(R.string.backend_error_invalid_parameters),
         GENERIC(R.string.backend_error_generic);
 
         public final int messageRes;
@@ -28,8 +31,24 @@ public final class BackendError {
         }
     }
 
-    public static Reason reasonFor(int code, Credential credential) {
+    public static Reason reasonFor(JSONObject response, Credential credential) {
+        if (response == null || !Integer.valueOf(960).equals(response.get("code"))) {
+            return null;
+        }
+        Object msg = response.get("msg");
+        if (!(msg instanceof String)) return null;
+        try {
+            JSONObject error = JSON.parseObject((String) msg);
+            if (error == null || !(error.get("errcode") instanceof Integer)) return null;
+            return reasonForErrorCode(error.getInteger("errcode"), credential);
+        } catch (RuntimeException malformedMessage) {
+            return null;
+        }
+    }
+
+    private static Reason reasonForErrorCode(int code, Credential credential) {
         switch (code) {
+            case -3: return Reason.INVALID_PARAMETERS;
             case 10004: return Reason.AUTHORIZATION_EXPIRED;
             case 20002: return Reason.ADMIN_REQUIRED;
             case -2012: return Reason.DEVICE_NOT_CONNECTED_TO_GATEWAY;
@@ -47,8 +66,8 @@ public final class BackendError {
         }
     }
 
-    public static int messageRes(int code, int fallbackRes, Credential credential) {
-        Reason reason = reasonFor(code, credential);
+    public static int messageRes(JSONObject response, int fallbackRes, Credential credential) {
+        Reason reason = reasonFor(response, credential);
         // 未纳入本次映射的业务码继续使用页面已有提示。
         return reason == null ? fallbackRes : reason.messageRes;
     }

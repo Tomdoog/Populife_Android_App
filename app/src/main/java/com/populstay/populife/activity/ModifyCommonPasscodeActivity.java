@@ -298,7 +298,7 @@ public class ModifyCommonPasscodeActivity extends BaseActivity {
 							EventBus.getDefault().post(new Event(Event.EventType.MODIFY_LOCK_PASSCODE, newPwd));
 							finish();
 						} else {
-							toastBackendError(code, R.string.operation_fail);
+							toastBackendError(result, R.string.operation_fail);
 						}
 					}
 				}).failure(new IFailure() {
@@ -396,7 +396,7 @@ public class ModifyCommonPasscodeActivity extends BaseActivity {
 							setResult(RESULT_OK, intent);*/
 							finish();
 						} else {
-							toastBackendError(code, R.string.note_modify_admin_passcode_fail);
+							toastBackendError(result, R.string.note_modify_admin_passcode_fail);
 						}
 					}
 				})

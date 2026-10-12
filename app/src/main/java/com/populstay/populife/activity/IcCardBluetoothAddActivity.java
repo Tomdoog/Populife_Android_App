@@ -730,7 +730,7 @@ public class IcCardBluetoothAddActivity extends BaseActivity {
 								}
 							}, 1000);
 						} else {
-							addFail(BackendError.messageRes(code,
+							addFail(BackendError.messageRes(result,
                                     HomeDeviceInfo.isPadlock(mLockType) ? R.string.padlock_fingerprint_failed : R.string.operation_fail,
                                     BackendError.Credential.FINGERPRINT));
 						}
@@ -784,7 +784,7 @@ public class IcCardBluetoothAddActivity extends BaseActivity {
 								}
 							}, 1000);
 						} else {
-							toastBackendError(code, R.string.adding_ic_card_operation_fail, BackendError.Credential.CARD);
+							toastBackendError(result, R.string.adding_ic_card_operation_fail, BackendError.Credential.CARD);
 							finish();
 						}
 					}

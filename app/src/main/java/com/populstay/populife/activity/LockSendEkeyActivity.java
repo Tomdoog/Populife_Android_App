@@ -540,7 +540,7 @@ public class LockSendEkeyActivity extends BaseActivity implements View.OnClickLi
 								break;
 
 							default:
-								toastBackendError(code, R.string.send_ekey_fail);
+								toastBackendError(result, R.string.send_ekey_fail);
 								break;
 						}
 					}

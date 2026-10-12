@@ -465,7 +465,7 @@ public class GatewayAddActivity extends BaseActivity implements TextWatcher {
 							toast(R.string.note_gateway_donot_exists);
 							refreshBtnState();
 						} else {
-							toastBackendError(code, R.string.note_gateway_init_fail);
+							toastBackendError(result, R.string.note_gateway_init_fail);
 							refreshBtnState();
 						}
 					}
@@ -556,7 +556,7 @@ public class GatewayAddActivity extends BaseActivity implements TextWatcher {
 							EventBus.getDefault().post(new Event(Event.EventType.ADD_DEVICE_SUCCESS));
 							AddDeviceSuccessActivity.actionStart(GatewayAddActivity.this, HomeDeviceInfo.IDeviceName.NAME_GATEWAY, device);
 						} else {
-							toastBackendError(code, R.string.note_gateway_init_fail);
+							toastBackendError(result, R.string.note_gateway_init_fail);
 							initFail();
 							refreshBtnState();
 						}
@@ -621,12 +621,12 @@ public class GatewayAddActivity extends BaseActivity implements TextWatcher {
 
 								addGateway(mSelectedDevice.getAddress(), deviceInfo, gatewayId);
 							} else {
-								toastBackendError(code, R.string.note_gateway_init_fail);
+								toastBackendError(result, R.string.note_gateway_init_fail);
 								refreshBtnState();
 								initFail();
 							}
 						} else {
-							toastBackendError(code, R.string.note_gateway_init_fail);
+							toastBackendError(result, R.string.note_gateway_init_fail);
 							initFail();
 							refreshBtnState();
 						}

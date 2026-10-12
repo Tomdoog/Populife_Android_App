@@ -289,7 +289,7 @@ public class GatewayListActivity extends BaseActivity implements AdapterView.OnI
 							mGatewayList.get(mSelectedItemIndex).setAlias(gatewayName);
 							mAdapter.notifyDataSetChanged();
 						} else {
-							toastBackendError(code, R.string.operation_fail);
+							toastBackendError(result, R.string.operation_fail);
 						}
 					}
 				})
@@ -326,7 +326,7 @@ public class GatewayListActivity extends BaseActivity implements AdapterView.OnI
 						} else if (code == 951) {
 							toast(R.string.note_gateway_donot_exists);
 						} else {
-							toastBackendError(code, R.string.operation_fail);
+							toastBackendError(result, R.string.operation_fail);
 						}
 					}
 				})

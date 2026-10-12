@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.orhanobut.logger.Logger;
+import com.alibaba.fastjson.JSONObject;
 import com.populstay.populife.R;
 import com.populstay.populife.net.BackendError;
 import com.populstay.populife.app.MyApplication;
@@ -125,13 +126,13 @@ public abstract class BaseFragment extends Fragment {
 		toast(R.string.operation_fail);
 	}
 
-    protected void toastBackendError(int code, int fallbackRes) {
-        toastBackendError(code, fallbackRes, BackendError.Credential.UNKNOWN);
+    protected void toastBackendError(JSONObject response, int fallbackRes) {
+        toastBackendError(response, fallbackRes, BackendError.Credential.UNKNOWN);
     }
 
-    protected void toastBackendError(int code, int fallbackRes,
+    protected void toastBackendError(JSONObject response, int fallbackRes,
             BackendError.Credential credential) {
-        toast(BackendError.messageRes(code, fallbackRes, credential));
+        toast(BackendError.messageRes(response, fallbackRes, credential));
     }
 
 	/**

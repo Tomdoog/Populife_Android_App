@@ -671,7 +671,7 @@ public class LockSendPasscodeFragment extends BaseFragment implements View.OnCli
 							//toast(R.string.note_password_exist);
 							showShareKeyDialog(keyboardPwd);
 						} else {
-							toastBackendError(code, R.string.note_passcode_customize_fail, BackendError.Credential.PASSCODE);
+							toastBackendError(result, R.string.note_passcode_customize_fail, BackendError.Credential.PASSCODE);
 						}
 					}
 				}).failure(new IFailure() {
@@ -800,7 +800,7 @@ public class LockSendPasscodeFragment extends BaseFragment implements View.OnCli
 							showShareKeyDialog(passcodeInfo.getString("keyboardPwd"));
 
 						} else {
-							toastBackendError(code, R.string.create_password_fail, BackendError.Credential.PASSCODE);
+							toastBackendError(result, R.string.create_password_fail, BackendError.Credential.PASSCODE);
 						}
 					}
 				})

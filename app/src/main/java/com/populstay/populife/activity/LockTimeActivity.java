@@ -391,7 +391,7 @@ public class LockTimeActivity extends BaseActivity {
 							toast(R.string.calibrate_time_success);
 							showLockTime();
 						} else {
-							toastBackendError(code, R.string.operation_fail);
+							toastBackendError(result, R.string.operation_fail);
 						}
 					}
 				})

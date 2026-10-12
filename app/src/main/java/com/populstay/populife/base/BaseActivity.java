@@ -290,13 +290,13 @@ public class BaseActivity extends AppCompatActivity{
 		toast(R.string.operation_fail);
 	}
 
-    protected void toastBackendError(int code, int fallbackRes) {
-        toastBackendError(code, fallbackRes, BackendError.Credential.UNKNOWN);
+    protected void toastBackendError(JSONObject response, int fallbackRes) {
+        toastBackendError(response, fallbackRes, BackendError.Credential.UNKNOWN);
     }
 
-    protected void toastBackendError(int code, int fallbackRes,
+    protected void toastBackendError(JSONObject response, int fallbackRes,
             BackendError.Credential credential) {
-        toast(BackendError.messageRes(code, fallbackRes, credential));
+        toast(BackendError.messageRes(response, fallbackRes, credential));
     }
 
 	/**

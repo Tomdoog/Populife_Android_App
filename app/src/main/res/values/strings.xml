@@ -1153,4 +1153,5 @@
     <string name="backend_error_service">A service error occurred. Try again later. If the issue continues, contact customer support.</string>
     <string name="backend_error_period_deleted">A random passcode for this time period was previously generated and deleted and cannot be generated again. Choose another time period starting on the hour.</string>
     <string name="backend_error_generic">Unable to complete the action. Try again shortly.</string>
+    <string name="backend_error_invalid_parameters">Invalid parameters. Check the information you entered, then try again.</string>
 </resources>

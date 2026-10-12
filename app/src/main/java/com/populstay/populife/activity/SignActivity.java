@@ -729,7 +729,7 @@ public class SignActivity extends BaseActivity implements View.OnClickListener, 
 
 								default:
 									resetVerifictionCodeView();
-									toastBackendError(code, R.string.note_get_verification_code_fail);
+									toastBackendError(result, R.string.note_get_verification_code_fail);
 									break;
 							}
 						}
@@ -785,7 +785,7 @@ public class SignActivity extends BaseActivity implements View.OnClickListener, 
                                     toast(Utils.get955CodeLimit(mContext, msg));
                                     break;
 								default:
-									toastBackendError(code, R.string.note_get_verification_code_fail);
+									toastBackendError(result, R.string.note_get_verification_code_fail);
 									break;
 							}
 						}
@@ -841,7 +841,7 @@ public class SignActivity extends BaseActivity implements View.OnClickListener, 
                                     toast(Utils.get955CodeLimit(mContext, msg));
                                     break;
 								default:
-									toastBackendError(code, R.string.note_get_verification_code_fail);
+									toastBackendError(result, R.string.note_get_verification_code_fail);
 									break;
 							}
 						}
@@ -922,7 +922,7 @@ public class SignActivity extends BaseActivity implements View.OnClickListener, 
 								break;
 
 							default:
-								toastBackendError(code, R.string.note_sign_in_fail);
+								toastBackendError(result, R.string.note_sign_in_fail);
 								break;
 						}
 					}
@@ -983,7 +983,7 @@ public class SignActivity extends BaseActivity implements View.OnClickListener, 
 								break;
 
 							default:
-								toastBackendError(code, R.string.note_sign_in_fail);
+								toastBackendError(result, R.string.note_sign_in_fail);
 								break;
 						}
 					}
@@ -1037,7 +1037,7 @@ public class SignActivity extends BaseActivity implements View.OnClickListener, 
 								break;
 
 							default:
-								toastBackendError(code, R.string.note_register_fail);
+								toastBackendError(result, R.string.note_register_fail);
 								break;
 						}
 					}
@@ -1091,7 +1091,7 @@ public class SignActivity extends BaseActivity implements View.OnClickListener, 
 						} else if (code == 954 || code == 953) {
 							toast(R.string.note_verifiction_code_invalid);
 						} else {
-							toastBackendError(code, R.string.note_reset_pwd_fail);
+							toastBackendError(result, R.string.note_reset_pwd_fail);
 						}
 					}
 				})

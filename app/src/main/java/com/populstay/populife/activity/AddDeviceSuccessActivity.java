@@ -282,7 +282,7 @@ public class AddDeviceSuccessActivity extends BaseActivity implements View.OnCli
 						int code = result.getInteger("code");
 						if (code == 200) {
 						} else {
-							toastBackendError(code, R.string.note_lock_name_add_fail);
+							toastBackendError(result, R.string.note_lock_name_add_fail);
 						}
 					}
 				})
@@ -351,7 +351,7 @@ public class AddDeviceSuccessActivity extends BaseActivity implements View.OnCli
 							LockDetailActivity.actionStart(AddDeviceSuccessActivity.this, String.valueOf(mKey.getLockId()), mHomeDevice.getName());
 							finish();
 						} else {
-							toastBackendError(code, R.string.note_lock_name_add_fail);
+							toastBackendError(result, R.string.note_lock_name_add_fail);
 						}
 					}
 				})
@@ -395,7 +395,7 @@ public class AddDeviceSuccessActivity extends BaseActivity implements View.OnCli
 						int code = result.getInteger("code");
 						if (code == 200) {
 						} else {
-							toastBackendError(code, R.string.note_lock_name_add_fail);
+							toastBackendError(result, R.string.note_lock_name_add_fail);
 						}
 					}
 				})
@@ -435,7 +435,7 @@ public class AddDeviceSuccessActivity extends BaseActivity implements View.OnCli
 							gateway.setName(mEtDeviceName.getTextStr());
 							GatewayBindedLockListActivity.actionStart(AddDeviceSuccessActivity.this, gateway);
 						} else {
-							toastBackendError(code, R.string.note_lock_name_add_fail);
+							toastBackendError(result, R.string.note_lock_name_add_fail);
 						}
 					}
 				})

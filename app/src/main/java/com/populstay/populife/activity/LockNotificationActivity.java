@@ -94,7 +94,7 @@ public class LockNotificationActivity extends BaseActivity {
                         if (code == 200) {
                             setOpen(Objects.equals(data, "true"));
                         } else {
-                            toastBackendError(code, R.string.backend_error_generic);
+                            toastBackendError(result, R.string.backend_error_generic);
                         }
                     }
                 })
@@ -126,7 +126,7 @@ public class LockNotificationActivity extends BaseActivity {
                         int code = result.getInteger("code");
                         if (code == 200) {
                         } else {
-                            toastBackendError(code, R.string.backend_error_generic);
+                            toastBackendError(result, R.string.backend_error_generic);
                         }
                     }
                 })
