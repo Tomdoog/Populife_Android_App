@@ -82,6 +82,10 @@ public class RestClient {
 	}
 
 	private void request(HttpMethod method) {
+		if (method == HttpMethod.GET || method == HttpMethod.POST
+				|| method == HttpMethod.PUT || method == HttpMethod.DELETE) {
+			ScienerApiVersion.addTo(URL, PARAMS);
+		}
 //		//判断网络连接状态
 //		if (NetworkUtil.isNetworkAvailable(BaseApplication.getApplication())) {
 			final RestService service = RestCreator.getRestService();
